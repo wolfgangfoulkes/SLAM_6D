@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<TrackingData>
+  <Sensors>
+    <Sensor Type="SLAMSensorSource">
+      <SensorID>SLAM</SensorID>
+      <Parameters>
+		<Initialization>
+			<BaseLineAngleThreshold>2</BaseLineAngleThreshold>
+	   	</Initialization>
+	    <MinNumberOfObservations>2</MinNumberOfObservations>
+		<SimilarityThreshold>0.7</SimilarityThreshold>
+      </Parameters>
+      <SensorCOS>
+        <SensorCosID>world</SensorCosID>
+        <Parameters>
+			<MinTriangulationAngle>2</MinTriangulationAngle>
+        </Parameters>
+      </SensorCOS>
+    </Sensor>
+  </Sensors>
+  <Connections>
+    <COS>
+      <Name>COS0</Name>
+      <Fuser Type="SmoothingFuser">
+        <Parameters>
+          <AlphaRotation>0.5</AlphaRotation>
+          <AlphaTranslation>0.8</AlphaTranslation>
+          <GammaRotation>0.5</GammaRotation>
+          <GammaTranslation>0.8</GammaTranslation>
+          <KeepPoseForNumberOfFrames>165</KeepPoseForNumberOfFrames>
+		  <ContinueLostTrackingWithOrientationSensor>true</ContinueLostTrackingWithOrientationSensor>
+		  <GravityAssistance>replaceZAxis</GravityAssistance>
+        </Parameters>
+      </Fuser>
+      <SensorSource>
+        <SensorID>SLAM</SensorID>
+        <SensorCosID>world</SensorCosID>
+      </SensorSource>
+    </COS>
+  </Connections>
+</TrackingData>
