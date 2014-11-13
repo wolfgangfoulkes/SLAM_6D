@@ -1,39 +1,45 @@
 
+rate = 1000;
+cx = 0;
+cy = 0;
+ox = 0;
+oy = 0;
 
 isReady = false;
 
-setXY = function(otx, oty, ctx, cty)
+setXY = function()
+{
+    var ct =
     {
-        var ct =
-        {
-            bottom: cty.toString() + "%",
-            left: ctx.toString() + "%"
-        }
-        
-        var ot =
-        {
-            bottom: oty.toString() + "%",
-            left: otx.toString() + "%"
-        }
-    
-        
-        $("#camera").css(ct);
-        $("#object").css(ot);
-        
-        var _cty = $("#camera").css("bottom");
-        var _ctx = $("#camera").css("left");
-        
-        var _oty = $("#object").css("bottom");
-        var _otx = $("#object").css("left");
-        
-        console.log("camera: " + ctx + ", " + cty);
-        console.log("object: " + otx + ", " + oty);
-
+        bottom: (cy.toString() + "%"),
+        left: (cx.toString() + "%")
     };
+    
+    var ot =
+    {
+        bottom: (oy.toString() + "%"),
+        left: (ox.toString() + "%")
+    };
+
+    
+    $("#camera").css(ct);
+    $("#object").css(ot);
+    
+    
+    var _cy = $("#camera").css("bottom");
+    var _cx = $("#camera").css("left");
+    
+    var _oy = $("#object").css("bottom");
+    var _ox = $("#object").css("left");
+    
+    console.log("camera: " + _cx + ", " + _cy);
+    console.log("object: " + _ox + ", " + _oy);
+
+};
 
 
 jQuery(document).ready(function(){
 //    $("#xy-outer").css("background-color", "blue");
     isReady = true;
-    
+    setInterval(setXY, rate);
     });

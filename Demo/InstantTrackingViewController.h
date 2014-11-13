@@ -34,6 +34,8 @@
 - (IBAction)onResetTrackingBtnPress:(id)sender;
 - (IBAction)onChangeModelVisibilityBtnPress:(id)sender;
 
+- (void)initPose;
+
 - (void)loadDebugView;
 - (void)updateDebugView: (metaio::Vector3d)tc  object: (metaio::Vector3d)to;
 

@@ -333,16 +333,10 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     {
         return;
     }
-    JSValue *setXY = ctx[@"setXY"];
-    NSArray *args = @[
-        [NSNumber numberWithFloat: tc.x/100.],
-        [NSNumber numberWithFloat: tc.y/100.],
-        [NSNumber numberWithFloat: to.x/100.],
-        [NSNumber numberWithFloat: to.y/100.]
-        ];
-    
-        [setXY callWithArguments:args];
-    
+    ctx[@"cx"] = @(tc.x/10.); //shorthand for NSNumber
+    ctx[@"cy"] = @(tc.y/10.);
+    ctx[@"ox"] = @(to.x/10.);
+    ctx[@"oy"] = @(to.y/10.);
     
     ctx[@"console"][@"log"] = ^(JSValue *msg)
     {
