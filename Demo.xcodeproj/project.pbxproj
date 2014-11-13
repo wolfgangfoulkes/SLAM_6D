@@ -13,8 +13,8 @@
 		7CCB429D19582BAE007355FA /* InstantTrackingViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7CCB429B19582BAE007355FA /* InstantTrackingViewController.mm */; };
 		986917CD1A08C69A00508D34 /* Assets in Resources */ = {isa = PBXBuildFile; fileRef = 986917CC1A08C69A00508D34 /* Assets */; };
 		986917CF1A08C72F00508D34 /* metaioSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 986917CE1A08C72F00508D34 /* metaioSDK.framework */; };
+		98A012411A1450BC005993B4 /* js in Resources */ = {isa = PBXBuildFile; fileRef = 98A012401A1450BC005993B4 /* js */; };
 		98BD77211A112B6C00CC9EAD /* slam.html in Resources */ = {isa = PBXBuildFile; fileRef = 98BD77201A112B6C00CC9EAD /* slam.html */; };
-		98BD77231A112C0E00CC9EAD /* slam_debug.js in Resources */ = {isa = PBXBuildFile; fileRef = 98BD77221A112C0E00CC9EAD /* slam_debug.js */; };
 		98BD77251A112C2F00CC9EAD /* slam.css in Resources */ = {isa = PBXBuildFile; fileRef = 98BD77241A112C2F00CC9EAD /* slam.css */; };
 		98BD77291A1139B400CC9EAD /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98BD77281A1139B400CC9EAD /* WebKit.framework */; };
 		98BD772B1A113A3600CC9EAD /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98BD772A1A113A3600CC9EAD /* JavaScriptCore.framework */; };
@@ -62,8 +62,8 @@
 		7CFED0811950650E006E88AE /* MapTransitionHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapTransitionHelper.h; sourceTree = "<group>"; };
 		986917CC1A08C69A00508D34 /* Assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Assets; path = Demo/Assets; sourceTree = "<group>"; };
 		986917CE1A08C72F00508D34 /* metaioSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = metaioSDK.framework; sourceTree = "<group>"; };
+		98A012401A1450BC005993B4 /* js */ = {isa = PBXFileReference; lastKnownFileType = folder; name = js; path = Demo/Assets/web/js; sourceTree = "<group>"; };
 		98BD77201A112B6C00CC9EAD /* slam.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = slam.html; path = Demo/Assets/web/slam.html; sourceTree = "<group>"; };
-		98BD77221A112C0E00CC9EAD /* slam_debug.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = slam_debug.js; path = Demo/Assets/web/slam_debug.js; sourceTree = "<group>"; };
 		98BD77241A112C2F00CC9EAD /* slam.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; name = slam.css; path = Demo/Assets/web/slam.css; sourceTree = "<group>"; };
 		98BD77281A1139B400CC9EAD /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		98BD772A1A113A3600CC9EAD /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -143,8 +143,8 @@
 		B9BC114015D8FA7B00713ED3 = {
 			isa = PBXGroup;
 			children = (
+				98A012401A1450BC005993B4 /* js */,
 				98BD77241A112C2F00CC9EAD /* slam.css */,
-				98BD77221A112C0E00CC9EAD /* slam_debug.js */,
 				98BD77201A112B6C00CC9EAD /* slam.html */,
 				986917CC1A08C69A00508D34 /* Assets */,
 				B9BC115515D8FA7B00713ED3 /* Demo */,
@@ -291,9 +291,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				B9BC115A15D8FA7B00713ED3 /* InfoPlist.strings in Resources */,
+				98A012411A1450BC005993B4 /* js in Resources */,
 				FEFF393218AA2EBD00A1891E /* Default-Landscape~ipad.png in Resources */,
 				98BD77251A112C2F00CC9EAD /* slam.css in Resources */,
-				98BD77231A112C0E00CC9EAD /* slam_debug.js in Resources */,
 				FEFF393518AA2EBD00A1891E /* Default.png in Resources */,
 				FEFF393418AA2EBD00A1891E /* Default-Portrait~ipad.png in Resources */,
 				FEFF393118AA2EBD00A1891E /* Default-Landscape@2x~ipad.png in Resources */,

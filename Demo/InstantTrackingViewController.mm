@@ -39,6 +39,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 - (void) viewDidLoad
 {
 	[super viewDidLoad];
+    NSLog(@"view did load!");
     
     // Set the rendering clipping plane
     m_metaioSDK->setRendererClippingPlaneLimits(10, 30000);
@@ -226,7 +227,8 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         // Apply the new translation
         m_obj->setTranslation(newTranslation); //pPoint(in real world) - tCam = tPoint(relative to camera)
         
-        [self updateDebugView:newTranslation object:newTranslation];
+
+        
     }
     
     int frame_rate = m_metaioSDK->getTrackingFrameRate(); //returns float average of last many frames. not rendering fr
@@ -239,6 +241,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         metaio::Vector3d obj_t = m_obj->getTranslation();
         metaio::Vector3d obj_r = m_obj->getRotation().getEulerAngleDegrees();
         
+        
         printf("\n---------------------|%d|---------------------\n", m_frames); //NSLOG prints date and time and some junk
         printf("\n--|rotation: (%f, %f, %f) |---\n--|translation: (%f, %f, %f) |---\n",
         r.x, r.y, r.z, t.x, t.y, t.z);
@@ -248,6 +251,9 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         obj_r.x, obj_r.y, obj_r.z, obj_t.x, obj_t.y, obj_t.z);
         printf("\n---------\n");
         printf("\n-----\n");
+        
+        [self updateDebugView:m_tn object:m_tn];
+        
     }
     m_frames++; //update frame count.
 }
@@ -322,13 +328,29 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 -(void)updateDebugView: (metaio::Vector3d)tc  object: (metaio::Vector3d)to {
     JSContext *ctx = [self.webView valueForKeyPath:@"documentView.webView.mainFrame.javaScriptContext"];
     NSAssert([ctx isKindOfClass:[JSContextclass]], @"could not find context in web view");
+    JSValue *isReady = ctx[@"isReady"];
+    if (!isReady.toBool)
+    {
+        return;
+    }
     JSValue *setXY = ctx[@"setXY"];
     NSArray *args = @[
         [NSNumber numberWithFloat: tc.x/100.],
         [NSNumber numberWithFloat: tc.y/100.],
         [NSNumber numberWithFloat: to.x/100.],
-        [NSNumber numberWithFloat: to.y/100.]];
-    [setXY callWithArguments:args];
+        [NSNumber numberWithFloat: to.y/100.]
+        ];
+    
+        [setXY callWithArguments:args];
+    
+    
+    ctx[@"console"][@"log"] = ^(JSValue *msg)
+    {
+        NSLog(@"JavaScript %@ log message: %@", [JSContext currentContext], msg);
+    }; //works for all console.log messages
+    
+    //[ctx evaluateScript:@"console.log('this is a log message that goes to my Xcode debug console :)')"];
+    
 }
 
 
