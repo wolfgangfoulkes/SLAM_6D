@@ -214,9 +214,22 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         metaio::Vector3d newTranslation = mapTransitionHelper.getTranslationCameraFromWorld();
         //camera COS
         
+        if(!hasInitPose)
+        {
+            [self initPoseWithT:newTranslation AndR: newRotation];
+            NSLog(@"init: t = (%f, %f, %f) r = (%f, %f, %f)", m_ti.x, m_ti.y, m_ti.z, m_ri.getEulerAngleDegrees().x, m_ri.getEulerAngleDegrees().y, m_ri.getEulerAngleDegrees().z);
+            
+            m_rn = metaio::Rotation(m_ri);
+            m_tn = metaio::Vector3d(m_ti);
+        }
+        else
+        {
+            m_tn = newTranslation - m_ti;
+            m_rn = metaio::Rotation(newRotation.getEulerAngleDegrees() - m_ri.getEulerAngleDegrees());
+        }
+        
         //set global vars
-        m_rn = metaio::Rotation(newRotation);
-        m_tn = metaio::Vector3d(newTranslation);
+        
         
         m_obj->setScale(m_scale);
         
@@ -227,15 +240,14 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         // Apply the new translation
         m_obj->setTranslation(newTranslation); //pPoint(in real world) - tCam = tPoint(relative to camera)
         
-
-        
     }
     
     int frame_rate = m_metaioSDK->getTrackingFrameRate(); //returns float average of last many frames. not rendering fr
     
-    if ((m_frames % frame_rate) == 0) //replace this with button press!
+    if ((m_frames % frame_rate) == 0 && hasInitPose) //replace this with button press!
     {
-        metaio::Vector3d r = m_rn.getEulerAngleDegrees(); //can be radians, could get mat, quat, etc.
+        
+        metaio::Vector3d r = m_rn.getEulerAngleDegrees();
         metaio::Vector3d t = m_tn;
         
         metaio::Vector3d obj_t = m_obj->getTranslation();
@@ -272,22 +284,6 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 
 
 #pragma mark - Button handlers
-
-/**
- * Scale down the models
- */
-- (IBAction)onDecreseBtnPress:(id)sender
-{
-    m_scale = m_scale - m_scale / 10;
-}
-
-/**
- * Scale up the models
- */
-- (IBAction)onIncreaseBtnPress:(id)sender
-{
-    m_scale = m_scale + m_scale / 10;
-}
 
 /**
  * Reset the tracking
@@ -333,10 +329,10 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     {
         return;
     }
-    ctx[@"cx"] = @(tc.x/10.); //shorthand for NSNumber
-    ctx[@"cy"] = @(tc.y/10.);
-    ctx[@"ox"] = @(to.x/10.);
-    ctx[@"oy"] = @(to.y/10.);
+    ctx[@"cx"] = @(50. + tc.x/100.); //shorthand for NSNumber
+    ctx[@"cy"] = @(50. + tc.y/100.);
+    ctx[@"ox"] = @(50. + to.x/100.);
+    ctx[@"oy"] = @(50. + to.y/100.);
     
     ctx[@"console"][@"log"] = ^(JSValue *msg)
     {
@@ -347,5 +343,12 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     
 }
 
+-(void)initPoseWithT:(metaio::Vector3d)t_ AndR:(metaio::Rotation)r_
+{
+    m_ti = metaio::Vector3d(t_);
+    m_ri = metaio::Rotation(r_);
+    
+    hasInitPose = true;
+}
 
 @end
