@@ -52,7 +52,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     m_rn = metaio::Rotation(metaio::Vector3d(0,0,0));
     
     //relative to camera-init. 304.8 is 6', assumes I've got it just-under-head
-    m_obj_p = metaio::Vector3d(0, 100, 0); //-300);
+    m_obj_p = metaio::Vector3d(0, 0, -1000); //-300);
     //will need to convert r for rotating geometry, which rotates relative to camera COS
     m_obj_r = metaio::Rotation(metaio::Vector3d(0, 0, 0));
     
@@ -144,7 +144,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 	NSString* tr = [[NSBundle mainBundle] pathForResource:config ofType:ext inDirectory:dir];
     NSLog(@"full path: %s", [tr UTF8String]);
 	
-	bool success = m_metaioSDK->setTrackingConfiguration([tr UTF8String]);
+    bool success = m_metaioSDK->setTrackingConfiguration([tr UTF8String]);
     if(!success)
     {
         NSLog(@"No success loading the tracking configuration");
@@ -264,7 +264,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         printf("\n---------\n");
         printf("\n-----\n");
         
-        [self updateDebugView:m_tn object:m_tn];
+        [self updateDebugView:m_tn object:obj_t];
         
     }
     m_frames++; //update frame count.

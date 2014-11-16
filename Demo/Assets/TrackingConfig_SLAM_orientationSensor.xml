@@ -2,6 +2,7 @@
 <TrackingData>
   <Sensors>
     <Sensor Type="SLAMSensorSource">
+<!--id is arbitrary and used internally in this file-->
       <SensorID>SLAM</SensorID>
       <Parameters>
 		<Initialization>
@@ -33,6 +34,7 @@
         </Parameters>
       </Fuser>
       <SensorSource>
+<!-- both of these are assigned above-->
         <SensorID>SLAM</SensorID>
         <SensorCosID>world</SensorCosID>
       </SensorSource>
