@@ -228,16 +228,16 @@ int printf(const char * __restrict format, ...) //printf don't print to console
             m_rn = metaio::Rotation(newRotation.getEulerAngleDegrees() - m_ri.getEulerAngleDegrees());
         }
         
-//        printf("/nCOS's: %i of %i", m_metaioSDK->getNumberOfValidCoordinateSystems(), m_metaioSDK->getNumberOfDefinedCoordinateSystems());
-//        metaio::TrackingValues cos0 = m_metaioSDK->getTrackingValues(0);
-//        metaio::TrackingValues cos1 = m_metaioSDK->getTrackingValues(1);
-//        metaio::TrackingValues cos2 = m_metaioSDK->getTrackingValues(2);
-//        if (cos0.isTrackingState()) {printf("COS0: is tracking!");}
-//        else {printf("COS0: is not tracking!");}
-//        if (cos1.isTrackingState()) {printf("COS1: is tracking!");}
-//        else {printf("COS1: is not tracking!");}
-//        if (cos2.isTrackingState()) {printf("COS2: is tracking!");}
-//        else {printf("COS2: is not tracking!");}
+        printf("/nCOS's: %i of %i", m_metaioSDK->getNumberOfValidCoordinateSystems(), m_metaioSDK->getNumberOfDefinedCoordinateSystems());
+        metaio::TrackingValues cos0 = m_metaioSDK->getTrackingValues(0);
+        metaio::TrackingValues cos1 = m_metaioSDK->getTrackingValues(1);
+        metaio::TrackingValues cos2 = m_metaioSDK->getTrackingValues(2);
+        if (cos0.isTrackingState()) {printf("COS0: is tracking!");}
+        else {printf("COS0: is not tracking!");}
+        if (cos1.isTrackingState()) {printf("COS1: is tracking!");}
+        else {printf("COS1: is not tracking!");}
+        if (cos2.isTrackingState()) {printf("COS2: is tracking!");}
+        else {printf("COS2: is not tracking!");}
         
 
         

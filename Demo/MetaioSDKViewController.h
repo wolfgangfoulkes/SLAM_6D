@@ -5,6 +5,7 @@
 // Copyright 2007-2014 metaio GmbH. All rights reserved.
 //
 
+#import <AVFoundation/AVFoundation.h>
 #import <UIKit/UIKit.h>
 #import <metaioSDK/IMetaioSDKIOS.h>
 

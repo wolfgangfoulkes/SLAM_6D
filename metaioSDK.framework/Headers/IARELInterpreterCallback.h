@@ -1,9 +1,11 @@
-// Copyright 2007-2013 metaio GmbH. All rights reserved.
+// Copyright 2007-2014 metaio GmbH. All rights reserved.
+// This file is part of Metaio SDK 6.0 beta
 #ifndef _IAREL_INTERPRETER_CALLBACK_H_
 #define _IAREL_INTERPRETER_CALLBACK_H_
 
-#include <metaioSDK/ARELSceneOptions.h>
-#include <metaioSDK/STLCompatibility.h>
+#include "Common/ARELSceneOptions.h"
+#include "Common/Path.h"
+#include "Common/STLCompatibility.h"
 
 #include <map>
 #include <string>
@@ -28,10 +30,10 @@ public:
 
 	/**
 	 * The implementation should play a video from a given URL
-	 * \param videoURL the url to the video
+	 * \param videoAsset the path or URL to the video
 	 * \return true if handled by the callback, false to use the default implementation
 	 */
-	virtual bool playVideo(const stlcompat::String& videoURL) { return false; }
+	virtual bool playVideo(const metaio::PathOrURL& videoAsset) { return false; }
 
 	/**
 	 * Open the URL
@@ -81,25 +83,6 @@ public:
 	 */
 	virtual void openPOIDetail(const metaio::IARELObject* poi) {};
 
-    
-private:
-	/**
-	 * \deprecated You must use the method signature with stlcompat::Vector instead. The other method
-	 *             replaces this one!
-	 */
-	virtual void onSceneOptionsParsed(const std::map<std::string, std::string>& sceneOptions) METAIOSDK_CPP11_FINAL {};
-
-	/**
-	 * \deprecated You must use the method signature with stlcompat::String instead. The other method
-	 *             replaces this one!
-	 */
-	virtual bool openWebsite(const std::string& url, bool openInExternalApp = false) METAIOSDK_CPP11_FINAL { return false; }
-
-	/**
-	 * \deprecated You must use the method signature with stlcompat::String instead. The other method
-	 *             replaces this one!
-	 */
-	virtual bool playVideo(const std::string& videoURL) METAIOSDK_CPP11_FINAL { return false; }
 };
 
 }

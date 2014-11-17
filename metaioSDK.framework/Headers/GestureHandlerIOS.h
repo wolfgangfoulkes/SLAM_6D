@@ -1,14 +1,8 @@
-//
-//  GestureHandlerIOS.h
-//  Example
-//
-//  Created by WeiLuc Liu on 11/19/12.
-//  Copyright 2007-2013 metaio GmbH. All rights reserved.
-//
-
+// Copyright 2007-2014 metaio GmbH. All rights reserved.
+// This file is part of Metaio SDK 6.0 beta
 #import <UIKit/UIKit.h>
-#import <metaioSDK/IMetaioSDK.h>
-#import <metaioSDK/STLCompatibility.h>
+#import "IMetaioSDK.h"
+#import "Common/STLCompatibility.h"
 
 namespace metaio
 {

@@ -1,10 +1,10 @@
-// Copyright 2007-2013 metaio GmbH. All rights reserved.
+// Copyright 2007-2014 Metaio GmbH. All rights reserved.
+// This file is part of Metaio SDK 6.0 beta
 #ifndef ___AS_IMETAIOSDKIOS_H_INCLUDED___
 #define ___AS_IMETAIOSDKIOS_H_INCLUDED___
 
 
 #include "IMetaioSDK.h"
-#include "DeviceInfoIOS.h"
 #import <CoreGraphics/CoreGraphics.h>
 #import <UIKit/UIKit.h>
 
@@ -29,8 +29,8 @@
  * This is called everytime SDK encounters an error.
  * See ErrorCodes.h for a list of error codes.
  *
- * @param errorCode A code representing type of the error (see ErrorCodes.h)
- * @param errorDescription Description of the error
+ * \param errorCode A code representing type of the error (see ErrorCodes.h)
+ * \param errorDescription Description of the error
  */
 - (void) onError: (const int) errorCode description:(const NSString*) errorDescription;
 
@@ -38,8 +38,8 @@
  * This is called everytime SDK encounters a warning.
  * See WarningCodes.h for a list of warning codes.
  *
- * @param warningCode Code A code representing type of the warning (see WarningCodes.h)
- * @param warningDescription Description of the warning
+ * \param warningCode Code A code representing type of the warning (see WarningCodes.h)
+ * \param warningDescription Description of the warning
  */
 - (void) onWarning: (const int) warningCode description:(const NSString*) warningDescription;
 
@@ -48,16 +48,16 @@
  * \param animationName the name of the just finished animation
  * \return void
  */
-- (void) onAnimationEnd: (metaio::IGeometry*) geometry  andName:(NSString*) animationName;
+- (void) onAnimationEnd: (metaio::IGeometry*) geometry  andName:(const NSString*) animationName;
 
 
 /**
  * \brief This function will be triggered, if a movietexture-playback has ended
  * \param geometry the geometry which has finished animating/movie-playback
- * \param movieName the filename of the movie
+ * \param moviePath the file path of the movie
  * \return void
  */
-- (void) onMovieEnd: (metaio::IGeometry*) geometry  andName:(NSString*) movieName;
+- (void) onMovieEnd:(metaio::IGeometry*)geometry andMoviePath:(const NSString*) moviePath;
 
 /**
  * \brief Request a callback that delivers the next camera image.
@@ -69,17 +69,17 @@
  * 
  * \note you must copy the ImageStuct::buffer, if you need it for later. 
  */
-- (void) onNewCameraFrame: ( metaio::ImageStruct*)  cameraFrame;
+- (void) onNewCameraFrame: (metaio::ImageStruct*)  cameraFrame;
 
 /**
  * \brief Callback that notifies that camera image has been saved
  *
  * To request this callback, call requestCameraFrame(filepath, width, height)
  *
- * \param filepath File path in which image is written, or empty string in case of a failure
+ * \param filePath File path where image has been written, or empty in case of a failure
  * 
  */
-- (void) onCameraImageSaved: (NSString*) filepath; 
+- (void) onCameraImageSaved:(const NSString*) filePath;
 
 /**
  * Callback for changes in rendering, e.g. if geometry became visible
@@ -111,9 +111,9 @@
  * an empty string.
  * Note: This callback is called on the render thread.
  *
- * \param filepath File path where screenshot image has been written
+ * \param filePath File path where screenshot image has been written
  */
--(void) onScreenshotSaved:(NSString*) filepath;
+-(void) onScreenshotSaved:(const NSString*) filePath;
 
 /**
  * \brief Callback that informs new pose states (tracked, detected or lost)
@@ -135,14 +135,14 @@
  * \brief Callback that informs about instant 3D tracking event
  *
  * \param success result of the instant tracking event
- * \param file saved tracking configuration path
+ * \param filePath File path where generated tracking configuration has been saved.
  *
  */
-- (void) onInstantTrackingEvent:(bool)success file:(NSString*) file;
+- (void) onInstantTrackingEvent:(bool)success file:(const NSString*) filePath;
 
 /**
  * \brief This method is always called after you successfully started a new visual search
- * (with IUnifeyeMobile::performVisualSearch()) and received the result from the server.
+ * (with IMetaioSDK::performVisualSearch()) and received the result from the server.
  *
  * \param response All found results. If response.size() > 0 the search has found something.
  * \param errorCode if > 0, then an error has occured.
@@ -173,7 +173,7 @@ namespace metaio
 		
         virtual ~IMetaioSDKIOS() {};
         
-        /** \brief Register the delegate object that will receive callbacks
+        /**  Register the delegate object that will receive callbacks
          * \param delegate the object
          * \return void
          */
@@ -207,29 +207,39 @@ namespace metaio
          * \return the pointer to the instance of the class AVCaptureVideoPreviewLayer
 		 */
 		virtual AVCaptureVideoPreviewLayer* getCameraPreviewLayer() = 0;    
-        
+
+		/**
+		 * Check if multisampling is supported by this iOS device
+		 * \return	True if device is new enough to support multisampling, otherwise false (e.g. for
+		 *			iPhone 3GS and other old devices). For unknown devices, we assume it's a modern
+		 *			one and return true.
+		 */
+		static bool isMultisamplingSupported();
+
         /**
-         * @brief Specialized function for iPhone
+         *  Specialized function for iPhone
          *
-         * @param textureName name that should be assigned to the texture 
+         * \param textureName name that should be assigned to the texture 
          *	(for reuse).
-         * @param image CGImage reference to set
-		 * @param displayAsBillboard true if the plane should be rendered as a billboard (always facing camera)
-		 * @param autoScale true if the plane size should be assigned a height of 100, and width of
+         * \param image CGImage reference to set
+		 * \param displayAsBillboard true if the plane should be rendered as a billboard (always facing camera)
+		 * \param autoScale true if the plane size should be assigned a height of 100, and width of
 		 *        100*{image width}/{image height}. false if the size should be the image width and height
 		 *        (e.g. 640 by 480 units for a 640x480 image)
-         * @return pointer to geometry
+         * \return pointer to geometry
          */
-        virtual IGeometry* createGeometryFromCGImage(const stlcompat::String& textureName, CGImageRef image,
+        virtual IGeometry* createGeometryFromCGImage(
+			const stlcompat::String& textureName, 
+			CGImageRef image,
 			const bool displayAsBillboard = false,
 			const bool autoScale = true) = 0;
         
         /**
-         * @brief Helper function to convert an ImageStruct image to UIImage
+         * Helper function to convert an ImageStruct image to UIImage
          *
-         * @param imgStruct Source image to be converted
-         * @param rotate Specify if the converted image should be rotated according to screen rotation
-         * @return pointer to UIImage
+         * \param imgStruct Source image to be converted
+         * \param rotate Specify if the converted image should be rotated according to screen rotation
+         * \return pointer to UIImage
          */
         virtual UIImage* ImageStruct2UIImage( metaio::ImageStruct* imgStruct, bool rotate ) = 0;
 	
@@ -269,6 +279,23 @@ namespace metaio
      */
     void endGetData(CGContextRef* context, CGColorSpaceRef* rgbColorSpace);
 
+    
+    /** Creates image for annotation billboard in a predefined design
+     *
+     * This method will create a UIImage for given parameters that can be used for location based 
+     * experiences. AREL and Junaio also use the same annotation images.
+     *
+     * \param title The title that should be drawn.
+     * \param poiLocation LLA position of the poi that should be represented by this annotation
+     * \param currentLocation LLA position of the device
+     * \param thumbnailImage Thumbnail that should be displayed on the annotation
+     * \param attributionImage Optional icon that is displayed on the annotation. Meant for providing attribution to 3rd party content
+
+     * \return Final image or nil in case of error
+     *
+     * \note Your application package needs to include MetaioCloudPlugin.bundle for this method to use.
+     */
+    UIImage* createAnnotationImage(NSString* title, metaio::LLACoordinate poiLocation, metaio::LLACoordinate currentLocation, UIImage* thumbnailImage, UIImage* attributionImage, float rating=-1);
 
 	/**
 	* \brief Create an ARMobileSystem instance

@@ -1,9 +1,10 @@
-// Copyright 2007-2013 metaio GmbH. All rights reserved.
+// Copyright 2007-2014 metaio GmbH. All rights reserved.
+// This file is part of Metaio SDK 6.0 beta
 #ifndef __Example__GeometryExtension__
 #define __Example__GeometryExtension__
 
 #include <iostream>
-#include <metaioSDK/IMetaioSDK.h>
+#include "IMetaioSDK.h"
 
 namespace metaio
 {

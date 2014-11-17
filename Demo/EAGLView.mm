@@ -252,7 +252,7 @@
 
 - (BOOL)deviceSupportsAntialiasing
 {
-    metaio::E_IOS_DEVICETYPE currentDevice = metaio::getDeviceType();
+    /*metaio::E_IOS_DEVICETYPE currentDevice = metaio::getDeviceType();
 	switch (currentDevice)
 	{
 		case metaio::EID_IPHONEOLD__UNSUPPORTED:
@@ -266,6 +266,8 @@
         default:
 			return true;
 	}
+    */
+    return true;
 }
 
 - (GLuint) getDefaultFrameBuffer

@@ -1,11 +1,12 @@
-// Copyright 2007-2013 metaio GmbH. All rights reserved.
+// Copyright 2007-2014 metaio GmbH. All rights reserved.
+// This file is part of Metaio SDK 6.0 beta
 #ifndef __GESTURE_HANDLER_H__
 #define __GESTURE_HANDLER_H__
 
-#include <metaioSDK/IMetaioSDK.h>
-#include <metaioSDK/GeometryExtension.h>
-#include <metaioSDK/IGestureHandlerCallback.h>
-#include <metaioSDK/STLCompatibility.h>
+#include "IMetaioSDK.h"
+#include "GeometryExtension.h"
+#include "IGestureHandlerCallback.h"
+#include "Common/STLCompatibility.h"
 
 namespace metaio
 {

@@ -1,4 +1,5 @@
-// Copyright 2007-2013 metaio GmbH. All rights reserved.
+// Copyright 2007-2014 metaio GmbH. All rights reserved.
+// This file is part of Metaio SDK 6.0 beta
 #ifndef _AS_IARELINTERPRETERIOS_
 #define _AS_IARELINTERPRETERIOS_
 
@@ -13,6 +14,7 @@ namespace metaio {
 @class UIWebView;
 @class UIViewController;
 @class UIImage;
+@class NSURL;
 
 /** Delegate to handle AREL callbacks
  */
@@ -20,15 +22,15 @@ namespace metaio {
 
 @optional
 /** The implementation should play a video from a given URL
- * \param videoURL the url to the video
- * \return void
+ * \param videoAsset the url to the video
+ * \return true, if successful
  */
--(bool) playVideo:(NSString*) videoURL;
+-(bool) playVideo:(NSURL*)videoAsset;
 
 /**
  * \param url the url to the website
  * \param openInExternalApp true to open in external app, false otherwise
- * \return void
+ * \return true, if successful
  */
 -(bool) openWebsiteWithUrl:(NSString*) url inExternalApp:(bool) openInExternalApp;
 
@@ -40,6 +42,7 @@ namespace metaio {
 /**
  * Called after scene options were loaded from AREL XML file (always called even if there are no
  * scene options)
+ * \param sceneOptions vector of sceneoptions
  */
 -(void) onSceneOptionsParsed:(metaio::stlcompat::Vector<metaio::ARELSceneOption>&) sceneOptions;
 
@@ -63,6 +66,14 @@ namespace metaio {
  * \param poi the poi
  */
 - (void) openPOIDetail:  (const metaio::IARELObject*) poi;
+
+
+/** Tell the app to display or hide the progressbar and provide progress updates
+ * \param displayProgressBar true if the progressbar should be shown
+ * \param progress the progress for the progress bar from 0.0 to 1.0
+ */
+- (void) showProgressBar:(bool) displayProgressBar
+                progress:(float) progress;
 
 @end
 

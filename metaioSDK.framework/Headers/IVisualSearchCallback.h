@@ -1,11 +1,10 @@
-// Copyright 2007-2013 metaio GmbH. All rights reserved.
+// Copyright 2007-2014 metaio GmbH. All rights reserved.
+// This file is part of Metaio SDK 6.0 beta
 #ifndef __AS_VISUALSEARCH_CALLBACK__
 #define __AS_VISUALSEARCH_CALLBACK__
 
-#include <metaioSDK/STLCompatibility.h>
-#include <metaioSDK/VisualSearchResponse.h>
-
-#include <vector>
+#include "Common/STLCompatibility.h"
+#include "Common/VisualSearchResponse.h"
 
 namespace metaio
 {
@@ -53,14 +52,6 @@ public:
 	* \sa EVISUAL_SEARCH_STATE
 	*/
 	virtual void onVisualSearchStatusChanged(metaio::EVISUAL_SEARCH_STATE state) {};
-
-private:
-
-	/**
-	 * \deprecated You must use the method signature with stlcompat::Vector instead. The other method
-	 *             replaces this one!
-	 */
-	virtual void onVisualSearchResult(const std::vector<metaio::VisualSearchResponse>& response, int errorCode) METAIOSDK_CPP11_FINAL {}
 };
 
 }

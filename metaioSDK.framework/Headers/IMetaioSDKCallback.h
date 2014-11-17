@@ -1,19 +1,19 @@
-// Copyright 2007-2013 metaio GmbH. All rights reserved.
+// Copyright 2007-2014 metaio GmbH. All rights reserved.
+// This file is part of Metaio SDK 6.0 beta
 #ifndef __AS_METAIOSDK_CALLBACK__
 #define __AS_METAIOSDK_CALLBACK__
 
-#include <string>
-#include <vector>
-
-#include <metaioSDK/ImageStruct.h>
-#include <metaioSDK/RenderEvent.h>
-#include <metaioSDK/STLCompatibility.h>
-#include <metaioSDK/TrackingValues.h>
+#include "Common/Dll.h"
+#include "Common/ImageStruct.h"
+#include "Common/STLCompatibility.h"
+#include "Common/TrackingValues.h"
+#include "Rendering/RenderEvent.h"
 
 namespace metaio
 {
 // forward declarations
 class IGeometry;
+class Path;
 
 
 /**
@@ -21,7 +21,7 @@ class IGeometry;
  *
  * These functions should be implemented for handling events triggered by the metaio SDK.
  */
-class IMetaioSDKCallback
+class METAIO_DLL_API IMetaioSDKCallback
 {
 public:
 
@@ -57,7 +57,7 @@ public:
 	 * This function will be triggered, if an animation has ended
 	 *
 	 * \param geometry the geometry which has finished animating
-	 * \param animationName the name of the just finished animation or in case of movie-playback the filename of the movie
+	 * \param animationName the name of the just finished animation
 	 */
 	virtual void onAnimationEnd(metaio::IGeometry* geometry, const stlcompat::String& animationName) {};
 
@@ -65,10 +65,10 @@ public:
 	 * This function will be triggered, if an animation/movietexture-playback has ended
 	 *
 	 * \param geometry the geometry which has finished animating/movie-playback
-	 * \param movieName the name of the just finished animation or in case of movie-playback the filename of the movie
+	 * \param moviePath path to the movie file
 	 * \return void
 	 */
-	virtual void onMovieEnd(metaio::IGeometry* geometry, const stlcompat::String& movieName) {};
+	virtual void onMovieEnd(metaio::IGeometry* geometry, const metaio::Path& moviePath) {};
 
 	/**
 	 * Callback that delivers the next camera image.
@@ -88,10 +88,9 @@ public:
 	 *
 	 * To request this callback, call requestCameraFrame(filepath, width, height)
 	 *
-	 * \param filepath File path in which image is written, or empty string in case of a failure
-	 *
+	 * \param filePath File path in which image is written, or empty path in case of failure
 	 */
-	virtual void onCameraImageSaved(const stlcompat::String& filepath) {};
+	virtual void onCameraImageSaved(const metaio::Path& filePath) {};
 
 	/**
 	 * Callback for changes in rendering
@@ -116,10 +115,10 @@ public:
 	 * an empty string.
 	 * Note: This callback is called on the render thread.
 	 * 
-	 * \param filepath File path where screenshot image has been written
+	 * \param filePath File path where screenshot image has been written
 	 * \sa IMetaioSDK::requestScreenshot
 	 */
-	virtual void onScreenshotSaved(const stlcompat::String& filepath) {};
+	virtual void onScreenshotSaved(const metaio::Path& filePath) {};
 
 	/**
 	* Callback to inform that tracking state has changed.
@@ -141,50 +140,45 @@ public:
 	/**
 	* Callback to notify the application about an instant tracker event.
 	*
-	*	If "success" is true, "file" will contain a file name you either specified
-	*	when starting the instant tracking or a temporarily result.
+	* If "success" is true, "file" will contain a file path you either specified when starting the
+	* instant tracking or a temporarily result. Since SDK 6.0, this path is unused for "INSTANT_3D"
+	* because the new 3D tracking keeps running when an instant target was found.
 	*
-	* \param success true on success
-	* \param file path to the tracking configuration
+	* \param	success		True on success
+	* \param	filePath	Path to the tracking configuration (do not use for "INSTANT_3D")
 	*/
-	virtual void onInstantTrackingEvent(bool success, const stlcompat::String& file) {};
+	virtual void onInstantTrackingEvent(bool success, const metaio::Path& filePath) {};
 
 private:
 	/**
-	 * \deprecated You must use the method signature with stlcompat::String instead. The other method
-	 *             replaces this one!
+	 * NOT SUPPORTED ANYMORE
+	 * \param filepath -
+	 * \deprecated This signature is not supported anymore, use the one with metaio::Path!
 	 */
-	virtual void onAnimationEnd(metaio::IGeometry* geometry, std::string animationName) METAIOSDK_CPP11_FINAL {};
+	virtual void onCameraImageSaved(const stlcompat::String& filepath) METAIOSDK_CPP11_FINAL;
 
 	/**
-	 * \deprecated You must use the method signature with stlcompat::String instead. The other method
-	 *             replaces this one!
+	 * NOT SUPPORTED ANYMORE
+	 * \param success -
+	 * \param file -
+	 * \deprecated This signature is not supported anymore, use the one with metaio::Path!
 	 */
-	virtual void onCameraImageSaved(const std::string& filepath) METAIOSDK_CPP11_FINAL {};
+	virtual void onInstantTrackingEvent(bool success, const stlcompat::String& file) METAIOSDK_CPP11_FINAL;
 
 	/**
-	 * \deprecated You must use the method signature with stlcompat::String instead. The other method
-	 *             replaces this one!
+	 * NOT SUPPORTED ANYMORE
+	 * \param geometry -
+	 * \param movieName -
+	 * \deprecated This signature is not supported anymore, use the one with metaio::Path!
 	 */
-	virtual void onInstantTrackingEvent(bool success, const std::string& file) METAIOSDK_CPP11_FINAL {};
+	virtual void onMovieEnd(metaio::IGeometry* geometry, const stlcompat::String& movieName) METAIOSDK_CPP11_FINAL;
 
 	/**
-	 * \deprecated You must use the method signature with stlcompat::String instead. The other method
-	 *             replaces this one!
+	 * NOT SUPPORTED ANYMORE
+	 * \param filepath -
+	 * \deprecated This signature is not supported anymore, use the one with metaio::Path!
 	 */
-	virtual void onMovieEnd(metaio::IGeometry* geometry, std::string movieName) METAIOSDK_CPP11_FINAL {};
-
-	/**
-	 * \deprecated You must use the method signature onScreenshotSaved with stlcompat::String
-	 *             instead. The other method replaces this one!
-	 */
-	virtual void onScreenshot(const std::string& filepath) METAIOSDK_CPP11_FINAL {};
-
-	/**
-	 * \deprecated You must use the method signature with stlcompat::Vector instead. The other method
-	 *             replaces this one!
-	 */
-	virtual void onTrackingEvent(std::vector<metaio::TrackingValues> trackingValues) METAIOSDK_CPP11_FINAL {}
+	virtual void onScreenshotSaved(const stlcompat::String& filepath) METAIOSDK_CPP11_FINAL;
 };
 
 }

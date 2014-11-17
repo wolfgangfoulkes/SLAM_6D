@@ -1,17 +1,11 @@
-//
-//  MetaioCloudPluginDelegate.h
-//  MetaioCloudPlugin
-//
-//  Created by Stefan Misslinger.
-//  Copyright 2013 metaio, Inc. All rights reserved.
-//
+// Copyright 2007-2014 Metaio GmbH. All rights reserved.
 
 @protocol MetaioCloudPluginDelegate
 
 /** 
  * Provide the channel number that should be opened by the plugin 
  */
-- (NSInteger) getChannelID;
+- (int) getChannelID;
 
 
 @optional

@@ -1,20 +1,21 @@
-// Copyright 2007-2013 metaio GmbH. All rights reserved.
+// Copyright 2007-2014 metaio GmbH. All rights reserved.
+// This file is part of Metaio SDK 6.0 beta
 #ifndef __AS_IMETAIOSDK_H_INCLUDED__
 #define __AS_IMETAIOSDK_H_INCLUDED__
 
-#include <metaioSDK/Camera.h>
-#include <metaioSDK/IGeometry.h>
-#include <metaioSDK/ILight.h>
-#include <metaioSDK/IAnnotatedGeometriesGroup.h>
-#include <metaioSDK/IBillboardGroup.h>
-#include <metaioSDK/IRadar.h>
-#include <metaioSDK/IMetaioSDKCallback.h>
-#include <metaioSDK/ISensorsComponent.h>
-#include <metaioSDK/IVisualSearchCallback.h>
-#include <metaioSDK/GeometryHit.h>
-#include <metaioSDK/Log.h>
-#include <metaioSDK/ScreenRotation.h>
-#include <metaioSDK/STLCompatibility.h>
+#include "Common/Log.h"
+#include "Common/ScreenRotation.h"
+#include "Common/STLCompatibility.h"
+#include "Common/Camera.h"
+#include "Common/ISensorsComponent.h"
+#include "Common/Path.h"
+#include "Rendering/IGeometry.h"
+#include "Rendering/GeometryHit.h"
+#include "Rendering/ILight.h"
+#include "Rendering/IAnnotatedGeometriesGroup.h"
+#include "Rendering/IRadar.h"
+#include "IMetaioSDKCallback.h"
+#include "IVisualSearchCallback.h"
 
 namespace metaio
 {
@@ -53,27 +54,27 @@ enum EENV_MAP_FORMAT
 enum ECAMERA_TYPE
 {
 	/// Camera parameters that are used for tracking
-	ECT_TRACKING =			1<<0,
-	// Camera parameters for the left rendering camera on stereo rendering
-	ECT_RENDERING_LEFT =	1<<1,
-	// Camera parameters for the right rendering camera on stereo rendering
-	ECT_RENDERING_RIGHT =	1<<2,
+	ECT_TRACKING = 1<<0,
 	/**
 	 * Camera parameters used for rendering (in case of stereo rendering: parameters
 	 * that apply to both eyes)
 	 */
-	ECT_RENDERING =			ECT_RENDERING_LEFT | ECT_RENDERING_RIGHT,
-	/// Camera parameters that are used for both tracking and rendering
-	ECT_ALL =				0xFF
+	ECT_RENDERING_MONO = 1<<1,
+	// Camera parameters for the left rendering camera on stereo rendering
+	ECT_RENDERING_STEREO_LEFT = 1<<2,
+	// Camera parameters for the right rendering camera on stereo rendering
+	ECT_RENDERING_STEREO_RIGHT = 1<<3,
+	/// Camera parameters that are used for both tracking and rendering (mono/stereo)
+	ECT_ALL = 0xFF
 };
 
 /**
- *  The common interface to metaio SDK on all platforms.
+ *  The common interface to Metaio SDK on all platforms.
  *
  * \par License
- * This code is the property of the metaio GmbH (www.metaio.com).
+ * This code is the property of the Metaio GmbH (www.metaio.com).
  * It is absolutely not free to be used, copied or
- * be modified without prior written permission from metaio GmbH.
+ * be modified without prior written permission from Metaio GmbH.
  * The code is provided "as is" with no expressed or implied warranty.
  * The author accepts no liability if it causes
  * any damage to your computer, or any harm at all.
@@ -84,7 +85,7 @@ public:
 
 
 	/**
-	 * Destructor of the metaio SDK
+	 * Destructor of the Metaio SDK
 	 */
 	virtual ~IMetaioSDK() {};
 
@@ -95,6 +96,7 @@ public:
 	 * This can be used to show additional or fewer messages on console/LogCat.
 	 * The default level is ELL_WARNING.
 	 *
+	 * \param level the log level
 	 * \sa ELOG_LEVEL
 	 */
 	static void setLogLevel(metaio::ELOG_LEVEL level);
@@ -115,7 +117,7 @@ public:
 	virtual stlcompat::String getVersion() const = 0;
 
 	/**
-	 *  Set tracking configuration from an XML file.
+	 *  Set tracking configuration from an XML file or string
 	 *
 	 *	This function configures the tracking system and the coordinate systems based on an XML file or string input.
 	 *	Additionally, some predefined configurations can be loaded by specifying special strings below:
@@ -129,13 +131,35 @@ public:
 	 *		"QRCODE" configuration for reading QR codes only
 	 *		"FACE" configuration for Face Tracking  
 	 *
-	 * \param trackingConfig Fully qualified path of the XML file that should be loaded. If a ZIP is specified it will first try
+	 * \param trackingConfig Path of the XML file that should be loaded. If a ZIP is specified it will first try
 	 *		 to load "TrackingData_ML3D.xml" from the ZIP and if that isn't successful it'll try to load any other xml from the ZIP.
 	 *		 It can also be one of the special strings to load predefined configurations, or string containing XML configuration.
 	 * \param readFromFile if set to false, it will interpret trackingConfig as tracking-configuration XML
 	 * \return true if successful, false otherwise.
 	 */
 	virtual bool setTrackingConfiguration(const metaio::stlcompat::String& trackingConfig, bool readFromFile = true) = 0;
+	
+	/**
+	 *  Set tracking configuration from an XML file
+	 *
+	 *	This function configures the tracking system and the coordinate systems based on an XML file or string input.
+	 *	Additionally, some predefined configurations can be loaded by specifying special strings below:
+	 *
+	 *		"DUMMY" A dummy tracking configuration that delivers null translation and rotation
+	 *		"MARKER_ID=<>_SIZE=<>_[ROBUST]" ID Marker tracking configuration with marker ID, size and optional type
+	 *		"GPS" default configuration for GPS-Compass tracking, suitable for location based scenarios.
+	 *		"ORIENTATION" tracking configuration for device attitude tracking, suitable for 360 degrees scenarios.
+	 *		"LLA" tracking configuration for LLA markers, it also uses GPS-Compass tracking in addition to LLA markers reading
+	 *		"CODE" configuration for reading bar codes including QR codes
+	 *		"QRCODE" configuration for reading QR codes only
+	 *		"FACE" configuration for Face Tracking  
+	 *
+	 * \param	trackingConfigFilePath Path of the XML file that should be loaded. If a ZIP is
+	 *			specified it will first try to load "TrackingData_ML3D.xml" from the ZIP and if that
+	 *			isn't successful it'll try to load any other xml from the ZIP.
+	 * \return true if successful, false otherwise
+	 */
+	virtual bool setTrackingConfiguration(const metaio::Path& trackingConfigFilePath) = 0;
 
 
 	/**
@@ -157,16 +181,68 @@ public:
 
 	 * "INSTANT_3D" create instant tracking configuration for 3D objects. It is also known as SLAM.
 	 *
+	 * Note that since SDK 6.0, "INSTANT_3D" does not create a new tracking configuration on
+	 * success, but keeps running. onInstantTrackingEvent is passed true/false as success value,
+	 * but an invalid path for the tracking configuration. You should not use this path anymore.
+	 *
 	 * \param trackingMode one of the supported tracking modes
 	 * \param outFile Output file to save the result, if empty, it will save it to a temporary file.
 	 * \param enablePreview Enable preview of 2D tracking area or 3D visualization
 	 * The saved file path is returned in IMetaioSDKCallback.onInstantTrackingEvent callback.
 	 * \sa IMetaioSDKCallback.onInstantTrackingEvent
 	 */
-	virtual void startInstantTracking(const stlcompat::String& trackingMode,
-	                                  const stlcompat::String& outFile = "",
-									  bool enablePreview = false ) = 0;
+	virtual void startInstantTrackingOld(const stlcompat::String& trackingMode,
+		const stlcompat::String& outFile = "", bool enablePreview = false ) = 0;
 
+	/**
+	 * Start creating instant tracking configuration by specifying a tracking mode.
+	 *
+	 * It will instantly start creating a tracking configuration based on camera image and available
+	 * device sensors if requested. Once the tracking configuration has been created, it will report it
+	 * through IMetaioSDKCallback.onInstantTrackingEvent() callback. The following tracking modes are
+	 * supported:
+	 *
+	 * "INSTANT_2D" create instant tracking configuration for 2D planar target.
+	 * "INSTANT_2D_GRAVITY" same as INSTANT_2D with additional use of gravity sensor to rectify the pose.
+	 * "INSTANT_2D_GRAVITY_EXTRAPOLATED" same as INSTANT_2D_GRAVITY with additional use of attitude sensor to extrapolate the pose when
+	 *                                   the target image cannot be tracked visually.
+	 * "INSTANT_2D_GRAVITY_SLAM" create instant tracking configuration for 2D objects like INSTANT_2D_GRAVITY, 
+	 * additionally uses 3D tracking (SLAM) to continue tracking when the original reference image gets out of sight.
+	 * "INSTANT_2D_GRAVITY_SLAM_EXTRAPOLATED" Same as INSTANT_2D_GRAVITY_SLAM, but additionally tries to use
+	 * sensors to extrapolate the pose if optical tracking is lost.
+
+	 * "INSTANT_3D" create instant tracking configuration for 3D objects. It is also known as SLAM.
+	 *
+	 * Note that since SDK 6.0, "INSTANT_3D" does not create a new tracking configuration on
+	 * success, but keeps running. onInstantTrackingEvent is passed true/false as success value,
+	 * but an invalid path for the tracking configuration. You should not use this path anymore.
+	 *
+	 * \param trackingMode one of the supported tracking modes
+	 * \param outFilePath Output file to save the result, if empty, it will save it to a temporary file.
+	 * \param enablePreview Enable preview of 2D tracking area or 3D visualization
+	 * \sa IMetaioSDKCallback.onInstantTrackingEvent
+	 */
+	virtual void startInstantTracking(const stlcompat::String& trackingMode,
+	                                  const metaio::Path& outFilePath = metaio::Path(),
+									  bool enablePreview = false) = 0;
+
+	/**
+	 * Start creating instant tracking configuration by specifying a instant tracking configuration
+	 * file.
+	 *
+	 * It will instantly start creating a tracking configuration based on camera image and available
+	 * device sensors if requested. Once the tracking configuration has been created, it will report it
+	 * through IMetaioSDKCallback.onInstantTrackingEvent() callback.
+	 *
+	 * \param	trackingConfigFilePath	Instant tracking configuration
+	 * \param	outFilePath				Output file to save the result, if empty, it will save it to
+	 *									a temporary file.
+	 * \param	enablePreview			Enable preview of 2D tracking area or 3D visualization.
+	 * \sa IMetaioSDKCallback.onInstantTrackingEvent
+	 */
+	virtual void startInstantTracking(const metaio::Path& trackingConfigFilePath,
+	                                  const metaio::Path& outFilePath = metaio::Path(),
+									  bool enablePreview = false) = 0;
 
 	/**
 	 * Set camera intrinsic parameters from an XML file or string.
@@ -183,16 +259,39 @@ public:
 	 * Note: The camera parameters can be automatically loaded for selected Android and iOS devices by passing an empty string.
 	 * In case camera parameters for the device are not loaded, the method will return false.
 	 *
+	 * \param	parametersFilePathOrXmlString	Fully qualified path to the camera parameters file or complete XML string
+	 * \param	cameraType						Camera type, i.e. tracking, rendering or both
+	 * \return True if successful, false otherwise
+	 * \sa getCameraParameters, setCameraParameters
+	 * \sa ECAMERA_TYPE
+	 */
+	virtual bool setCameraParameters(const stlcompat::String& parametersFilePathOrXmlString, ECAMERA_TYPE cameraType=ECT_ALL) = 0;
+
+	/**
+	 * Set camera intrinsic parameters from an XML file
+	 *
+	 * The provided XML file should be structured as follows:
+	 *
+	 *	&lt;?xml version="1.0"?&gt;<br/>
+	 *	&lt;Camera&gt;&lt;Name&gt;iPhoneCamera&lt;/Name&gt;<br/>
+	 *		&lt;CalibrationResolution&gt;&lt;X&gt;480&lt;/X&gt;&lt;Y&gt;360&lt;/Y&gt;&lt;/CalibrationResolution&gt;<br/>
+	 *		&lt;FocalLength&gt;&lt;X&gt;500&lt;/X&gt;&lt;Y&gt;500&lt;/Y&gt;&lt;/FocalLength&gt;<br/>
+	 *		&lt;PrincipalPoint&gt;&lt;X&gt;240&lt;/X&gt;&lt;Y&gt;180&lt;/Y&gt;&lt;/PrincipalPoint&gt;<br/>
+	 *	&lt;/Camera&gt;
+	 *
+	 * Note: The camera parameters can be automatically loaded for selected Android and iOS devices by passing an empty string.
+	 * In case camera parameters for the device are not loaded, the method will return false.
+	 *
 	 * Hand-eye calibration set with setHandEyeCalibration is not changed by this method.
 	 *
-	 * \param	parameters	Path to the camera parameters file or complete XML string.
-	 * \param	cameraType	Camera type, i.e. tracking, rendering or both
-	 * \return true if successful, false otherwise.
+	 * \param	parametersFilePath	Path to the camera parameters XML file
+	 * \param	cameraType			Camera type, i.e. tracking, rendering or both
+	 * \return True if successful, false otherwise
 	 * \sa getCameraParameters, setCameraParameters
 	 * \sa ECAMERA_TYPE
 	 * \sa setHandEyeCalibration
 	 */
-	virtual bool setCameraParameters(const stlcompat::String& parameters, ECAMERA_TYPE cameraType=ECT_ALL) = 0;
+	virtual bool setCameraParameters(const metaio::Path& parametersFilePath, ECAMERA_TYPE cameraType=ECT_ALL) = 0;
 
 	/**
 	 * Set custom camera intrinsic parameters.
@@ -212,18 +311,19 @@ public:
 		const metaio::Vector2d& principalPoint, const metaio::Vector4d& distortion, ECAMERA_TYPE cameraType=ECT_ALL) = 0;
 
 	/**
-     * Get the currently used camera intrinsic parameters.
+     * Get the currently used or original camera intrinsic parameters.
      *
      * \param[out] imageResolution   The resolution (width=x and height=y) of the camera image in pixels.
      * \param[out] focalLengths      The horizontal (x) and vertical (y) focal lengths of the camera in pixels.
      * \param[out] principalPoint    The principal point of the camera in pixels.
 	 * \param[out] distortion		 Distortion coefficients
 	 * \param cameraType camera type, i.e. tracking or rendering
+	 * \param original Original camera intrinsic parameters if true, else currently used parameters (default)
 	 * \sa setCameraParameters
 	 * \sa ECAMERA_TYPE
      */
     virtual void getCameraParameters(metaio::Vector2di* const imageResolution, metaio::Vector2d* const focalLengths, 
-		metaio::Vector2d* const principalPoint, Vector4d* const distortion, ECAMERA_TYPE cameraType=ECT_TRACKING) const = 0;
+		metaio::Vector2d* const principalPoint, Vector4d* const distortion, ECAMERA_TYPE cameraType=ECT_TRACKING, bool original=false) const = 0;
 
 	/**
      * Get the currently used camera intrinsic parameters.
@@ -299,14 +399,37 @@ public:
 	virtual Vector2di setImage(const stlcompat::String& source) = 0;
 
 	/**
+	 * Set an image file as image source.
+	 *
+	 * This method is used to set the image source from a file for rendering and tracking. It will
+	 * automatically stop camera capture if currently running. Call startCamera again to resume
+	 * capturing from camera.
+	 *
+	 * Supported file formats are JPG, PNG, BMP, PPM and PGM.
+	 *
+	 * If the image does not pertain to the current camera parameters (set with setCameraParameters),
+	 * e.g. a widescreen image like 1280x720, you should first set appropriate parameters and only
+	 * then call setImage. Else the SDK will try to adjust the current parameters to the image's
+	 * resolution.
+	 *
+	 * \param source Path to an image file
+	 * \return Resolution of the image if loaded successfully, else a null vector.
+	 * \sa startCamera
+	 * \sa setCameraParameters
+	 */
+	virtual Vector2di setImage(const metaio::Path& source) = 0;
+
+	/**
 	 *  Set an image from memory.
 	 *
 	 *	This method is used to set the image source for rendering and tracking. Valid color
-	 *	formats are ECF_YUV420SP and ECF_A8R8G8B8. On Unity, only ECF_R8G8B8 is supported at the
+	 *	formats are ECF_NV21, ECF_NV12 (iOS only) and ECF_RGBA8. On Unity, only ECF_RGBA8 is supported at the
 	 *	moment.
 	 *
-	 *	Note: On iOS and Android, this function is only available with a signature retrieved using a PRO license.
-	 *		  However on Win32 you can use also use it with Free or Basic license.
+	 *	Note: On Android and iOS, this function is only available when using the inbuilt renderer. To use
+	 *        it with custom renderer Basic or Pro license is required. 
+	 *        On Windows platform it is always available.
+	 *		  
 	 * If the image does not pertain to the current camera parameters (set with setCameraParameters),
 	 * e.g. a widescreen image like 1280x720, you should first set appropriate parameters and only
 	 * then call setImage. Else the SDK will try to adjust the current parameters to the image's
@@ -317,8 +440,14 @@ public:
 	 *                       the SDK uses it (i.e. until the next setImage or startCamera call), set
 	 *                       this to false to avoid unnecessary copying. If true, the SDK will copy
 	 *                       the image buffer immediately and takes care of destroying it later.
+	 *                       This also applies to the depth image buffer and the UV map buffer if
+	 *                       they are provided. 
+	 * \param pDepthImage	A 16-bit integer depth image, specifying depth value per pixel in mm. A 
+	 *						value of 0 indicates that no depth measurement is available. The color format 
+	 *						must be ECF_D16. 
 	 */
-	virtual void setImage(const ImageStruct& image, bool forceCopyImage = false) = 0;
+	virtual void setImage(const ImageStruct& image, bool forceCopyImage = false, 
+		const ImageStruct* pDepthImage = NULL) = 0;
 
 	/**
 	 * Get a list of all available cameras
@@ -328,31 +457,6 @@ public:
 	 * \return Definitions of available cameras
 	 */
 	virtual metaio::stlcompat::Vector<metaio::Camera> getCameraList() const = 0;
-
-	/**
-	 * Start capturing on a camera.
-	 *
-	 * Start the specified camera with the given capture resolution (optional).
-	 * The captured image can be optionally downsampled for tracking to allow rendering at higher resolution.
-	 * This is always valid on Android, while on other platforms, it is only valid if YUV pipeline
-	 * is enabled.
-	 * The YUV pipeline can only be enabled on Android or iOS. It is enabled by default on these
-	 * platforms.
-
-	 * \deprecated This method is deprecated and will be removed in the future version. Please use startCamera
-	 *             with Camera object containing full parameters.
-	 *
-	 * \param index The index of the camera to start (zero-based).
-	 * \param width The desired width of the camera frame (default=320).
-	 * \param height The desired height of the camera frame (default=240).
-	 * \param downsample downsampling factor for the tracking image(default=1 means no downsampling), e.g. 2 or 3.
-	 * \param enableYUVpipeline Enable/disable processing camera frames in YUV color space (default=true).
-	 *	This is ignored on Windows and OSX because YUV pipeline can only be enabled on Android or iOS.
-	 * \return Actual camera frame resolution (x = width, y = height) on success, else a null vector.
-	 * \sa stopCamera
-	 */
-	virtual Vector2di startCamera(int index, unsigned int width = 320, unsigned int height = 240,
-		int downsample = 1, bool enableYUVpipeline = true) = 0;
 
 	/**
 	 * Start capturing on a camera.
@@ -374,6 +478,23 @@ public:
 	virtual bool startCamera(Camera& camera) = 0;
 
 	/**
+	 * Start capturing on the default camera with the given facing.
+	 * It will use default rest of the camra parameters such as resolution, fps etc.
+	 * Call getCamera to retrieve camera parameters used by this method.
+	 *
+	 * In case no camera is found with the given facing, it will start the default camera
+	 * as a fallback.
+	 *
+	 * If you need to change the default parameters, use the other startCamera method
+	 * with the Camera object retrieved by calling getCameraList.
+	 *
+	 * \param facing Facing of the camera to start, if FACE_UNDEFINED is passed
+	 *               it will simple start the first found camera
+	 * \param true on success, false on failure
+	 */
+	virtual bool startCamera(int facing = Camera::FACE_UNDEFINED) = 0;
+
+	/**
 	 *  Stop capturing on a camera.
 	 *
 	 *	Use this to stop capturing on the current camera.
@@ -384,6 +505,8 @@ public:
 
 	/**
 	 * Get currently running camera
+	 * 
+	 * \return the Camera object 
 	 * \sa startCamera
 	 */
 	virtual Camera getCamera() = 0;
@@ -506,6 +629,28 @@ public:
 	virtual void requestCameraImage(const stlcompat::String& filepath, int width = 0, int height = 0) = 0;
 
 	/**
+	 * Request a high resolution camera image that will be saved as file.
+	 *
+	 * The result is notified in IMetaioSDKCallback.onCameraImageSaved. In case of failure,
+	 * an empty string will be returned, else the string will have full path
+	 * of the file. 
+	 * 
+	 * Note: On iOS devices the resolution depends on the actual device. An appropriate resolution
+	 * is chosen automatically depending on the specified width (e.g. width=9999 will choose the
+	 * highest resolution).
+	 * Use width/height=0 if you want to use the resulting image with setImage(), this will choose
+	 * the current capturing resolution.
+	 *
+	 * \param	filePath	File path to write, currently only JPEG is supported
+	 * \param	width		Desired width of the camera image (if 0, it will be the current capturing width)
+	 * \param	height		Desired height of the camera image (if 0, it will be the current capturing height)
+	 *
+	 * \sa registerCallback to register a callback.
+	  * \sa IMetaioSDKCallback::onCameraImageSaved
+	 */
+	virtual void requestCameraImage(const metaio::Path& filePath, int width = 0, int height = 0) = 0;
+
+	/**
 	 * Request screen shot in memory.
 	 * The screenshot will be returned in IMetaioSDKCallback::onScreenshot
 	 * as a new ImageStruct object in the next render cycle.
@@ -525,25 +670,29 @@ public:
 	 *
 	 * The result will be notified in IMetaioSDKCallback::onScreenshot. In case
 	 * of success, the full path to the file will be passed, else an empty string.
-	 * \param filepath Filepath where screenshot should be saved, or empty string to use
+	 * \param filePath File path where screenshot should be saved, or empty string to use
 	 *                 temporary directory
      * \param frameBuffer Frame Buffer (iOS only)
      * \param renderBuffer Render Buffer (iOS only)
 	 * \sa IMetaioSDKCallback::onScreenshotSaved
 	 * \sa setRendererFrameBuffers
 	 */
-	virtual void requestScreenshot(const stlcompat::String& filepath, unsigned int frameBuffer = 0, unsigned int renderBuffer = 0) = 0;
+	virtual void requestScreenshot(const stlcompat::String& filePath, unsigned int frameBuffer = 0, unsigned int renderBuffer = 0) = 0;
+	/// \copydoc requestScreenshot(const stlcompat::String&, unsigned int, unsigned int)
+	virtual void requestScreenshot(const metaio::Path& filePath, unsigned int frameBuffer = 0, unsigned int renderBuffer = 0) = 0;
 
 	/** 
 	 * Set the renderbuffers for iOS screenshot functionality.
 	 * If you pass in the valid framebuffers here, it's not necessary anymore to specify them
 	 * in the requestScreenshot functions.
 	 *
-	 * \param frameBuffer the default framebuffer
-	 * \param renderBuffer the default renderBuffer
-	 *
+	 * \param frameBuffer			The default framebuffer
+	 * \param renderBuffer			The default renderbuffer
+	 * \param usingMultisampling	Whether multisampling is used for the renderbuffer. At the
+	 *								moment, this value is only important for the screenshot
+	 *								functionality on iOS.
 	 */
-	virtual void setRendererFrameBuffers( unsigned int frameBuffer, unsigned int renderBuffer ) = 0;
+	virtual void setRendererFrameBuffers(unsigned int frameBuffer, unsigned int renderBuffer, bool usingMultisampling) = 0;
 
 	/**
 	 * Enable or disable the advanced rendering features. If this option is
@@ -619,18 +768,6 @@ public:
 	virtual void setConstantBlurIntensity(const float intensity) = 0;
 	
 	/**
-	 * Take a screenshot and put it into an ImageStruct.
-	 *
-	 * The returned ImageStruct and its' buffer must be released by the
-	 * caller.
-	 *
-	 * \deprecated Use requestScreenshot
-	 * \return Returns a new ImageStruct containing the screenshot.
-	 * \sa requestScreenshot
-	 */
-	virtual ImageStruct* getScreenshot() = 0;
-
-	/**
 	 * Get the duration in milliseconds per frame it took to render the 3D geometry, UI and camera image.
 	 *
 	 * \return The duration in seconds for rendering the last frame.
@@ -685,7 +822,7 @@ public:
 	 */
 	virtual void getTrackingValues(int coordinateSystemID, float* matrix,
 	                               bool preMultiplyWithStandardViewMatrix = true,
-								   bool rightHanded = false) = 0;
+								   bool rightHanded = false) const = 0;
 
 	/**
 	 * Allows to get the state of the tracking system for a given coordinate system.
@@ -702,7 +839,7 @@ public:
 	 * \param coordinateSystemID The (one-based) index of the coordinate system, the values should be retrieved for.
 	 * \return A TrackingValues object containing the tracking values for the desired coordinate system.
 	 */
-	virtual metaio::TrackingValues getTrackingValues(int coordinateSystemID, bool rotate = false) = 0;
+	virtual metaio::TrackingValues getTrackingValues(int coordinateSystemID, bool rotate = false) const = 0;
 
 	/**
 	 * Get the TrackingValues of all tracked coordinate systems.
@@ -716,7 +853,7 @@ public:
 	 * \sa metaio::IMetaioSDKCallback.onTrackingEvent
 	 * \return A vector containing the TrackingValues.
 	 */
-	virtual metaio::stlcompat::Vector<metaio::TrackingValues> getTrackingValues(bool rotate = false) = 0;
+	virtual metaio::stlcompat::Vector<metaio::TrackingValues> getTrackingValues(bool rotate = false) const = 0;
 
 	/**
 	 * Set whether IMetaioSDKCallback::onTrackingEvent should always receive all tracking values and
@@ -846,20 +983,31 @@ public:
 	 *
 	 * \param translation	Translation component of the transform
 	 * \param rotation		Rotation component of the transform
-	 * \param cameraType	Camera type for which to set the hand-eye calibration - one of
-	 *						ECT_RENDERING, ECT_RENDERING_LEFT or ECT_RENDERING_RIGHT (defaults to
-	 *						ECT_RENDERING)
+	 * \param cameraType	Camera type(s) for which to set the hand-eye calibration
+	 *						(combination of ECT_RENDERING_MONO, ECT_RENDERING_STEREO_LEFT,
+	 *						ECT_RENDERING_STEREO_RIGHT)
 	 */
-	virtual void setHandEyeCalibration(const Vector3d& translation, const Rotation& rotation, ECAMERA_TYPE cameraType=ECT_RENDERING) = 0;
+	virtual void setHandEyeCalibration(const Vector3d& translation, const Rotation& rotation, ECAMERA_TYPE cameraType) = 0;
+
+	/**
+	 * Sets the hand-eye calibration for stereo rendering for well-known devices
+	 *
+	 * If the device is unknown, nothing is changed. At the moment, there are only Android
+	 * devices (with stereo rendering) that we support, such as the Epson Moverio glasses.
+	 *
+	 * \return True if a calibration was set, false if nothing was changed because device is unknown
+	 */
+	virtual bool setHandEyeCalibrationByDevice() = 0;
 
 	/**
 	 * Get hand-eye calibration
 	 * \param[out] translation	Translation component of the transform
 	 * \param[out] rotation		Rotation component of the transform
 	 * \param cameraType		Camera type for which to return the hand-eye calibration
-	 *							(ECT_RENDERING, ECT_RENDERING_LEFT or ECT_RENDERING_RIGHT)
+	 *							(ECT_RENDERING_MONO, ECT_RENDERING_STEREO_LEFT or
+	 *							ECT_RENDERING_STEREO_RIGHT)
 	 */
-	virtual void getHandEyeCalibration(Vector3d* const translation, Rotation* const rotation, ECAMERA_TYPE cameraType=ECT_RENDERING) = 0;
+	virtual void getHandEyeCalibration(Vector3d* const translation, Rotation* const rotation, ECAMERA_TYPE cameraType) = 0;
 
 	/**
 	 * Check if stereo rendering is enabled
@@ -915,8 +1063,6 @@ public:
 	 *
 	 * The clipping plane limits must be greater than 0 and far clipping plane
 	 * limit must be greater than near clipping plane limit.
-	 * 
-	 * Note: This should be called after initializeRenderer() on Android.
 	 *
 	 * \param nearCP The distance of the near clipping plane in millimeters.
 	 * \param farCP The distance of the far clipping plane in millimeters.
@@ -939,6 +1085,23 @@ public:
 	 * \return Pointer to the geometry. Null pointer if not successful.
 	 */
 	virtual IGeometry* createGeometry(const stlcompat::String& filepath) = 0;
+
+	/**
+	 * Load a 3D geometry from a given file.
+	 *
+	 * This function loads a 3D geometry from the given file. The file format can be OBJ, MD2 or
+	 * converted FBX. ZIP archive containing 3D geometry is also supported.
+	 *
+	 * The geometry can be deleted by calling unloadGeometry.
+	 *
+	 * \sa createGeometryFromMovie to create a 3D plane to play a movie file
+	 * \sa createGeometryFromImage to create a 3D plane showing an image
+	 * \sa unloadGeometry to unload the geometry.
+	 *
+	 * \param path Path to the geometry file to load.
+	 * \return Pointer to the geometry. Null pointer if not successful.
+	 */
+	virtual IGeometry* createGeometry(const metaio::Path& path) = 0;
 
 	/**
 	 * Loads an image from a given file and places it on a generated 3D-plane.
@@ -968,11 +1131,36 @@ public:
 			const bool autoScale = true) = 0;
 
 	/**
-	 * Loads an image from given ImageStruct and places it on a generated 3D-plane.
+	 * Loads an image from a given file and places it on a generated 3D-plane.
 	 *
 	 * This function loads an image from a given file and places it on a generated 3D-plane.
 	 * You can unload the geometry again with unloadGeometry().
 	 * Supported image formats are PNG, JPG and BMP.
+	 *
+	 * \sa unloadGeometry to unload the geometry.
+	 * \sa createGeometry
+	 * \sa createGeometryFromMovie
+	 *
+	 * \param filePath Path to the image file.
+	 * \param displayAsBillboard true if the plane should be rendered as a billboard (always facing camera)
+	 * \param autoScale true if the plane size should be assigned a height of 100, and width of
+	 *        100*{image width}/{image height}. false if the size should be the image width and height
+	 *        (e.g. 640 by 480 units for a 640x480 image)
+	 * \return Pointer to the geometry. Null pointer if not successful.
+	 */
+	virtual IGeometry* createGeometryFromImage(const metaio::Path& filePath,
+	    bool displayAsBillboard = false,
+		bool autoScale = true) = 0;
+
+	/**
+	 * Loads an image from given ImageStruct and places it on a generated 3D-plane.
+	 *
+	 * This function loads an image from a given file and places it on a generated 3D-plane.
+	 * You can unload the geometry again with unloadGeometry().
+	 *
+	 * Supported image formats are GRAY8, BGR8, BGRA8, RGB8, RGBA8, NV21, NV12, YV12 and YUY2.
+	 * Note that texture is always converted to RGBA8, therefore if another color format is
+	 * used, it may impact performance.
 	 *
 	 * \sa unloadGeometry to unload the geometry.
 	 * \sa createGeometry
@@ -1007,7 +1195,7 @@ public:
 	 * \sa createGeometryFromImage to create a 3D plane showing an image
 	 * \sa unloadGeometry to unload the geometry.
 	 *
-	 * \param	filepath				Path to the movie file.
+	 * \param	filePath				Path to the movie file.
 	 * \param	transparentMovie		True if the movie contains an alpha-plane next to the movie itself. default is false.
 	 * \param	displayAsBillboard		True if the plane should be rendered as a billboard (always
 	 *									facing camera). You may want to consider setting this to
@@ -1016,9 +1204,14 @@ public:
 	 *									independent of trackable orientation.
 	 * \return Pointer to the geometry. Null pointer if not successful.
 	 */
-	virtual IGeometry* createGeometryFromMovie(const stlcompat::String& filepath,
+	virtual IGeometry* createGeometryFromMovie(const stlcompat::String& filePath,
 	        const bool transparentMovie = false,
 	        const bool displayAsBillboard = false) = 0;
+
+	/// \copydoc createGeometryFromMovie(const stlcompat::String&, const bool, const bool)
+	virtual IGeometry* createGeometryFromMovie(const metaio::Path& filePath,
+	    bool transparentMovie = false,
+	    bool displayAsBillboard = false) = 0;
 
 	/**
 	 * Creates and adds a new light.
@@ -1105,20 +1298,6 @@ public:
 	/**
 	 * Determines the front-most 3D geometry that is located at a given viewport coordinate.
 	 *
-	 * \deprecated	This method is deprecated and will be removed in a future version. Please use
-	 *				getGeometryFromViewportCoordinates instead.
-	 * \param x The x-component of the viewport coordinate.
-	 * \param y The y-component of the viewport coordinate.
-	 * \param useTriangleTest If true, all triangles are tested which is more accurate but slower. If set to false, bounding boxes are used instead.
-	 * \sa getAllGeometriesFromViewportCoordinates
-	 * \return A pointer to the geometry. If no 3D geometry is located at the given coordinate, it's a null pointer.
-	 */
-	virtual metaio::IGeometry* getGeometryFromScreenCoordinates(int x, int y,
-		bool useTriangleTest = false) const = 0;
-
-	/**
-	 * Determines the front-most 3D geometry that is located at a given viewport coordinate.
-	 *
 	 * \param x The x-component of the viewport coordinate.
 	 * \param y The y-component of the viewport coordinate.
 	 * \param useTriangleTest If true, all triangles are tested which is more accurate but slower. If set to false, bounding boxes are used instead.
@@ -1134,46 +1313,28 @@ public:
 	 * The returned coordinates are only valid if the specified coordinate system is currently
 	 * being tracked.
 	 *
-	 * \deprecated	This method is deprecated and will be removed in a future version. Please use
-	 *				getViewportCoordinatesFrom3DPosition instead.
 	 * \param coordinateSystemID The (one-based) index of the coordinate system in which the 3D point is defined.
 	 * \param point A 3D point on the specified coordinate system.
 	 * \param forRelativeToScreenGeometry Set this to true to find correct viewport coordinates for RTS geometries
 	 * \return A 2D vector containing the viewport coordinates. The origin is at Top-Left that is consistent with
 	 *	the touch coordinates.
-	 */
-	virtual Vector2d getScreenCoordinatesFrom3DPosition(int coordinateSystemID, const Vector3d& point, bool forRelativeToScreenGeometry = false) const = 0;
-
-	/**
-	 * Converts the given 3D point to viewport coordinates.
-	 *
-	 * The returned coordinates are only valid if the specified coordinate system is currently
-	 * being tracked.
-	 *
-	 * \param coordinateSystemID The (one-based) index of the coordinate system in which the 3D point is defined.
-	 * \param point A 3D point on the specified coordinate system.
-	 * \param forRelativeToScreenGeometry Set this to true to find correct viewport coordinates for RTS geometries
-	 * \return A 2D vector containing the viewport coordinates. The origin is at Top-Left that is consistent with
-	 *	the touch coordinates.
+	 * \sa getCameraImageCoordinatesFrom3DPosition
 	 */
 	virtual Vector2d getViewportCoordinatesFrom3DPosition(int coordinateSystemID, const Vector3d& point, bool forRelativeToScreenGeometry = false) const = 0;
 
 	/**
-	 * Converts viewport coordinates to the corresponding 3D point on the plane of the tracked target.
+	 * Convert the given 3D point in the given tracked coordinate system to a 2D point on the camera image.
 	 *
-	 * The function will only return (0,0,0) if the COS ID is invalid. The z value is always 0
-	 * because the point lies on the plane defined by the tracked target.
+	 * The returned 2D point is only valid of the given coordinate system is currently being tracked.
 	 *
-	 * \deprecated	This method is deprecated and will be removed in a future version. Please use
-	 *				get3DPositionFromViewportCoordinates instead.
-	 * \param coordinateSystemID The coordinate system in which the 3D point is defined
-	 * \param point The 2D viewport coordinates to use
-	 * \param distance the distance vector that specifies the distance of the plane from the origin
-	 * \param normal the normal factor that specifies the direction and size of the plane
-	 * \return A 3D vector containing the coordinates of the resulting 3D point.
+	 * \param coordinateSystemID The (one-based) index of the coordinate system in which the 3D point is defined.
+	 * \param point A 3D point on the specified coordinate system.
+	 * \return A 2D vector containing the camera image coordinates. The origin is at Top-Left that is consistent with
+	 *  the touch coordinates.
+	 * \sa getViewportCoordinatesFrom3DPosition
 	 */
-	virtual Vector3d get3DPositionFromScreenCoordinates(int coordinateSystemID, const Vector2d& point, const Vector3d& distance = Vector3d(0.0f, 0.0f, 0.0f), const Vector3d& normal = Vector3d(0.0f, 0.0f, 1.0f)) const = 0;
-
+	virtual Vector2d getCameraImageCoordinatesFrom3DPosition(int coordinateSystemID, const Vector3d& point) const = 0;
+		 
 	/**
 	 * Converts viewport coordinates to the corresponding 3D point on the plane of the tracked target.
 	 *
@@ -1188,18 +1349,6 @@ public:
 	 */
 	virtual Vector3d get3DPositionFromViewportCoordinates(int coordinateSystemID, const Vector2d& point, const Vector3d& distance = Vector3d(0.0f, 0.0f, 0.0f), const Vector3d& normal = Vector3d(0.0f, 0.0f, 1.0f)) const = 0;
 
-	/**
-	 * Converts screen coordinates to the corresponding 3D point on surface of the touched model.
-	 *
-	 * The function will only return (0,0,0) if there's no model at the given screen position
-	 *
-	 * \deprecated	This method is deprecated and will be removed in a future version. Please use
-	 *				getAllGeometriesFromViewportCoordinates and GeometryHit::objectCoordinates instead.
-	 * \param point The 2D screen coordinate to use.
-	 * \param useTriangleTest If true, all triangles are tested which is more accurate but slower. If set to false, bounding boxes are used instead.
-	 * \return A 3D vector containing the coordinates of the resulting 3D point.
-	 */
-	virtual Vector3d get3DLocalPositionFromScreenCoordinates(const Vector2d& point, const bool useTriangleTest = false) const = 0;
 
 	/**
 	 * Set the rendering limits for geometries with LLA coordinates.
@@ -1232,32 +1381,24 @@ public:
 	 */
 	virtual metaio::IAnnotatedGeometriesGroup* createAnnotatedGeometriesGroup() = 0;
 
-	/**
-	 * Creates or gets the billboard group object.
-	 *
-	 * Calling this function the first time will create a billboard group. Calling it again, will return the
-	 * previously created object.
-	 *
-	 * A billboard group takes a set of billboards and reorders them in space. All billboards within the set are
-	 * placed in space relative to each other. First the billboard distance to the global origin (3d camera position)
-	 * is adjusted (in the range [nearValue, farValue] see parameters) and then the billboards are arranged in
-	 * clip space that they don't overlap anymore.
-	 *
-	 * \param nearValue The minimum billboard-to-camera distance in meters a billboard can have (default 0.5m).
-	 * \param farValue The maximum billboard-to-camera distance in meters a billboard can have (default 3.0m).
-	 * \return Pointer to the billboard group.
-	 */
-	virtual metaio::IBillboardGroup* createBillboardGroup(const float nearValue=0.5f, const float farValue=3.f) = 0;
 
 	/**
 	 * Loads shader materials from XML (file or buffer)
 	 *
-	 * \param filenameOrXmlContent Path to shader materials XML file, or the XML content itself
+	 * \param filePathOrXmlContent Path to shader materials XML file, or the XML content itself
 	 *                             as string
-	 * \param isFile Whether filenameOrXmlContent specifies a file path
+	 * \param isFile Whether filePathOrXmlContent specifies a file path
 	 * \return bool True on success, false on error
 	 */
-	virtual bool loadShaderMaterials(const stlcompat::String& filenameOrXmlContent, bool isFile = true) = 0;
+	virtual bool loadShaderMaterials(const stlcompat::String& filePathOrXmlContent, bool isFile = true) = 0;
+
+	/**
+	 * Loads shader materials from XML file
+	 *
+	 * \param	filePath	Path to shader materials XML file
+	 * \return bool True on success, false on error
+	 */
+	virtual bool loadShaderMaterials(const metaio::Path& filePath) = 0;
 
 	/**
 	 * Create and add radar object. The radar object is destroyed with the
@@ -1333,15 +1474,17 @@ public:
 	 * "positive_x.png", "positive_y.png", "positive_z.png",
 	 * "negative_x.png", "negative_y.png",	"negative_z.png".
 	 *
-	 * \param folder In case of envMapFormat = EEMF_CUBESIDES, the path of a folder that 
-	 *				 should contain six PNG image files containing the textures for the six faces of 
-	 *				 the cube. In case of envMapFormat = EEMF_LATLONG, folder must be set to the file 
-	 *				 URI of the lat-long-image.
+	 * \param	path	In case of envMapFormat = EEMF_CUBESIDES, the path of a folder that 
+	 *					should contain six PNG image files containing the textures for the six faces
+	 *					of the cube. In case of envMapFormat = EEMF_LATLONG, folder must be set to
+	 *					the file URI of the lat-long-image.
 	 * \param envMapFormat format of given environment map
 	 * \return Returns true, if the environment map was successfully loaded.
 	 * \sa metaio::EENV_MAP_FORMAT
 	 */
-	virtual bool loadEnvironmentMap(const stlcompat::String& folder, EENV_MAP_FORMAT envMapFormat = EEMF_CUBESIDES) = 0;
+	virtual bool loadEnvironmentMap(const stlcompat::String& path, EENV_MAP_FORMAT envMapFormat = EEMF_CUBESIDES) = 0;
+	/// \copydoc loadEnvironmentMap(const stlcompat::String&, EENV_MAP_FORMAT)
+	virtual bool loadEnvironmentMap(const metaio::Path& path, EENV_MAP_FORMAT envMapFormat = EEMF_CUBESIDES) = 0;
 
 	/**
 	 * This function will pause all currently running movie textures.
@@ -1389,6 +1532,8 @@ public:
 
 	/**
 	 * Get currently running sensors that have been started by the SDK.
+	 * 
+	 * \return bitmask of currently running sensors
 	 * \sa metaio::ISensorsComponent
 	 */
 	virtual int getRunningSensors() const = 0;
@@ -1400,8 +1545,9 @@ public:
 	 * Some times a sensor need a more fine grained control, e.g. for Stereo-SLAM initialization it
 	 * is helpful to specify an output file, without needing to re-generate XML file.
 	 *
-	 * \param command the command to send to the sensor
-	 * \param parameter the parameters for the sensor
+	 * \param command	Command to send to the sensor
+	 * \param parameter	The parameters for the sensor. If you use file/directory paths in the
+	 *					parameter, they must be encoded as UTF-8 (see metaio::Path::asUTF8).
 	 * \return result of the command
 	 */
 	virtual stlcompat::String sensorCommand(const stlcompat::String& command, const stlcompat::String& parameter = "") = 0 ;
@@ -1426,6 +1572,7 @@ public:
 	 * \return the id, 0 if coordinate system name is not found
 	 */
 	virtual int getCoordinateSystemID(const stlcompat::String& name) = 0;
+
 
 };
 

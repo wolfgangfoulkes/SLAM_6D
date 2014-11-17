@@ -1,27 +1,22 @@
-//
-// LiveViewInterfaceController.h
-// Junaio
-//
-//  Created by Stefan Misslinger on 10/2/09.
-//  Copyright 2013 metaio, Inc. All rights reserved.
-//
+// Copyright 2007-2014 Metaio GmbH. All rights reserved.
+
 #import "MetaioViewControllerClosingCallback.h"
 #import "POIDetailViewController.h"
+#import <GLKit/GLKit.h>
 
 // forward declarations
 @class ASEAGLView;
 
-@interface LiveViewInterfaceController : UIViewController
- <UINavigationControllerDelegate, UIWebViewDelegate, UIGestureRecognizerDelegate, POIDetailViewControllerDelegate, UIAlertViewDelegate>
+@interface LiveViewInterfaceController : GLKViewController
+ <UINavigationControllerDelegate, UIWebViewDelegate, UIGestureRecognizerDelegate, POIDetailViewControllerDelegate, UIAlertViewDelegate, GLKViewControllerDelegate>
 {	
 }
 
-@property (readonly, nonatomic, getter=isAnimating) BOOL animating;
-@property (nonatomic) NSInteger animationFrameInterval;
+//@property (readonly, nonatomic, getter=isAnimating) BOOL animating;
+//@property (nonatomic) NSInteger animationFrameInterval;
 
 @property (nonatomic, retain) IBOutlet UILabel*                         messageActivityLabel;		// Label that
 //@property (nonatomic, retain) IBOutlet LiveViewObjectContextView*		objectContextView;
-@property (nonatomic, retain) IBOutlet ASEAGLView*                        glView;
 @property (nonatomic, retain) IBOutlet UIView*							interfaceView;
 @property (nonatomic, retain) IBOutlet UIWebView*                       arelWebView;
 @property (nonatomic, retain) IBOutlet UIProgressView*                  progressView;
@@ -34,16 +29,6 @@
 
 /** Override this method if you want to display your webviewcontroller in a different way */
 - (void) presentContentViewController: (UIViewController<MetaioViewControllerClosingCallback>*) contentViewController;
-
-
-/** Implementation to get a billboard image for a poi
- * \param poi the poi
- * \param image the thumbnail of the poi
- * \param attribution image (might be NULL)
- * \return the image
- */
-- (UIImage*) getBillboardImageForPOI: (const metaio::IARELObject*) poi withThumbnail: (UIImage*) image  attributionImage:(UIImage*) image;
-
 
 /** Overwrite this method to provide your own viewcontroller for displaying URLs
  * \param url the URL that should be openend

@@ -1,4 +1,5 @@
-// Copyright 2007-2013 metaio GmbH. All rights reserved.
+// Copyright 2007-2014 metaio GmbH. All rights reserved.
+// This file is part of Metaio SDK 6.0 beta
 #ifndef _AS_ERROR_CODES_H_
 #define _AS_ERROR_CODES_H_
 
@@ -18,6 +19,7 @@
  */
 #define AS_ERROR_CAPTURE_NOT_INITIALIZED			0x200
 #define AS_ERROR_CAPTURE_START_FAILED				0x201
+#define AS_ERROR_CAPTURE_NOT_FOUND					0x202
 
 /**
  * Tracking error codes

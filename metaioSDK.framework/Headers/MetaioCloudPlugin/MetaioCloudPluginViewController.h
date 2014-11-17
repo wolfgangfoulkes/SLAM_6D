@@ -1,14 +1,8 @@
-//
-//  MetaioCloudPluginViewController.h
-//  Version 4.7
-//
-//  Created by Stefan Misslinger.
-//  Copyright 2013 metaio, Inc. All rights reserved.
-//
+// Copyright 2007-2014 Metaio GmbH. All rights reserved.
 
 #import <UIKit/UIKit.h>
 #include <vector>
-#include <MetaioSDK/TrackingValues.h>
+#include <MetaioSDK/Common/TrackingValues.h>
 
 #import "LiveViewInterfaceController.h"
 #import "MetaioCloudPluginDelegate.h"
@@ -43,14 +37,6 @@ static const int ANCHOR_BR = ANCHOR_BOTTOM|ANCHOR_RIGHT;			///< Anchor to the Bo
 /** Override this method if you want to display your webviewcontroller in a different way */
 - (void) presentContentViewController: (UIViewController<MetaioViewControllerClosingCallback>*) contentViewController;
 
-
-/** Implementation to get a billboard image for a poi
- * \param poi the poi
- * \param image the thumbnail of the poi
- * \param attribution image (might be NULL)
- * \return the image
- */
-- (UIImage*) getBillboardImageForPOI: (const metaio::IARELObject*) poi withThumbnail: (UIImage*) image  attributionImage:(UIImage*) image;
 
 /** Overwrite this method to provide your own viewcontroller for displaying URLs
  * \param url the URL that should be openend

@@ -6,8 +6,8 @@
 //
 
 #import <QuartzCore/QuartzCore.h>
-#import <metaioSDK/IGeometry.h>
-#import <metaioSDK/STLCompatibility.h>
+#import <metaioSDK/Rendering/IGeometry.h>
+#import <metaioSDK/Common/STLCompatibility.h>
 #import "EAGLView.h"
 #import "MetaioSDKViewController.h"
 
@@ -129,7 +129,7 @@
     m_metaioSDK->initializeRenderer(screenSize.x, screenSize.y, metaio::getScreenRotationForInterfaceOrientation(self.interfaceOrientation), metaio::ERENDER_SYSTEM_OPENGL_ES_2_0, context);
     
     // necessary for requesting screenshots
-    m_metaioSDK->setRendererFrameBuffers([glView getDefaultFrameBuffer], [glView getColorRenderBuffer]);
+    //m_metaioSDK->setRendererFrameBuffers([glView getDefaultFrameBuffer], [glView getColorRenderBuffer]);
     
     
     // register our callback method for animations
@@ -410,6 +410,9 @@
     {
         m_metaioSDK->render();    
     }
+    
+    metaio::Vector3d g = m_sensors->getGravity();
+    NSLog(@"gravity: (%f, %f, %f)",  g.x, g.y, g.z );
     
     [glView presentFramebuffer];
 }

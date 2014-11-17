@@ -1,4 +1,5 @@
-// Copyright 2007-2013 metaio GmbH. All rights reserved.
+// Copyright 2007-2014 metaio GmbH. All rights reserved.
+// This file is part of Metaio SDK 6.0 beta
 #ifndef _AS_WARNING_CODES_H_
 #define _AS_WARNING_CODES_H_
 
@@ -12,6 +13,11 @@
 #define AS_WARN_FILE_INVALID						0x104
 #define AS_WARN_INVALID_PARAMETERS					0x105
 #define AS_WARN_UNSUPPORTED_OPERATION				0x106
+
+/**
+ * Capture component error codes
+ */
+#define AS_WARN_CAPTURE_NOT_FOUND					0x202
 
 /**
  * SDK warning codes

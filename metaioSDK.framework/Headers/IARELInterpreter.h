@@ -1,10 +1,11 @@
-// Copyright 2007-2013 metaio GmbH. All rights reserved.
+// Copyright 2007-2014 metaio GmbH. All rights reserved.
+// This file is part of Metaio SDK 6.0 beta
 #ifndef _AS_IARELINTERPRETER_
 #define _AS_IARELINTERPRETER_
 
-#include <metaioSDK/IARELInterpreterCallback.h>
-#include <metaioSDK/STLCompatibility.h>
-#include <metaioSDK/Vector3d.h>
+#include "IARELInterpreterCallback.h"
+#include "Common/STLCompatibility.h"
+#include "Common/Vector3d.h"
 
 //forward declaration
 class QGraphicsWebView;
@@ -17,6 +18,7 @@ namespace metaio
 class IMetaioSDK;
 class IARELInterpreterIOS;
 class GestureHandler;
+class Path;
 
 /**
 * The main Interface to AREL
@@ -55,8 +57,9 @@ public:
 	/**
 	* Load a AREL file
 	* \param file the filename to load
+	* \return true on success
 	*/
-	virtual bool loadARELFile(const stlcompat::String& file) = 0;
+	virtual bool loadARELFile(const metaio::Path& file) = 0;
 
 	/**
 	* Load an AREL by junaio channel ID.

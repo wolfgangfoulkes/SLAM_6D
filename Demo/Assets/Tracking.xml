@@ -37,6 +37,7 @@
                     <GammaTranslation>1.0</GammaTranslation>
                     <KeepPoseForNumberOfFrames>240</KeepPoseForNumberOfFrames>
                     <ContinueLostTrackingWithOrientationSensor>true</ContinueLostTrackingWithOrientationSensor>
+                    <GravityAssistance>replaceZAxis</GravityAssistance>
                 </Parameters>
             </Fuser>
             <SensorSource>
@@ -78,8 +79,9 @@
                     <AlphaTranslation>1.0</AlphaTranslation>
                     <GammaRotation>0.8</GammaRotation>
                     <GammaTranslation>1.0</GammaTranslation>
-                    <KeepPoseForNumberOfFrames>2400</KeepPoseForNumberOfFrames>
+                    <KeepPoseForNumberOfFrames>240</KeepPoseForNumberOfFrames>
                     <ContinueLostTrackingWithOrientationSensor>true</ContinueLostTrackingWithOrientationSensor>
+                    <GravityAssistance>replaceZAxis</GravityAssistance>
                 </Parameters>
             </Fuser>
             <SensorSource>

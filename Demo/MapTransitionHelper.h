@@ -1,8 +1,8 @@
 #ifndef __MapTransitionHelper__
 #define __MapTransitionHelper__
 
-#include <metaioSDK/TrackingValues.h>	
-#include <metaioSDK/SensorValues.h>
+#include <metaioSDK/Common/TrackingValues.h>
+#include <metaioSDK/Common/SensorValues.h>
 
 namespace metaio
 {
