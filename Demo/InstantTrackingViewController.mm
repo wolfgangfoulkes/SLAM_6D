@@ -104,7 +104,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 	{
 		m_metaioSDK->setTrackingConfiguration([file UTF8String]);
         m_metaioSDK->sensorCommand("drawFeatures", "false");
-	}
+    }
 	else
 	{
 		NSLog(@"SLAM has timed out!");
@@ -234,11 +234,11 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         m_obj->setScale(m_scale);
         
         // Apply the new rotation
-        m_obj->setRotation(newRotation); //* metaio::Rotation(metaio::Vector3d(0, M_PI, 0)));
+        m_obj->setRotation(newRotation.inverse()); //* metaio::Rotation(metaio::Vector3d(0, M_PI, 0)));
         //rotation done relative to camera. dunno how we'd do it with rotating object, but that's what GL is for!
         
         // Apply the new translation
-        m_obj->setTranslation(newTranslation); //pPoint(in real world) - tCam = tPoint(relative to camera)
+        m_obj->setTranslation(metaio::Vector3d(-m_tn.x, -m_tn.y, newTranslation.z));
         
     }
     

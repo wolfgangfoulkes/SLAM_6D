@@ -10,6 +10,7 @@
 	   	</Initialization>
 	    <MinNumberOfObservations>2</MinNumberOfObservations>
 		<SimilarityThreshold>0.7</SimilarityThreshold>
+        <ReferenceImage>IMG_1.JPG</ReferenceImage>
       </Parameters>
       <SensorCOS>
         <SensorCosID>world</SensorCosID>
