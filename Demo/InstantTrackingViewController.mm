@@ -83,7 +83,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 
 - (void) onTrackingEvent:(const metaio::stlcompat::Vector<metaio::TrackingValues>&)poses
 {
-	if (poses.empty())
+    if (poses.empty())
 		return;
     
     // If tracking initialization failed or tracking is lost
@@ -138,7 +138,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
  * Set the tracking configuration file
  */
 - (void) setTrackingConfiguration {
-    NSString* config = [NSString stringWithFormat:@"TrackingConfig_SLAM_orientationSensor"];
+    NSString* config = [NSString stringWithFormat:@"Tracking"];
 	NSString* dir = [NSString stringWithFormat:@"Assets"];
     NSString* ext = [NSString stringWithFormat:@"xml"];
 	NSString* tr = [[NSBundle mainBundle] pathForResource:config ofType:ext inDirectory:dir];
@@ -217,7 +217,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         if(!hasInitPose)
         {
             [self initPoseWithT:newTranslation AndR: newRotation];
-            NSLog(@"init: t = (%f, %f, %f) r = (%f, %f, %f)", m_ti.x, m_ti.y, m_ti.z, m_ri.getEulerAngleDegrees().x, m_ri.getEulerAngleDegrees().y, m_ri.getEulerAngleDegrees().z);
+            printf("init: t = (%f, %f, %f) r = (%f, %f, %f)", m_ti.x, m_ti.y, m_ti.z, m_ri.getEulerAngleDegrees().x, m_ri.getEulerAngleDegrees().y, m_ri.getEulerAngleDegrees().z);
             
             m_rn = metaio::Rotation(m_ri);
             m_tn = metaio::Vector3d(m_ti);
@@ -227,6 +227,19 @@ int printf(const char * __restrict format, ...) //printf don't print to console
             m_tn = newTranslation - m_ti;
             m_rn = metaio::Rotation(newRotation.getEulerAngleDegrees() - m_ri.getEulerAngleDegrees());
         }
+        
+        printf("/nCOS's: %i of %i", m_metaioSDK->getNumberOfValidCoordinateSystems(), m_metaioSDK->getNumberOfDefinedCoordinateSystems());
+        metaio::TrackingValues cos0 = m_metaioSDK->getTrackingValues(0);
+        metaio::TrackingValues cos1 = m_metaioSDK->getTrackingValues(1);
+        metaio::TrackingValues cos2 = m_metaioSDK->getTrackingValues(2);
+        if (cos0.isTrackingState()) {printf("COS0: is tracking!");}
+        else {printf("COS0: is not tracking!");}
+        if (cos1.isTrackingState()) {printf("COS1: is tracking!");}
+        else {printf("COS1: is not tracking!");}
+        if (cos2.isTrackingState()) {printf("COS2: is tracking!");}
+        else {printf("COS2: is not tracking!");}
+        
+
         
         //set global vars
         
@@ -252,17 +265,17 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         
         metaio::Vector3d obj_t = m_obj->getTranslation();
         metaio::Vector3d obj_r = m_obj->getRotation().getEulerAngleDegrees();
-        
-        
-        printf("\n---------------------|%d|---------------------\n", m_frames); //NSLOG prints date and time and some junk
-        printf("\n--|rotation: (%f, %f, %f) |---\n--|translation: (%f, %f, %f) |---\n",
-        r.x, r.y, r.z, t.x, t.y, t.z);
-        
-        printf("\n-----|OBJ|--------------------\n");
-        printf("\n--|rotation: (%f, %f, %f) |---\n--|translation: (%f, %f, %f) |---\n",
-        obj_r.x, obj_r.y, obj_r.z, obj_t.x, obj_t.y, obj_t.z);
-        printf("\n---------\n");
-        printf("\n-----\n");
+//        
+//        
+//        printf("\n---------------------|%d|---------------------\n", m_frames); //NSLOG prints date and time and some junk
+//        printf("\n--|rotation: (%f, %f, %f) |---\n--|translation: (%f, %f, %f) |---\n",
+//        r.x, r.y, r.z, t.x, t.y, t.z);
+//        
+//        printf("\n-----|OBJ|--------------------\n");
+//        printf("\n--|rotation: (%f, %f, %f) |---\n--|translation: (%f, %f, %f) |---\n",
+//        obj_r.x, obj_r.y, obj_r.z, obj_t.x, obj_t.y, obj_t.z);
+//        printf("\n---------\n");
+//        printf("\n-----\n");
         
         [self updateDebugView:m_tn object:obj_t];
         
@@ -336,7 +349,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     
     ctx[@"console"][@"log"] = ^(JSValue *msg)
     {
-        NSLog(@"JavaScript %@ log message: %@", [JSContext currentContext], msg);
+        //NSLog(@"JavaScript %@ log message: %@", [JSContext currentContext], msg);
     }; //works for all console.log messages
     
     //[ctx evaluateScript:@"console.log('this is a log message that goes to my Xcode debug console :)')"];
