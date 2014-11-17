@@ -2,7 +2,7 @@
 <TrackingData>
     <Sensors>
         <Sensor Type="FeatureBasedSensorSource" Subtype="ML3D">
-            <SensorID>FBSS</SensorID>
+            <SensorID>SLAM</SensorID>
             <Parameters>
                 <MaxObjectsToDetectPerFrame>5</MaxObjectsToDetectPerFrame>
                 <MaxObjectsToTrackInParallel>2</MaxObjectsToTrackInParallel>
@@ -35,13 +35,12 @@
                     <AlphaTranslation>1.0</AlphaTranslation>
                     <GammaRotation>0.8</GammaRotation>
                     <GammaTranslation>1.0</GammaTranslation>
-                    <KeepPoseForNumberOfFrames>1</KeepPoseForNumberOfFrames>
+                    <KeepPoseForNumberOfFrames>240</KeepPoseForNumberOfFrames>
                     <ContinueLostTrackingWithOrientationSensor>true</ContinueLostTrackingWithOrientationSensor>
-                    <GravityAssistance>replaceZAxis</GravityAssistance>
                 </Parameters>
             </Fuser>
             <SensorSource>
-                <SensorID>FBSS</SensorID>
+                <SensorID>SLAM</SensorID>
                 <SensorCosID>Map0</SensorCosID>
                 <HandEyeCalibration>
                     <TranslationOffset>
@@ -79,9 +78,8 @@
                     <AlphaTranslation>1.0</AlphaTranslation>
                     <GammaRotation>0.8</GammaRotation>
                     <GammaTranslation>1.0</GammaTranslation>
-                    <KeepPoseForNumberOfFrames>1</KeepPoseForNumberOfFrames>
+                    <KeepPoseForNumberOfFrames>2400</KeepPoseForNumberOfFrames>
                     <ContinueLostTrackingWithOrientationSensor>true</ContinueLostTrackingWithOrientationSensor>
-                    <GravityAssistance>replaceZAxis</GravityAssistance>
                 </Parameters>
             </Fuser>
             <SensorSource>

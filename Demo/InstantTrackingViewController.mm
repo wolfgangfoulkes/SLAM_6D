@@ -39,7 +39,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 - (void) viewDidLoad
 {
 	[super viewDidLoad];
-    NSLog(@"view did load!");
+    printf("view did load! version: %s", m_metaioSDK->getVersion().c_str());
     
     // Set the rendering clipping plane
     m_metaioSDK->setRendererClippingPlaneLimits(10, 30000);
@@ -52,7 +52,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     m_rn = metaio::Rotation(metaio::Vector3d(0,0,0));
     
     //relative to camera-init. 304.8 is 6', assumes I've got it just-under-head
-    m_obj_p = metaio::Vector3d(0, 0, -1000); //-300);
+    m_obj_p = metaio::Vector3d(0, 0, 0); //-300);
     //will need to convert r for rotating geometry, which rotates relative to camera COS
     m_obj_r = metaio::Rotation(metaio::Vector3d(0, 0, 0));
     
@@ -182,7 +182,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
             geometry->setScale(scale);
             geometry->setTranslation(translation);
             geometry->setRenderOrder(renderOrder);
-            geometry->setCoordinateSystemID(0);
+            geometry->setCoordinateSystemID(1);
             
 		}
 		else
@@ -228,16 +228,16 @@ int printf(const char * __restrict format, ...) //printf don't print to console
             m_rn = metaio::Rotation(newRotation.getEulerAngleDegrees() - m_ri.getEulerAngleDegrees());
         }
         
-        printf("/nCOS's: %i of %i", m_metaioSDK->getNumberOfValidCoordinateSystems(), m_metaioSDK->getNumberOfDefinedCoordinateSystems());
-        metaio::TrackingValues cos0 = m_metaioSDK->getTrackingValues(0);
-        metaio::TrackingValues cos1 = m_metaioSDK->getTrackingValues(1);
-        metaio::TrackingValues cos2 = m_metaioSDK->getTrackingValues(2);
-        if (cos0.isTrackingState()) {printf("COS0: is tracking!");}
-        else {printf("COS0: is not tracking!");}
-        if (cos1.isTrackingState()) {printf("COS1: is tracking!");}
-        else {printf("COS1: is not tracking!");}
-        if (cos2.isTrackingState()) {printf("COS2: is tracking!");}
-        else {printf("COS2: is not tracking!");}
+//        printf("/nCOS's: %i of %i", m_metaioSDK->getNumberOfValidCoordinateSystems(), m_metaioSDK->getNumberOfDefinedCoordinateSystems());
+//        metaio::TrackingValues cos0 = m_metaioSDK->getTrackingValues(0);
+//        metaio::TrackingValues cos1 = m_metaioSDK->getTrackingValues(1);
+//        metaio::TrackingValues cos2 = m_metaioSDK->getTrackingValues(2);
+//        if (cos0.isTrackingState()) {printf("COS0: is tracking!");}
+//        else {printf("COS0: is not tracking!");}
+//        if (cos1.isTrackingState()) {printf("COS1: is tracking!");}
+//        else {printf("COS1: is not tracking!");}
+//        if (cos2.isTrackingState()) {printf("COS2: is tracking!");}
+//        else {printf("COS2: is not tracking!");}
         
 
         
@@ -247,11 +247,11 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         m_obj->setScale(m_scale);
         
         // Apply the new rotation
-        m_obj->setRotation(newRotation.inverse()); //* metaio::Rotation(metaio::Vector3d(0, M_PI, 0)));
+        //m_obj->setRotation(newRotation.inverse()); //* metaio::Rotation(metaio::Vector3d(0, M_PI, 0)));
         //rotation done relative to camera. dunno how we'd do it with rotating object, but that's what GL is for!
         
         // Apply the new translation
-        m_obj->setTranslation(metaio::Vector3d(-m_tn.x, -m_tn.y, newTranslation.z));
+        //m_obj->setTranslation(metaio::Vector3d(-m_tn.x, -m_tn.y, newTranslation.z));
         
     }
     
@@ -265,17 +265,17 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         
         metaio::Vector3d obj_t = m_obj->getTranslation();
         metaio::Vector3d obj_r = m_obj->getRotation().getEulerAngleDegrees();
-//        
-//        
-//        printf("\n---------------------|%d|---------------------\n", m_frames); //NSLOG prints date and time and some junk
-//        printf("\n--|rotation: (%f, %f, %f) |---\n--|translation: (%f, %f, %f) |---\n",
-//        r.x, r.y, r.z, t.x, t.y, t.z);
-//        
-//        printf("\n-----|OBJ|--------------------\n");
-//        printf("\n--|rotation: (%f, %f, %f) |---\n--|translation: (%f, %f, %f) |---\n",
-//        obj_r.x, obj_r.y, obj_r.z, obj_t.x, obj_t.y, obj_t.z);
-//        printf("\n---------\n");
-//        printf("\n-----\n");
+        
+        
+        printf("\n---------------------|%d|---------------------\n", m_frames); //NSLOG prints date and time and some junk
+        printf("\n--|rotation: (%f, %f, %f) |---\n--|translation: (%f, %f, %f) |---\n",
+        r.x, r.y, r.z, t.x, t.y, t.z);
+        
+        printf("\n-----|OBJ|--------------------\n");
+        printf("\n--|rotation: (%f, %f, %f) |---\n--|translation: (%f, %f, %f) |---\n",
+        obj_r.x, obj_r.y, obj_r.z, obj_t.x, obj_t.y, obj_t.z);
+        printf("\n---------\n");
+        printf("\n-----\n");
         
         [self updateDebugView:m_tn object:obj_t];
         
