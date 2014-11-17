@@ -1,35 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TrackingData>
     <Sensors>
-        <Sensor Type="SLAMSensorSource">
-<!--             Version="2"-->
-            <SensorID>SLAM</SensorID>
+        <Sensor Type="FeatureBasedSensorSource" Subtype="ML3D">
+            <SensorID>FBSS</SensorID>
             <Parameters>
                 <MaxObjectsToDetectPerFrame>5</MaxObjectsToDetectPerFrame>
                 <MaxObjectsToTrackInParallel>2</MaxObjectsToTrackInParallel>
+                <FeatureOrientationAssignment>gravity</FeatureOrientationAssignment>
             </Parameters>
             <SensorCOS>
                 <SensorCosID>Map0</SensorCosID>
                 <Parameters>
-                    <Initialization Type="map">
-                        <Map>Map0.f3b</Map>
-                    </Initialization>
-                    <Learning Enabled="false"/>
-                    <Tracking>
-                        <AlignZAxisWithGravity>true</AlignZAxisWithGravity>
-                    </Tracking>
+                    <NumExtensibleFeatures>100000</NumExtensibleFeatures>
+                    <MinTriangulationAngle>8</MinTriangulationAngle>
+                    <Map>Map0.f3b</Map>
                 </Parameters>
             </SensorCOS>
             <SensorCOS>
                 <SensorCosID>Map1</SensorCosID>
                 <Parameters>
-                    <Initialization Type="map">
-                        <Map>Map1.f3b</Map>
-                    </Initialization>
-                    <Learning Enabled="false"/>
-                    <Tracking>
-                        <AlignZAxisWithGravity>true</AlignZAxisWithGravity>
-                    </Tracking>
+                    <NumExtensibleFeatures>100000</NumExtensibleFeatures>
+                    <MinTriangulationAngle>8</MinTriangulationAngle>
+                    <Map>Map1.f3b</Map>
                 </Parameters>
             </SensorCOS>
         </Sensor>
@@ -44,12 +36,12 @@
                     <GammaRotation>0.8</GammaRotation>
                     <GammaTranslation>1.0</GammaTranslation>
                     <KeepPoseForNumberOfFrames>1</KeepPoseForNumberOfFrames>
-<!--                    <ContinueLostTrackingWithOrientationSensor>true</ContinueLostTrackingWithOrientationSensor>-->
+                    <ContinueLostTrackingWithOrientationSensor>true</ContinueLostTrackingWithOrientationSensor>
                     <GravityAssistance>replaceZAxis</GravityAssistance>
                 </Parameters>
             </Fuser>
             <SensorSource>
-                <SensorID>SLAM</SensorID>
+                <SensorID>FBSS</SensorID>
                 <SensorCosID>Map0</SensorCosID>
                 <HandEyeCalibration>
                     <TranslationOffset>
@@ -88,7 +80,7 @@
                     <GammaRotation>0.8</GammaRotation>
                     <GammaTranslation>1.0</GammaTranslation>
                     <KeepPoseForNumberOfFrames>1</KeepPoseForNumberOfFrames>
-<!--                    <ContinueLostTrackingWithOrientationSensor>true</ContinueLostTrackingWithOrientationSensor>-->
+                    <ContinueLostTrackingWithOrientationSensor>true</ContinueLostTrackingWithOrientationSensor>
                     <GravityAssistance>replaceZAxis</GravityAssistance>
                 </Parameters>
             </Fuser>
