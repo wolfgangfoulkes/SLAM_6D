@@ -128,7 +128,7 @@
 
     m_metaioSDK->initializeRenderer(screenSize.x, screenSize.y, metaio::getScreenRotationForInterfaceOrientation(self.interfaceOrientation), metaio::ERENDER_SYSTEM_OPENGL_ES_2_0, context);
     
-    // necessary for requesting screenshots
+    // necessary for requesting screenshots. //metaio 6.0 has changed params on this one
     //m_metaioSDK->setRendererFrameBuffers([glView getDefaultFrameBuffer], [glView getColorRenderBuffer]);
     
     
@@ -411,8 +411,6 @@
         m_metaioSDK->render();    
     }
     
-    metaio::Vector3d g = m_sensors->getGravity();
-    NSLog(@"gravity: (%f, %f, %f)",  g.x, g.y, g.z );
     
     [glView presentFramebuffer];
 }

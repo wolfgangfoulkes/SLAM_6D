@@ -2,19 +2,24 @@
 //
 // Copyright 2007-2014 metaio GmbH. All rights reserved.
 //
+#import <opencv2/opencv.hpp>
+#import <opencv2/core.hpp>
+#import <opencv2/calib3d.hpp>
 
 #import "InstantTrackingViewController.h"
 #import "EAGLView.h"
 #import <AudioToolbox/AudioToolbox.h>
 #import <WebKit/WebKit.h>
 #import <JavaScriptCore/JavaScriptCore.h>
-#include "MapTransitionHelper.h"
+#import "MapTransitionHelper.h"
+
+#import "common.h"
 
 int printf(const char * __restrict format, ...) //printf don't print to console
 //from http://stackoverflow.com/questions/8924831/iphone-debugging-real-device
 { 
     va_list args;
-    va_start(args,format);    
+    va_start(args,format);
     NSLogv([NSString stringWithUTF8String:format], args) ;    
     va_end(args);
     return 1;
@@ -56,12 +61,16 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     //will need to convert r for rotating geometry, which rotates relative to camera COS
     m_obj_r = metaio::Rotation(metaio::Vector3d(0, 0, 0));
     
-    
     //Initialize frame count
     m_frames = 0;
     
     // Load content
-    m_obj           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:m_obj_p modelScaling:m_scale];
+    m_obj           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:m_obj_p modelScaling:m_scale modelCos:1];
+    m_obj1           = [self createModel:@"stoopKid" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:1  modelTranslation:m_obj_p modelScaling:m_scale modelCos:2];
+    
+    //cv::Mat m = cv::Mat::eye(10, 10, CV_32F);
+    //cv::Point3f p = cv::Point3f(100, 0, 200);
+    //pToMat(p, m);
     
     [self loadDebugView];
     
@@ -90,9 +99,9 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 	if (poses[0].state == metaio::ETS_INITIALIZATION_FAILED || poses[0].state == metaio::ETS_LOST)
 	{
 		// Force immediate reset of tracking
-		NSLog(@"SLAM initialization cannot continue, resetting tracking...");
+		//NSLog(@"SLAM initialization cannot continue, resetting tracking...");
 		mapTransitionHelper.prepareForTransitionToNewMap();
-		[self setTrackingConfiguration];
+		//[self setTrackingConfiguration];
 	}
     
 }
@@ -107,7 +116,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     }
 	else
 	{
-		NSLog(@"SLAM has timed out!");
+		//NSLog(@"SLAM has timed out!");
 	}
 	
 }
@@ -138,11 +147,11 @@ int printf(const char * __restrict format, ...) //printf don't print to console
  * Set the tracking configuration file
  */
 - (void) setTrackingConfiguration {
-    NSString* config = [NSString stringWithFormat:@"Tracking"];
+    NSString* config = [NSString stringWithFormat:@"Tracking_TBSLAM"];
 	NSString* dir = [NSString stringWithFormat:@"Assets"];
     NSString* ext = [NSString stringWithFormat:@"xml"];
 	NSString* tr = [[NSBundle mainBundle] pathForResource:config ofType:ext inDirectory:dir];
-    NSLog(@"full path: %s", [tr UTF8String]);
+    //NSLog(@"full path: %s", [tr UTF8String]);
 	
     bool success = m_metaioSDK->setTrackingConfiguration([tr UTF8String]);
     if(!success)
@@ -151,7 +160,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     }
     else
     {
-        NSLog(@"Success loading the tracking configuration");
+        //NSLog(@"Success loading the tracking configuration");
     }
     
 }
@@ -165,7 +174,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
  * @param translation - model tranlation
  * @param scale - model scale
  */
-- (metaio::IGeometry*) createModel:(NSString*)resource ofType:(NSString*)type inDirectory:(NSString*)directory renderOrder:(NSInteger)renderOrder modelTranslation:(metaio::Vector3d)translation modelScaling:(NSInteger)scale
+- (metaio::IGeometry*) createModel:(NSString*)resource ofType:(NSString*)type inDirectory:(NSString*)directory renderOrder:(NSInteger)renderOrder modelTranslation:(metaio::Vector3d)translation modelScaling:(NSInteger)scale modelCos:(NSInteger)cos
 {
     metaio::IGeometry* geometry = nullptr;
     
@@ -182,8 +191,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
             geometry->setScale(scale);
             geometry->setTranslation(translation);
             geometry->setRenderOrder(renderOrder);
-            geometry->setCoordinateSystemID(1);
-            
+            geometry->setCoordinateSystemID(cos);
 		}
 		else
 		{
@@ -217,27 +225,52 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         if(!hasInitPose)
         {
             [self initPoseWithT:newTranslation AndR: newRotation];
-            printf("init: t = (%f, %f, %f) r = (%f, %f, %f)", m_ti.x, m_ti.y, m_ti.z, m_ri.getEulerAngleDegrees().x, m_ri.getEulerAngleDegrees().y, m_ri.getEulerAngleDegrees().z);
             
             m_rn = metaio::Rotation(m_ri);
             m_tn = metaio::Vector3d(m_ti);
+            
+            int right = m_metaioSDK->getCoordinateSystemID("map-mlab-front-right");
+            int left = m_metaioSDK->getCoordinateSystemID("map-mlab-front-left");
+            printf("\nmap-mlab-front-right: %d\n", right);
+            printf("\nmap-mlab-front-left: %d\n", left);
+            
+            //cv::Mat t = (Mat_<float>(4, 1) << m_ti.x, m_ti.y, m_ti.z, 1.);
+            
+            //float r_data[16];
+            //m_ri.getRotationMatrix4x4(r_data);
+            //cv::Mat r = cv::Mat(4, 4, CV_32F, r_data);
+            
+            //t.copyTo(obj.t);
+            //r.copyTo(obj.r);
         }
         else
         {
             m_tn = newTranslation - m_ti;
             m_rn = metaio::Rotation(newRotation.getEulerAngleDegrees() - m_ri.getEulerAngleDegrees());
+            
+            //cv::Mat mat = cv::Mat::eye(4, 4, CV_32F);
+            
+            //cv::Mat t = (Mat_<float>(4, 1) << m_ti.x, m_ti.y, m_ti.z, 1.);
+            
+            //float r_data[16];
+            //m_ri.getRotationMatrix4x4(r_data);
+            //cv::Mat r = cv::Mat(4, 4, CV_32F, r_data);
+            //matFromTandR(t, r, mat);
+            //obj.transform(mat);
         }
         
-        printf("/nCOS's: %i of %i", m_metaioSDK->getNumberOfValidCoordinateSystems(), m_metaioSDK->getNumberOfDefinedCoordinateSystems());
-        metaio::TrackingValues cos0 = m_metaioSDK->getTrackingValues(0);
-        metaio::TrackingValues cos1 = m_metaioSDK->getTrackingValues(1);
-        metaio::TrackingValues cos2 = m_metaioSDK->getTrackingValues(2);
-        if (cos0.isTrackingState()) {printf("COS0: is tracking!");}
-        else {printf("COS0: is not tracking!");}
-        if (cos1.isTrackingState()) {printf("COS1: is tracking!");}
-        else {printf("COS1: is not tracking!");}
-        if (cos2.isTrackingState()) {printf("COS2: is tracking!");}
-        else {printf("COS2: is not tracking!");}
+       // Mat m = Mat::eye(4, 4, CV_64F);
+        
+        //printf("/nCOS's: %i of %i", m_metaioSDK->getNumberOfValidCoordinateSystems(), m_metaioSDK->getNumberOfDefinedCoordinateSystems());
+//        metaio::TrackingValues cos0 = m_metaioSDK->getTrackingValues(0);
+//        metaio::TrackingValues cos1 = m_metaioSDK->getTrackingValues(1);
+//        metaio::TrackingValues cos2 = m_metaioSDK->getTrackingValues(2);
+//        if (cos0.isTrackingState()) {printf("COS0: is tracking!");}
+//        else {printf("COS0: is not tracking!");}
+//        if (cos1.isTrackingState()) {printf("COS1: is tracking!");}
+//        else {printf("COS1: is not tracking!");}
+//        if (cos2.isTrackingState()) {printf("COS2: is tracking!");}
+//        else {printf("COS2: is not tracking!");}
         
 
         
@@ -257,7 +290,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     
     int frame_rate = m_metaioSDK->getTrackingFrameRate(); //returns float average of last many frames. not rendering fr
     
-    if ((m_frames % frame_rate) == 0 && hasInitPose) //replace this with button press!
+    if ((m_frames % (frame_rate*10)) == 0 && hasInitPose) //replace this with button press!
     {
         
         metaio::Vector3d r = m_rn.getEulerAngleDegrees();
@@ -266,19 +299,18 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         metaio::Vector3d obj_t = m_obj->getTranslation();
         metaio::Vector3d obj_r = m_obj->getRotation().getEulerAngleDegrees();
         
-        
-        printf("\n---------------------|%d|---------------------\n", m_frames); //NSLOG prints date and time and some junk
-        printf("\n--|rotation: (%f, %f, %f) |---\n--|translation: (%f, %f, %f) |---\n",
-        r.x, r.y, r.z, t.x, t.y, t.z);
-        
-        printf("\n-----|OBJ|--------------------\n");
-        printf("\n--|rotation: (%f, %f, %f) |---\n--|translation: (%f, %f, %f) |---\n",
-        obj_r.x, obj_r.y, obj_r.z, obj_t.x, obj_t.y, obj_t.z);
-        printf("\n---------\n");
-        printf("\n-----\n");
-        
         [self updateDebugView:m_tn object:obj_t];
         
+        
+//        printf("\n---------------------|%d|---------------------\n", m_frames); //NSLOG prints date and time and some junk
+//        printf("\n--|rotation: (%f, %f, %f) |---\n--|translation: (%f, %f, %f) |---\n",
+//        r.x, r.y, r.z, t.x, t.y, t.z);
+//        
+//        printf("\n-----|OBJ|--------------------\n");
+//        printf("\n--|rotation: (%f, %f, %f) |---\n--|translation: (%f, %f, %f) |---\n",
+//        obj_r.x, obj_r.y, obj_r.z, obj_t.x, obj_t.y, obj_t.z);
+//        printf("\n---------\n");
+//        printf("\n-----\n");
     }
     m_frames++; //update frame count.
 }
@@ -304,7 +336,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 - (IBAction)onResetTrackingBtnPress:(id)sender
 {
     // Force immediate reset of tracking
-    NSLog(@"Resetting tracking...");
+    //NSLog(@"Resetting tracking...");
     mapTransitionHelper.prepareForTransitionToNewMap();
     mapTransitionHelper.reset();
     [self setTrackingConfiguration];
@@ -342,10 +374,10 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     {
         return;
     }
-    ctx[@"cx"] = @(50. + tc.x/100.); //shorthand for NSNumber
-    ctx[@"cy"] = @(50. + tc.y/100.);
-    ctx[@"ox"] = @(50. + to.x/100.);
-    ctx[@"oy"] = @(50. + to.y/100.);
+    ctx[@"cx"] = @(50. + tc.x/50.); //shorthand for NSNumber
+    ctx[@"cy"] = @(50. + tc.y/50.);
+    ctx[@"ox"] = @(50. + to.x/50.);
+    ctx[@"oy"] = @(50. + to.y/50.);
     
     ctx[@"console"][@"log"] = ^(JSValue *msg)
     {

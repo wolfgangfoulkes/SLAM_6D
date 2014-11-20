@@ -32,8 +32,8 @@ setXY = function()
     var _oy = $("#object").css("bottom");
     var _ox = $("#object").css("left");
     
-    console.log("camera: " + _cx + ", " + _cy);
-    console.log("object: " + _ox + ", " + _oy);
+    //console.log("camera: " + _cx + ", " + _cy);
+    //console.log("object: " + _ox + ", " + _oy);
 
 };
 

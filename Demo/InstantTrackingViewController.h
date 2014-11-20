@@ -4,6 +4,7 @@
 //
 
 #import "MetaioSDKViewController.h"
+//#import "Object.h"
 
 @interface InstantTrackingViewController : MetaioSDKViewController
 {
@@ -11,6 +12,7 @@
     NSInteger           m_scale;             // model scale
     
     metaio::IGeometry*  m_obj;            // pointer to the model
+    metaio::IGeometry*  m_obj1;           // pointer to the model
     
     metaio::Rotation    m_ri;
     metaio::Vector3d    m_ti;
@@ -22,6 +24,8 @@
     //object pose in real-world coordinates, static.
     metaio::Vector3d m_obj_p;
     metaio::Rotation m_obj_r; //will need to convert for rotating geometry, which rotates relative to camera COS.
+    
+    //wf_Object obj;
     
     bool hasInitPose;
 }
