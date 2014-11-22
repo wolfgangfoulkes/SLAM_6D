@@ -22,26 +22,29 @@
     metaio::Vector3d    m_tn;
     
     //object pose in real-world coordinates, static.
-    metaio::Vector3d m_obj_p;
+    metaio::Vector3d m_obj_ti;
+    metaio::Rotation m_obj_ri; //will need to convert for rotating geometry, which rotates relative to camera COS.
+    metaio::Vector3d m_obj_t;
     metaio::Rotation m_obj_r; //will need to convert for rotating geometry, which rotates relative to camera COS.
+    metaio::Vector3d m_obj1_ti;
+    metaio::Rotation m_obj1_ri; //will need to convert for rotating geometry, which rotates relative to camera COS.
+    metaio::Vector3d m_obj1_t;
+    metaio::Rotation m_obj1_r; //will need to convert for rotating geometry, which rotates relative to camera COS.
     
     //wf_Object obj;
     
     bool hasInitPose;
+    
+    int activeCOS;
 }
 
 
 @property (nonatomic, retain) IBOutlet UIWebView *webView;
 
-@property (weak, nonatomic) IBOutlet UIButton *resetTrackingBtn; // Hidden button - bottom middle
-@property (weak, nonatomic) IBOutlet UIButton *changeModelVisibilityBtn;
-
-- (IBAction)onResetTrackingBtnPress:(id)sender;
-- (IBAction)onChangeModelVisibilityBtnPress:(id)sender;
-
 - (void)initPoseWithT: (metaio::Vector3d)t AndR:(metaio::Rotation)r;
-
+- (void) updateObjectsWithCameraR: (metaio::Rotation)r AndT:(metaio::Vector3d)t;
 - (void)loadDebugView;
 - (void)updateDebugView: (metaio::Vector3d)tc  object: (metaio::Vector3d)to;
+- (void)printDebugToConsole;
 
 @end

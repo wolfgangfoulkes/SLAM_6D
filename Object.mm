@@ -6,7 +6,9 @@
 //  Copyright (c) 2014 metaio GmbH. All rights reserved.
 //
 
+#import "common.h"
 #import "Object.h"
+
 
 wf_Object::wf_Object()
 {

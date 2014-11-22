@@ -7,9 +7,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="InstantTrackingViewController">
             <connections>
-                <outlet property="changeModelVisibilityBtn" destination="QIy-kE-eHI" id="Iru-Zj-5Rb"/>
                 <outlet property="glView" destination="8" id="33"/>
-                <outlet property="resetTrackingBtn" destination="ltv-wY-eWu" id="Aqv-jc-Pls"/>
                 <outlet property="view" destination="20" id="32"/>
                 <outlet property="webView" destination="jNA-gV-9YX" id="2ie-gq-IrK"/>
             </connections>
@@ -22,30 +20,6 @@
                 <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="8" userLabel="GLView" customClass="EAGLView">
                     <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                    <subviews>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="ltv-wY-eWu">
-                            <rect key="frame" x="90" y="391" width="130" height="80"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                            <state key="normal" title="Reset Tracking">
-                                <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                            </state>
-                            <connections>
-                                <action selector="onResetTrackingBtnPress:" destination="-1" eventType="touchUpInside" id="q2i-iS-tVs"/>
-                            </connections>
-                        </button>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="QIy-kE-eHI">
-                            <rect key="frame" x="185" y="0.0" width="130" height="80"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                            <state key="normal" title="Hide">
-                                <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                            </state>
-                            <connections>
-                                <action selector="onChangeModelVisibilityBtnPress:" destination="-1" eventType="touchUpInside" id="IBB-HX-yh7"/>
-                            </connections>
-                        </button>
-                    </subviews>
                 </view>
                 <webView opaque="NO" contentMode="scaleToFill" id="jNA-gV-9YX">
                     <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>

@@ -13,7 +13,7 @@
 #import <JavaScriptCore/JavaScriptCore.h>
 #import "MapTransitionHelper.h"
 
-#import "common.h"
+#import "Object.h"
 
 int printf(const char * __restrict format, ...) //printf don't print to console
 //from http://stackoverflow.com/questions/8924831/iphone-debugging-real-device
@@ -29,6 +29,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 {
     // Instance of a class that helps moving from one map to the next one, without the user noticing it
     metaio::MapTransitionHelper mapTransitionHelper;
+    
 }
 
 @end
@@ -57,16 +58,21 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     m_rn = metaio::Rotation(metaio::Vector3d(0,0,0));
     
     //relative to camera-init. 304.8 is 6', assumes I've got it just-under-head
-    m_obj_p = metaio::Vector3d(0, 0, 0); //-300);
+    m_obj_t = m_obj_ti = metaio::Vector3d(0, 0, 0); //-300);
     //will need to convert r for rotating geometry, which rotates relative to camera COS
-    m_obj_r = metaio::Rotation(metaio::Vector3d(0, 0, 0));
+    m_obj_r = m_obj_ri = metaio::Rotation(metaio::Vector3d(0, 0, 0));
+    //relative to camera-init. 304.8 is 6', assumes I've got it just-under-head
+    m_obj1_t = m_obj1_ti = m_obj1_ti = metaio::Vector3d(0, 0, 0); //-300);
+    //will need to convert r for rotating geometry, which rotates relative to camera COS
+    m_obj1_r = m_obj1_ri = m_obj1_ri = metaio::Rotation(metaio::Vector3d(0, 0, 0));
     
     //Initialize frame count
     m_frames = 0;
     
-    // Load content
-    m_obj           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:m_obj_p modelScaling:m_scale modelCos:1];
-    m_obj1           = [self createModel:@"stoopKid" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:1  modelTranslation:m_obj_p modelScaling:m_scale modelCos:2];
+    // Load content //FLAG CHANGED RENDER ORDER TO SAME
+    
+    m_obj           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:m_obj_t modelScaling:m_scale modelCos:1];
+    m_obj1           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:m_obj1_t modelScaling:m_scale modelCos:2];
     
     //cv::Mat m = cv::Mat::eye(10, 10, CV_32F);
     //cv::Point3f p = cv::Point3f(100, 0, 200);
@@ -80,6 +86,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 {
     [self setTrackingConfiguration];
 }
+
 
 - (void)viewDidUnload
 {
@@ -103,6 +110,16 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 		mapTransitionHelper.prepareForTransitionToNewMap();
 		//[self setTrackingConfiguration];
 	}
+    else
+    {
+        metaio::TrackingValues cos1 = m_metaioSDK->getTrackingValues(1);
+        metaio::TrackingValues cos2 = m_metaioSDK->getTrackingValues(2);
+        metaio::TrackingValues cos3 = m_metaioSDK->getTrackingValues(3);
+        if (cos1.isTrackingState()) {activeCOS = 1;}
+        else if (cos2.isTrackingState()) {activeCOS = 2;}
+        else if (cos3.isTrackingState()) {activeCOS = 3;}
+        else {activeCOS = 0;}
+    }
     
 }
 
@@ -207,8 +224,9 @@ int printf(const char * __restrict format, ...) //printf don't print to console
  */
 - (void) update
 {
+
     // Update the internal state with the lastest tracking values from the SDK.
-    mapTransitionHelper.update(m_metaioSDK->getTrackingValues(1), m_metaioSDK->getRegisteredSensorsComponent()->getLastSensorValues());
+    mapTransitionHelper.update(m_metaioSDK->getTrackingValues(activeCOS), m_metaioSDK->getRegisteredSensorsComponent()->getLastSensorValues());
 
     
     // If the last frame could be tracked successfully
@@ -228,11 +246,6 @@ int printf(const char * __restrict format, ...) //printf don't print to console
             
             m_rn = metaio::Rotation(m_ri);
             m_tn = metaio::Vector3d(m_ti);
-            
-            int right = m_metaioSDK->getCoordinateSystemID("map-mlab-front-right");
-            int left = m_metaioSDK->getCoordinateSystemID("map-mlab-front-left");
-            printf("\nmap-mlab-front-right: %d\n", right);
-            printf("\nmap-mlab-front-left: %d\n", left);
             
             //cv::Mat t = (Mat_<float>(4, 1) << m_ti.x, m_ti.y, m_ti.z, 1.);
             
@@ -259,24 +272,10 @@ int printf(const char * __restrict format, ...) //printf don't print to console
             //obj.transform(mat);
         }
         
-       // Mat m = Mat::eye(4, 4, CV_64F);
-        
-        //printf("/nCOS's: %i of %i", m_metaioSDK->getNumberOfValidCoordinateSystems(), m_metaioSDK->getNumberOfDefinedCoordinateSystems());
-//        metaio::TrackingValues cos0 = m_metaioSDK->getTrackingValues(0);
-//        metaio::TrackingValues cos1 = m_metaioSDK->getTrackingValues(1);
-//        metaio::TrackingValues cos2 = m_metaioSDK->getTrackingValues(2);
-//        if (cos0.isTrackingState()) {printf("COS0: is tracking!");}
-//        else {printf("COS0: is not tracking!");}
-//        if (cos1.isTrackingState()) {printf("COS1: is tracking!");}
-//        else {printf("COS1: is not tracking!");}
-//        if (cos2.isTrackingState()) {printf("COS2: is tracking!");}
-//        else {printf("COS2: is not tracking!");}
-        
-
-        
+            // Mat m = Mat::eye(4, 4, CV_64F);
         //set global vars
         
-        
+        [self updateObjectsWithCameraR:m_rn AndT:m_tn];
         m_obj->setScale(m_scale);
         
         // Apply the new rotation
@@ -300,22 +299,15 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         metaio::Vector3d obj_r = m_obj->getRotation().getEulerAngleDegrees();
         
         [self updateDebugView:m_tn object:obj_t];
-        
-        
-//        printf("\n---------------------|%d|---------------------\n", m_frames); //NSLOG prints date and time and some junk
-//        printf("\n--|rotation: (%f, %f, %f) |---\n--|translation: (%f, %f, %f) |---\n",
-//        r.x, r.y, r.z, t.x, t.y, t.z);
-//        
-//        printf("\n-----|OBJ|--------------------\n");
-//        printf("\n--|rotation: (%f, %f, %f) |---\n--|translation: (%f, %f, %f) |---\n",
-//        obj_r.x, obj_r.y, obj_r.z, obj_t.x, obj_t.y, obj_t.z);
-//        printf("\n---------\n");
-//        printf("\n-----\n");
     }
     m_frames++; //update frame count.
 }
 
-
+- (void) updateObjectsWithCameraR: (metaio::Rotation)r AndT:(metaio::Vector3d)t
+{
+    //m_obj->setTranslation(m_obj_ti - metaio::Vector3d(-t.x, -t.y, t.z));
+    //m_obj1->setTranslation(m_obj1_ti - metaio::Vector3d(-t.x, -t.y, t.z));
+}
 
 #pragma mark - Rotation handling
 
@@ -326,38 +318,46 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 	return YES;
 }
 
+- (void)printDebugToConsole //call on button press
+{
+        //prints defined vs. valid (active) COS's
+        printf("/nCOS's: %i of %i", m_metaioSDK->getNumberOfValidCoordinateSystems(), m_metaioSDK->getNumberOfDefinedCoordinateSystems());
+        metaio::TrackingValues cos0 = m_metaioSDK->getTrackingValues(0);
+        metaio::TrackingValues cos1 = m_metaioSDK->getTrackingValues(1);
+        metaio::TrackingValues cos2 = m_metaioSDK->getTrackingValues(2);
+        if (cos0.isTrackingState()) {printf("COS0: is tracking!");}
+        else {printf("COS0: is not tracking!");}
+        if (cos1.isTrackingState()) {printf("COS1: is tracking!");}
+        else {printf("COS1: is not tracking!");}
+        if (cos2.isTrackingState()) {printf("COS2: is tracking!");}
+        else {printf("COS2: is not tracking!");}
 
+        //prints COS's IDs from name
+        int right = m_metaioSDK->getCoordinateSystemID("map-mlab-front-right");
+        int left = m_metaioSDK->getCoordinateSystemID("map-mlab-front-left");
+        printf("\nmap-mlab-front-right: %d\n", right); //1
+        printf("\nmap-mlab-front-left: %d\n", left); //2
+    
+        //put this one in Object instance, prints rotation and translation
+        metaio::Vector3d r = m_rn.getEulerAngleDegrees();
+        metaio::Vector3d t = m_tn;
+        
+        metaio::Vector3d obj_t = m_obj->getTranslation();
+        metaio::Vector3d obj_r = m_obj->getRotation().getEulerAngleDegrees();
+
+        printf("\n---------------------|%d|---------------------\n", m_frames); //NSLOG prints date and time and some junk
+        printf("\n--|rotation: (%f, %f, %f) |---\n--|translation: (%f, %f, %f) |---\n",
+        r.x, r.y, r.z, t.x, t.y, t.z);
+        
+        printf("\n-----|OBJ|--------------------\n");
+        printf("\n--|rotation: (%f, %f, %f) |---\n--|translation: (%f, %f, %f) |---\n",
+        obj_r.x, obj_r.y, obj_r.z, obj_t.x, obj_t.y, obj_t.z);
+        printf("\n---------\n");
+        printf("\n-----\n");
+}
 
 #pragma mark - Button handlers
 
-/**
- * Reset the tracking
- */
-- (IBAction)onResetTrackingBtnPress:(id)sender
-{
-    // Force immediate reset of tracking
-    //NSLog(@"Resetting tracking...");
-    mapTransitionHelper.prepareForTransitionToNewMap();
-    mapTransitionHelper.reset();
-    [self setTrackingConfiguration];
-}
-
-/**
- * Hide or show the earth model
- */
-- (IBAction)onChangeModelVisibilityBtnPress:(id)sender
-{
-    // Change the model transparency
-    NSInteger transparency = (m_obj->getTransparency() == 1) ? 0 : 1;
-    
-    m_obj->setTransparency(transparency);
-    
-    // Change button name to show or hide the earth model
-    if(m_obj->getTransparency() == 0)
-        [_changeModelVisibilityBtn setTitle:@"Hide" forState:UIControlStateNormal];
-    else
-        [_changeModelVisibilityBtn setTitle:@"Show" forState:UIControlStateNormal];
-}
 
 - (void)loadDebugView {
     NSURL *url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"Assets/web/slam" ofType:@"html"] isDirectory:NO];
@@ -381,7 +381,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     
     ctx[@"console"][@"log"] = ^(JSValue *msg)
     {
-        //NSLog(@"JavaScript %@ log message: %@", [JSContext currentContext], msg);
+        NSLog(@"JavaScript %@ log message: %@", [JSContext currentContext], msg);
     }; //works for all console.log messages
     
     //[ctx evaluateScript:@"console.log('this is a log message that goes to my Xcode debug console :)')"];

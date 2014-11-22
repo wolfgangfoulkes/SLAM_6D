@@ -13,7 +13,6 @@
 
 #import <opencv2/opencv.hpp>
 #import <metaioSDK/IMetaioSDKIOS.h>
-#import "common.h"
 
 using namespace std;
 using namespace cv;
