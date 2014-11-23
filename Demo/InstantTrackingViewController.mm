@@ -5,6 +5,7 @@
 #import <opencv2/opencv.hpp>
 #import <opencv2/core.hpp>
 #import <opencv2/calib3d.hpp>
+#import <QuartzCore/QuartzCore.h>
 
 #import "InstantTrackingViewController.h"
 #import "EAGLView.h"
@@ -29,7 +30,6 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 {
     // Instance of a class that helps moving from one map to the next one, without the user noticing it
     metaio::MapTransitionHelper mapTransitionHelper;
-    
 }
 
 @end
@@ -38,6 +38,8 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 @implementation InstantTrackingViewController
 
 @synthesize webView;
+@synthesize debugViewToggle;
+@synthesize debugPrintButton;
 
 #pragma mark - UIViewController lifecycle
 
@@ -66,6 +68,8 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     //will need to convert r for rotating geometry, which rotates relative to camera COS
     m_obj1_r = m_obj1_ri = m_obj1_ri = metaio::Rotation(metaio::Vector3d(0, 0, 0));
     
+    obj = wf_Object(metaio::Vector4d(0,0,0,1), metaio::Rotation(0,0,0));
+    
     //Initialize frame count
     m_frames = 0;
     
@@ -74,9 +78,8 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     m_obj           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:m_obj_t modelScaling:m_scale modelCos:1];
     m_obj1           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:m_obj1_t modelScaling:m_scale modelCos:2];
     
-    //cv::Mat m = cv::Mat::eye(10, 10, CV_32F);
-    //cv::Point3f p = cv::Point3f(100, 0, 200);
-    //pToMat(p, m);
+    debugView = true;
+    printToScreen = false;
     
     [self loadDebugView];
     
@@ -246,67 +249,31 @@ int printf(const char * __restrict format, ...) //printf don't print to console
             
             m_rn = metaio::Rotation(m_ri);
             m_tn = metaio::Vector3d(m_ti);
-            
-            //cv::Mat t = (Mat_<float>(4, 1) << m_ti.x, m_ti.y, m_ti.z, 1.);
-            
-            //float r_data[16];
-            //m_ri.getRotationMatrix4x4(r_data);
-            //cv::Mat r = cv::Mat(4, 4, CV_32F, r_data);
-            
-            //t.copyTo(obj.t);
-            //r.copyTo(obj.r);
         }
         else
         {
             m_tn = newTranslation - m_ti;
-            m_rn = metaio::Rotation(newRotation.getEulerAngleDegrees() - m_ri.getEulerAngleDegrees());
-            
-            //cv::Mat mat = cv::Mat::eye(4, 4, CV_32F);
-            
-            //cv::Mat t = (Mat_<float>(4, 1) << m_ti.x, m_ti.y, m_ti.z, 1.);
-            
-            //float r_data[16];
-            //m_ri.getRotationMatrix4x4(r_data);
-            //cv::Mat r = cv::Mat(4, 4, CV_32F, r_data);
-            //matFromTandR(t, r, mat);
-            //obj.transform(mat);
+            m_rn = newRotation;
         }
-        
-            // Mat m = Mat::eye(4, 4, CV_64F);
+
         //set global vars
         
-        [self updateObjectsWithCameraR:m_rn AndT:m_tn];
+        [self updateObjectsWithCameraT:m_tn AndR:m_rn];
         m_obj->setScale(m_scale);
-        
-        // Apply the new rotation
-        //m_obj->setRotation(newRotation.inverse()); //* metaio::Rotation(metaio::Vector3d(0, M_PI, 0)));
-        //rotation done relative to camera. dunno how we'd do it with rotating object, but that's what GL is for!
-        
-        // Apply the new translation
-        //m_obj->setTranslation(metaio::Vector3d(-m_tn.x, -m_tn.y, newTranslation.z));
-        
     }
     
-    int frame_rate = m_metaioSDK->getTrackingFrameRate(); //returns float average of last many frames. not rendering fr
-    
-    if ((m_frames % (frame_rate*10)) == 0 && hasInitPose) //replace this with button press!
+    if (debugView && hasInitPose) //replace this with button press!
     {
-        
-        metaio::Vector3d r = m_rn.getEulerAngleDegrees();
-        metaio::Vector3d t = m_tn;
-        
-        metaio::Vector3d obj_t = m_obj->getTranslation();
-        metaio::Vector3d obj_r = m_obj->getRotation().getEulerAngleDegrees();
-        
-        [self updateDebugView:m_tn object:obj_t];
+        [self updateDebugViewWithCameraT:m_tn andR:m_rn andObjectT:obj.getT_m() andR:obj.getR_m()];
     }
     m_frames++; //update frame count.
 }
 
-- (void) updateObjectsWithCameraR: (metaio::Rotation)r AndT:(metaio::Vector3d)t
+- (void) updateObjectsWithCameraT: (metaio::Vector3d)t AndR:(metaio::Rotation)r
 {
     //m_obj->setTranslation(m_obj_ti - metaio::Vector3d(-t.x, -t.y, t.z));
     //m_obj1->setTranslation(m_obj1_ti - metaio::Vector3d(-t.x, -t.y, t.z));
+    obj.transform(metaio::Vector4d(-t.x, -t.y, t.z, 1), r);
 }
 
 #pragma mark - Rotation handling
@@ -366,7 +333,22 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     [self.webView loadRequest:request];
 }
 
--(void)updateDebugView: (metaio::Vector3d)tc  object: (metaio::Vector3d)to {
+- (void)addPose: (int)name ToDebugContextT: (metaio::Vector4d)obj_t andR:(metaio::Rotation)obj_r
+{
+    JSContext *ctx = [self.webView valueForKeyPath:@"documentView.webView.mainFrame.javaScriptContext"];
+    metaio::Vector3d obj_e = obj_r.getEulerAngleDegrees();
+    /*http://www.bignerdranch.com/blog/objective-c-literals-part-1/*/
+    /*simpler to do this by creating a new version of an existing object with params?*/
+    ctx[@"poses"][[NSString stringWithFormat:@"%d", name]] =
+    @{
+        @"t" : @{ @"x" : @(obj_t.x), @"y" : @(obj_t.y), @"z" : @(obj_t.z) },
+        @"r" : @{ @"x" : @(obj_e.x), @"y" : @(obj_e.y), @"z" : @(obj_e.z) }
+        };
+}
+
+- (void)updateDebugViewWithCameraT: (metaio::Vector3d)c_t andR: (metaio::Rotation)c_r
+    andObjectT: (metaio::Vector4d)o_t andR: (metaio::Rotation)o_r
+{
     JSContext *ctx = [self.webView valueForKeyPath:@"documentView.webView.mainFrame.javaScriptContext"];
     NSAssert([ctx isKindOfClass:[JSContextclass]], @"could not find context in web view");
     JSValue *isReady = ctx[@"isReady"];
@@ -374,17 +356,38 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     {
         return;
     }
-    ctx[@"cx"] = @(50. + tc.x/50.); //shorthand for NSNumber
-    ctx[@"cy"] = @(50. + tc.y/50.);
-    ctx[@"ox"] = @(50. + to.x/50.);
-    ctx[@"oy"] = @(50. + to.y/50.);
+//    if (!( [ctx[@"poses"] hasProperty:[NSString stringWithFormat:@"%d", 1] ]))
+//    {
+//        [self addPose:1 ToDebugContextT: o_t andR: o_r];
+//    }
+    metaio::Vector3d c_e = c_r.getEulerAngleDegrees();
+    metaio::Vector3d o_e = c_r.getEulerAngleDegrees();
+    ctx[@"cx"] = @(50. + c_t.x/50.); //shorthand for NSNumber
+    ctx[@"cy"] = @(50. + c_t.y/50.);
+    ctx[@"ox"] = @(50. + o_t.x/50.);
+    ctx[@"oy"] = @(50. + o_t.y/50.);
     
     ctx[@"console"][@"log"] = ^(JSValue *msg)
     {
         NSLog(@"JavaScript %@ log message: %@", [JSContext currentContext], msg);
     }; //works for all console.log messages
     
-    //[ctx evaluateScript:@"console.log('this is a log message that goes to my Xcode debug console :)')"];
+    ctx[@"printToScreen"] = @(printToScreen);
+    ctx[@"c"][@"t"][@"x"] = @(c_t.x);
+    ctx[@"c"][@"t"][@"y"] = @(c_t.y);
+    ctx[@"c"][@"t"][@"z"] = @(c_t.z);
+    
+    ctx[@"c"][@"r"][@"x"] = @(c_e.x);
+    ctx[@"c"][@"r"][@"y"] = @(c_e.y);
+    ctx[@"c"][@"r"][@"z"] = @(c_e.z);
+    
+    ctx[@"o"][@"t"][@"x"] = @(o_t.x);
+    ctx[@"o"][@"t"][@"y"] = @(o_t.y);
+    ctx[@"o"][@"t"][@"z"] = @(o_t.z);
+    
+    ctx[@"o"][@"r"][@"x"] = @(o_e.x);
+    ctx[@"o"][@"r"][@"y"] = @(o_e.y);
+    ctx[@"o"][@"r"][@"z"] = @(o_e.z);
     
 }
 
@@ -394,6 +397,15 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     m_ri = metaio::Rotation(r_);
     
     hasInitPose = true;
+}
+
+- (IBAction)onDebugDown:(id)sender {
+    debugView = !debugView;
+    [self.webView setHidden:![self.webView isHidden] ];
+}
+
+- (IBAction)onPrintDown:(id)sender {
+    printToScreen = (!printToScreen) && debugView;
 }
 
 @end

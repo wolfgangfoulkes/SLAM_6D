@@ -3,8 +3,9 @@
 // Copyright 2007-2014 metaio GmbH. All rights reserved.
 //
 
+
+#import "Object.h"
 #import "MetaioSDKViewController.h"
-//#import "Object.h"
 
 @interface InstantTrackingViewController : MetaioSDKViewController
 {
@@ -31,20 +32,36 @@
     metaio::Vector3d m_obj1_t;
     metaio::Rotation m_obj1_r; //will need to convert for rotating geometry, which rotates relative to camera COS.
     
+    wf_Object obj;
+    
     //wf_Object obj;
     
     bool hasInitPose;
     
     int activeCOS;
+    
+    bool debugView;
+    bool printToScreen;
+    
+    IBOutlet UIWebView* webView;
+    IBOutlet UIButton* debugViewToggle;
+    IBOutlet UIButton* debugPrintButton;
 }
 
-
 @property (nonatomic, retain) IBOutlet UIWebView *webView;
+@property (nonatomic, retain) IBOutlet UIButton *debugViewToggle;
+@property (nonatomic, retain) IBOutlet UIButton *debugPrintButton;
+
+- (IBAction)onDebugDown:(id)sender;
+- (IBAction)onPrintDown:(id)sender;
 
 - (void)initPoseWithT: (metaio::Vector3d)t AndR:(metaio::Rotation)r;
-- (void) updateObjectsWithCameraR: (metaio::Rotation)r AndT:(metaio::Vector3d)t;
+- (void) updateObjectsWithCameraT: (metaio::Vector3d)t AndR:(metaio::Rotation)r;
 - (void)loadDebugView;
-- (void)updateDebugView: (metaio::Vector3d)tc  object: (metaio::Vector3d)to;
+- (void)updateDebugViewWithCameraT: (metaio::Vector3d)c_t andR: (metaio::Rotation)c_r
+    andObjectT: (metaio::Vector4d)o_t andR: (metaio::Rotation)o_r;
 - (void)printDebugToConsole;
+- (void)addPose: (int)name ToDebugContextT: (metaio::Vector4d)obj_t andR:(metaio::Rotation)obj_r;
+
 
 @end

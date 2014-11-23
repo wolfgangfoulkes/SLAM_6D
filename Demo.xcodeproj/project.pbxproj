@@ -66,7 +66,7 @@
 		6325D4391638445100BBCF85 /* cancel.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = cancel.png; path = Demo/Resources/cancel.png; sourceTree = "<group>"; };
 		6325D43D1638445100BBCF85 /* junaio.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = junaio.png; path = Demo/Resources/junaio.png; sourceTree = "<group>"; };
 		7CCB429919582BAE007355FA /* InstantTracking.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = InstantTracking.xib; sourceTree = "<group>"; };
-		7CCB429A19582BAE007355FA /* InstantTrackingViewController.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = InstantTrackingViewController.h; sourceTree = "<group>"; };
+		7CCB429A19582BAE007355FA /* InstantTrackingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = InstantTrackingViewController.h; sourceTree = "<group>"; };
 		7CCB429B19582BAE007355FA /* InstantTrackingViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = InstantTrackingViewController.mm; sourceTree = "<group>"; };
 		7CFED0811950650E006E88AE /* MapTransitionHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapTransitionHelper.h; sourceTree = "<group>"; };
 		9839FB0E1A1C12660076D4A8 /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = opencv2.framework; sourceTree = "<group>"; };

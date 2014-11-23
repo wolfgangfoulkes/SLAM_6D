@@ -12,8 +12,8 @@
 
 wf_Object::wf_Object()
 {
-    t = cv::Mat::eye(4, 1, CV_32F);
-    r = cv::Mat::eye(4, 4, CV_32F);
+    t = t_init = cv::Mat::eye(4, 1, CV_32F);
+    r = t_init = cv::Mat::eye(4, 4, CV_32F);
 }
 
 wf_Object::wf_Object(cv::Mat t_, cv::Mat r_)
@@ -22,10 +22,18 @@ wf_Object::wf_Object(cv::Mat t_, cv::Mat r_)
     r_.copyTo(r);
 }
 
-
-metaio::Vector3d wf_Object::getT_m()
+wf_Object::wf_Object(metaio::Vector4d t_, metaio::Rotation r_)
 {
-    return metaio::Vector3d(t.at<float>(1,0), t.at<float>(2,0), t.at<float>(3,0));
+    pToMat(t_, t);
+    rToMat(r_, r);
+    t.copyTo(t_init);
+    r.copyTo(r_init);
+}
+
+
+metaio::Vector4d wf_Object::getT_m()
+{
+    return metaio::Vector4d(t.at<float>(1,0), t.at<float>(2,0), t.at<float>(3,0), 1.);
 }
 
 metaio::Rotation wf_Object::getR_m()
@@ -35,10 +43,9 @@ metaio::Rotation wf_Object::getR_m()
     return metaio::Rotation(r_v(0), r_v(1), r_v(2));
 }
 
-void wf_Object::transform(cv::Mat mat_)
+void wf_Object::transform(metaio::Vector4d t_, metaio::Rotation r_) //rotation from world
 {
-    cv::Mat tr = cv::Mat::eye(4, 4, CV_32F);
-    matFromTandR(t, r, tr);
-    tr *= mat_;
-    tAndRFromMat(tr, t, r);
+    cv::Mat mat = cv::Mat::eye(4, 4, CV_32F);
+    matFromTandR(t_, r_, mat);
+    t = mat * t_init;
 }

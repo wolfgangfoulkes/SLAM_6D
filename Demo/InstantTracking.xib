@@ -7,6 +7,8 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="InstantTrackingViewController">
             <connections>
+                <outlet property="debugPrintButton" destination="cIB-42-NRp" id="JRd-m6-5Gk"/>
+                <outlet property="debugViewToggle" destination="UU7-r0-Jts" id="4tW-Hc-ydk"/>
                 <outlet property="glView" destination="8" id="33"/>
                 <outlet property="view" destination="20" id="32"/>
                 <outlet property="webView" destination="jNA-gV-9YX" id="2ie-gq-IrK"/>
@@ -26,6 +28,27 @@
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                 </webView>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="UU7-r0-Jts">
+                    <rect key="frame" x="10" y="8" width="80" height="52"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <state key="normal" title="DEBUG">
+                        <color key="titleColor" red="1" green="0.4600264758" blue="0.55487447879999996" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                    <connections>
+                        <action selector="onDebugDown:" destination="-1" eventType="touchDown" id="Reh-IE-Fg1"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="cIB-42-NRp">
+                    <rect key="frame" x="27" y="68" width="46" height="30"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <state key="normal" title="PRINT">
+                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                    <connections>
+                        <action selector="onPrintDown:" destination="-1" eventType="touchDown" id="Nvq-l8-Ec8"/>
+                    </connections>
+                </button>
             </subviews>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
             <nil key="simulatedStatusBarMetrics"/>

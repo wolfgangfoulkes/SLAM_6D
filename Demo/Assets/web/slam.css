@@ -14,17 +14,17 @@ html, body {
     height: 100vh;
 }
 
-.tvs {
+.poses {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
+    bottom: 0;
+    right: 0;
     height: 100%;
     visibility: transparent;
 }
-.tv {
+.p {
     display: inline-block;
     font-size: 1em;
+    min-width: 2em;
 }
 
 #xy-outer {
@@ -48,7 +48,6 @@ html, body {
     bottom: 50%;
     left: 50%;
     border-bottom-color: black;
-    transform: translate(0, 0); /*replace with transform: matrix()*/
     transform: rotate(0);
 }
 
@@ -57,7 +56,6 @@ html, body {
     bottom: 50%;
     left: 50%;
     border-bottom-color: yellow;
-    transform: translate(0, 0);
     transform: rotate(0);
 }
 

@@ -40,12 +40,8 @@ namespace metaio
 @property (nonatomic, retain) IBOutlet EAGLView *glView;
 @property (readonly, nonatomic, getter=isAnimating) BOOL animating;
 @property (nonatomic) NSInteger animationFrameInterval;
-@property (nonatomic, retain) IBOutlet UIButton *closeButton;
 
 - (void) startCamera;
-
-/** Close the current view again */
-- (IBAction)onBtnClosePushed:(id)sender;
 
 /** Start the OpenGL Animation */
 - (void)startAnimation;

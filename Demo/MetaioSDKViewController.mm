@@ -20,7 +20,6 @@
 
 
 @implementation MetaioSDKViewController
-@synthesize closeButton;
 @synthesize glView;
 @synthesize animating, context, displayLink;
 
