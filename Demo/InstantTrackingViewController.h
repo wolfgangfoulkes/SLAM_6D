@@ -4,7 +4,7 @@
 //
 
 
-#import "Object.h"
+#import "Pose.h"
 #import "MetaioSDKViewController.h"
 
 @interface InstantTrackingViewController : MetaioSDKViewController
@@ -15,30 +15,15 @@
     metaio::IGeometry*  m_obj;            // pointer to the model
     metaio::IGeometry*  m_obj1;           // pointer to the model
     
-    metaio::Rotation    m_ri;
-    metaio::Vector3d    m_ti;
+    Pose obj, cam;
     
-    //camera r and t relative to init.
-    metaio::Rotation    m_rn;
-    metaio::Vector3d    m_tn;
-    
-    //object pose in real-world coordinates, static.
-    metaio::Vector3d m_obj_ti;
-    metaio::Rotation m_obj_ri; //will need to convert for rotating geometry, which rotates relative to camera COS.
-    metaio::Vector3d m_obj_t;
-    metaio::Rotation m_obj_r; //will need to convert for rotating geometry, which rotates relative to camera COS.
-    metaio::Vector3d m_obj1_ti;
-    metaio::Rotation m_obj1_ri; //will need to convert for rotating geometry, which rotates relative to camera COS.
-    metaio::Vector3d m_obj1_t;
-    metaio::Rotation m_obj1_r; //will need to convert for rotating geometry, which rotates relative to camera COS.
-    
-    wf_Object obj;
-    
-    //wf_Object obj;
+    //Pose obj;
     
     bool hasInitPose;
     
     int activeCOS;
+    int lastCOS;
+    metaio::TrackingValues COS_offs; //can replace with pose
     
     bool debugView;
     bool printToScreen;
@@ -46,20 +31,34 @@
     IBOutlet UIWebView* webView;
     IBOutlet UIButton* debugViewToggle;
     IBOutlet UIButton* debugPrintButton;
+    IBOutlet UIButton* XppButton;
+    IBOutlet UIButton* XmmButton;
+    IBOutlet UIButton* YppButton;
+    IBOutlet UIButton* YmmButton;
+    IBOutlet UIButton* ZppButton;
+    IBOutlet UIButton* ZmmButton;
 }
 
 @property (nonatomic, retain) IBOutlet UIWebView *webView;
 @property (nonatomic, retain) IBOutlet UIButton *debugViewToggle;
 @property (nonatomic, retain) IBOutlet UIButton *debugPrintButton;
 
+@property (nonatomic, retain) IBOutlet UIButton* XppButton;
+@property (nonatomic, retain) IBOutlet UIButton* XmmButton;
+@property (nonatomic, retain) IBOutlet UIButton* YppButton;
+@property (nonatomic, retain) IBOutlet UIButton* YmmButton;
+@property (nonatomic, retain) IBOutlet UIButton* ZppButton;
+@property (nonatomic, retain) IBOutlet UIButton* ZmmButton;
+
 - (IBAction)onDebugDown:(id)sender;
 - (IBAction)onPrintDown:(id)sender;
+- (IBAction)poseButtonDown:(id)sender;
 
 - (void)initPoseWithT: (metaio::Vector3d)t AndR:(metaio::Rotation)r;
 - (void) updateObjectsWithCameraT: (metaio::Vector3d)t AndR:(metaio::Rotation)r;
 - (void)loadDebugView;
 - (void)updateDebugViewWithCameraT: (metaio::Vector3d)c_t andR: (metaio::Rotation)c_r
-    andObjectT: (metaio::Vector4d)o_t andR: (metaio::Rotation)o_r;
+    andObjectT: (metaio::Vector3d)o_t andR: (metaio::Rotation)o_r;
 - (void)printDebugToConsole;
 - (void)addPose: (int)name ToDebugContextT: (metaio::Vector4d)obj_t andR:(metaio::Rotation)obj_r;
 

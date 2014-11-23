@@ -48,7 +48,7 @@ html, body {
     bottom: 50%;
     left: 50%;
     border-bottom-color: black;
-    transform: rotate(0);
+    transform: rotate(0deg);
 }
 
 #object {
@@ -56,7 +56,7 @@ html, body {
     bottom: 50%;
     left: 50%;
     border-bottom-color: yellow;
-    transform: rotate(0);
+    transform: rotate(0deg);
 }
 
 .arrow-up {

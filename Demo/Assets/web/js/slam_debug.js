@@ -62,7 +62,7 @@ setXY = function()
     
     var ot =
     {
-        bottom: ((50. + o.t.y/50).toString() + "%"),
+        bottom: ((50. + o.t.z/50).toString() + "%"),
         left: ((50. + o.t.x/50).toString() + "%"),
         transform: "rotateZ(" + c.r.y + "deg)"
         

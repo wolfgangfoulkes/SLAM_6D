@@ -419,7 +419,8 @@
 
 - (IBAction)onBtnClosePushed:(id)sender 
 {
-    [self dismissModalViewControllerAnimated:YES];
+    [self
+    dismissModalViewControllerAnimated:YES];
 }
 
 

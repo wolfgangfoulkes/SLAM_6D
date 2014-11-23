@@ -14,6 +14,7 @@
 #import <metaioSDK/IMetaioSDKIOS.h>
 
 /*untested unless mentioned*/
+void matToArray(cv::Mat m_, float * _m);
 void rToMat(metaio::Rotation r_, cv::Mat& _r);
 void matToR(cv::Mat r_, metaio::Rotation& _r);
 void matFromTandR(cv::Mat t_, cv::Mat r_, cv::Mat& _mat);
@@ -25,7 +26,9 @@ void transformPoint(cv::Mat p_, cv::Mat mat_, cv::Mat& _p);
 void transformPoint(metaio::Vector4d& p, cv::Mat mat_);
 void pToMat(cv::Vec4f p_, cv::Mat& _mat);
 void pToMat(metaio::Vector4d p_, cv::Mat& _mat);
+void pToMat(metaio::Vector3d p_, cv::Mat& _mat);
 void matToP(cv::Mat mat_, cv::Vec4f& _p);
 void matToP(cv::Mat mat_, metaio::Vector4d& _p);
+void matToP(cv::Mat mat_, metaio::Vector3d& _p);
 
 #endif /* defined(__Demo__common__) */

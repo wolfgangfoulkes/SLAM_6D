@@ -14,7 +14,8 @@
 #import <JavaScriptCore/JavaScriptCore.h>
 #import "MapTransitionHelper.h"
 
-#import "Object.h"
+#import "Pose.h"
+
 
 int printf(const char * __restrict format, ...) //printf don't print to console
 //from http://stackoverflow.com/questions/8924831/iphone-debugging-real-device
@@ -40,6 +41,12 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 @synthesize webView;
 @synthesize debugViewToggle;
 @synthesize debugPrintButton;
+@synthesize XppButton;
+@synthesize XmmButton;
+@synthesize YppButton;
+@synthesize YmmButton;
+@synthesize ZppButton;
+@synthesize ZmmButton;
 
 #pragma mark - UIViewController lifecycle
 
@@ -55,29 +62,19 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     // Initial scaling for the models
     m_scale = 1;
     
-    //Initialize camera r and t
-    m_tn = metaio::Vector3d(metaio::Vector3d(0,0,0));
-    m_rn = metaio::Rotation(metaio::Vector3d(0,0,0));
-    
-    //relative to camera-init. 304.8 is 6', assumes I've got it just-under-head
-    m_obj_t = m_obj_ti = metaio::Vector3d(0, 0, 0); //-300);
-    //will need to convert r for rotating geometry, which rotates relative to camera COS
-    m_obj_r = m_obj_ri = metaio::Rotation(metaio::Vector3d(0, 0, 0));
-    //relative to camera-init. 304.8 is 6', assumes I've got it just-under-head
-    m_obj1_t = m_obj1_ti = m_obj1_ti = metaio::Vector3d(0, 0, 0); //-300);
-    //will need to convert r for rotating geometry, which rotates relative to camera COS
-    m_obj1_r = m_obj1_ri = m_obj1_ri = metaio::Rotation(metaio::Vector3d(0, 0, 0));
-    
-    obj = wf_Object(metaio::Vector4d(0,0,0,1), metaio::Rotation(0,0,0));
+    cam = Pose(metaio::Vector4d(0,0,0,1), metaio::Rotation(0,0,0));
+    obj = Pose(metaio::Vector4d(-100,0,-100,1), metaio::Rotation(0,0,0));
+    //from front-left of room
     
     //Initialize frame count
     m_frames = 0;
     
     // Load content //FLAG CHANGED RENDER ORDER TO SAME
     
-    m_obj           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:m_obj_t modelScaling:m_scale modelCos:1];
-    m_obj1           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:m_obj1_t modelScaling:m_scale modelCos:2];
+    m_obj           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:obj.getT_m() modelScaling:m_scale modelCos:0];
+//    m_obj1           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:m_obj1_t modelScaling:m_scale modelCos:0];
     
+    hasInitPose = false;
     debugView = true;
     printToScreen = false;
     
@@ -113,8 +110,9 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 		mapTransitionHelper.prepareForTransitionToNewMap();
 		//[self setTrackingConfiguration];
 	}
-    else
+    else //updating mapTransitionHelper should be contingent on this being positive
     {
+        lastCOS = activeCOS;
         metaio::TrackingValues cos1 = m_metaioSDK->getTrackingValues(1);
         metaio::TrackingValues cos2 = m_metaioSDK->getTrackingValues(2);
         metaio::TrackingValues cos3 = m_metaioSDK->getTrackingValues(3);
@@ -122,6 +120,15 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         else if (cos2.isTrackingState()) {activeCOS = 2;}
         else if (cos3.isTrackingState()) {activeCOS = 3;}
         else {activeCOS = 0;}
+        
+        if (!activeCOS)
+        {
+            printf("\nactiveCOS == 0\n");
+        }
+        else
+        {
+            printf("\nactiveCOS == %d", activeCOS);
+        }
     }
     
 }
@@ -171,7 +178,6 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 	NSString* dir = [NSString stringWithFormat:@"Assets"];
     NSString* ext = [NSString stringWithFormat:@"xml"];
 	NSString* tr = [[NSBundle mainBundle] pathForResource:config ofType:ext inDirectory:dir];
-    //NSLog(@"full path: %s", [tr UTF8String]);
 	
     bool success = m_metaioSDK->setTrackingConfiguration([tr UTF8String]);
     if(!success)
@@ -227,53 +233,93 @@ int printf(const char * __restrict format, ...) //printf don't print to console
  */
 - (void) update
 {
+    float tvm[16];
+    metaio::TrackingValues tv = m_metaioSDK->getTrackingValues(1);
+    if (activeCOS)
+    {
+        if (lastCOS)
+        {
+            COS_offs = tv;
+            lastCOS = activeCOS;
+        }
+        else
+        {
+            
+        }
+    }
+    m_metaioSDK->getTrackingValues(1, tvm, true); //false if you want only modelMatrix. additional true to get a right-handed system
+    //http://www.evl.uic.edu/ralph/508S98/coordinates.html
+    //right-handed right:x+, up:y+, screen:z-, rotation is counterclockwise around axis
+    //left-handed right:x+, up:y+, screen:z+, rotation is clockwise around axis
+    
+    //matrix maps object onto tracked object.
+    cv::Mat tv_mat = cv::Mat::Mat(4, 4, CV_32F, tvm);
+    //metaio::stlcompat::String points = m_metaioSDK->sensorCommand((metaio::stlcompat::String)"getNewMapFeatures");
 
     // Update the internal state with the lastest tracking values from the SDK.
-    mapTransitionHelper.update(m_metaioSDK->getTrackingValues(activeCOS), m_metaioSDK->getRegisteredSensorsComponent()->getLastSensorValues());
+    mapTransitionHelper.update(m_metaioSDK->getTrackingValues(1), m_metaioSDK->getRegisteredSensorsComponent()->getLastSensorValues());
+    
 
     
     // If the last frame could be tracked successfully
     if(mapTransitionHelper.lastFrameWasTracked())
     {
-        // Get the rotation of the "fused" camera pose
-        metaio::Rotation newRotation = mapTransitionHelper.getRotationCameraFromWorld();
-        //camera COS
         
-        // Get the translation of the "fused" camera pose
-        metaio::Vector3d newTranslation = mapTransitionHelper.getTranslationCameraFromWorld();
-        //camera COS
+        metaio::Rotation newRotation = mapTransitionHelper.getRotationCameraFromWorld();//tv.rotation;
+        metaio::Vector3d newTranslation = mapTransitionHelper.getTranslationCameraFromWorld();//tv.translation;
+        metaio::Vector3d newTranslation_r = metaio::Rotation(0, 0, dToR(180.)).rotatePoint(newTranslation);
+        
+//        if (activeCOS)
+//        {
+//            if (activeCOS == lastCOS)
+//            {
+//            }
+//            else if (activeCOS)
+//            {
+////                metaio::TrackingValues co;
+////                m_metaioSDK->getCosRelation(activeCOS, COS_offs.coordinateSystemID, co);
+////                m_metaioSDK->setCosOffset(activeCOS, co);
+////                cam.translate(co.translation);
+////                cam.rotate(co.rotation);
+//            }
+//            
+////            COS_offs = tv;
+//        }
+        
         
         if(!hasInitPose)
         {
             [self initPoseWithT:newTranslation AndR: newRotation];
-            
-            m_rn = metaio::Rotation(m_ri);
-            m_tn = metaio::Vector3d(m_ti);
         }
         else
         {
-            m_tn = newTranslation - m_ti;
-            m_rn = newRotation;
+            metaio::Vector3d t_cam = newRotation.inverse().rotatePoint(newTranslation * 1.0f);
+            cam.setT(t_cam);
+            cam.setR(newRotation);
         }
 
         //set global vars
         
-        [self updateObjectsWithCameraT:m_tn AndR:m_rn];
+        [self updateObjectsWithCameraT:cam.getT_m() AndR:cam.getR_m()];
         m_obj->setScale(m_scale);
+        m_obj->setRotation(obj.getR_m());
+        metaio::Vector3d t = newTranslation_r + obj.getT_m();
+
+        
+        m_obj->setTranslation(t);
+        
+        if (debugView) //replace this with button press!
+        {
+            [self updateDebugViewWithCameraT:cam.getT_m() andR:cam.getR_m() andObjectT:m_obj->getTranslation() andR:m_obj->getRotation()];
+        }
     }
     
-    if (debugView && hasInitPose) //replace this with button press!
-    {
-        [self updateDebugViewWithCameraT:m_tn andR:m_rn andObjectT:obj.getT_m() andR:obj.getR_m()];
-    }
+    
     m_frames++; //update frame count.
 }
 
 - (void) updateObjectsWithCameraT: (metaio::Vector3d)t AndR:(metaio::Rotation)r
 {
-    //m_obj->setTranslation(m_obj_ti - metaio::Vector3d(-t.x, -t.y, t.z));
-    //m_obj1->setTranslation(m_obj1_ti - metaio::Vector3d(-t.x, -t.y, t.z));
-    obj.transform(metaio::Vector4d(-t.x, -t.y, t.z, 1), r);
 }
 
 #pragma mark - Rotation handling
@@ -287,40 +333,40 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 
 - (void)printDebugToConsole //call on button press
 {
-        //prints defined vs. valid (active) COS's
-        printf("/nCOS's: %i of %i", m_metaioSDK->getNumberOfValidCoordinateSystems(), m_metaioSDK->getNumberOfDefinedCoordinateSystems());
-        metaio::TrackingValues cos0 = m_metaioSDK->getTrackingValues(0);
-        metaio::TrackingValues cos1 = m_metaioSDK->getTrackingValues(1);
-        metaio::TrackingValues cos2 = m_metaioSDK->getTrackingValues(2);
-        if (cos0.isTrackingState()) {printf("COS0: is tracking!");}
-        else {printf("COS0: is not tracking!");}
-        if (cos1.isTrackingState()) {printf("COS1: is tracking!");}
-        else {printf("COS1: is not tracking!");}
-        if (cos2.isTrackingState()) {printf("COS2: is tracking!");}
-        else {printf("COS2: is not tracking!");}
-
-        //prints COS's IDs from name
-        int right = m_metaioSDK->getCoordinateSystemID("map-mlab-front-right");
-        int left = m_metaioSDK->getCoordinateSystemID("map-mlab-front-left");
-        printf("\nmap-mlab-front-right: %d\n", right); //1
-        printf("\nmap-mlab-front-left: %d\n", left); //2
-    
-        //put this one in Object instance, prints rotation and translation
-        metaio::Vector3d r = m_rn.getEulerAngleDegrees();
-        metaio::Vector3d t = m_tn;
-        
-        metaio::Vector3d obj_t = m_obj->getTranslation();
-        metaio::Vector3d obj_r = m_obj->getRotation().getEulerAngleDegrees();
-
-        printf("\n---------------------|%d|---------------------\n", m_frames); //NSLOG prints date and time and some junk
-        printf("\n--|rotation: (%f, %f, %f) |---\n--|translation: (%f, %f, %f) |---\n",
-        r.x, r.y, r.z, t.x, t.y, t.z);
-        
-        printf("\n-----|OBJ|--------------------\n");
-        printf("\n--|rotation: (%f, %f, %f) |---\n--|translation: (%f, %f, %f) |---\n",
-        obj_r.x, obj_r.y, obj_r.z, obj_t.x, obj_t.y, obj_t.z);
-        printf("\n---------\n");
-        printf("\n-----\n");
+//        //prints defined vs. valid (active) COS's
+//        printf("/nCOS's: %i of %i", m_metaioSDK->getNumberOfValidCoordinateSystems(), m_metaioSDK->getNumberOfDefinedCoordinateSystems());
+//        metaio::TrackingValues cos0 = m_metaioSDK->getTrackingValues(0);
+//        metaio::TrackingValues cos1 = m_metaioSDK->getTrackingValues(1);
+//        metaio::TrackingValues cos2 = m_metaioSDK->getTrackingValues(2);
+//        if (cos0.isTrackingState()) {printf("COS0: is tracking!");}
+//        else {printf("COS0: is not tracking!");}
+//        if (cos1.isTrackingState()) {printf("COS1: is tracking!");}
+//        else {printf("COS1: is not tracking!");}
+//        if (cos2.isTrackingState()) {printf("COS2: is tracking!");}
+//        else {printf("COS2: is not tracking!");}
+//
+//        //prints COS's IDs from name
+//        int right = m_metaioSDK->getCoordinateSystemID("map-mlab-front-right");
+//        int left = m_metaioSDK->getCoordinateSystemID("map-mlab-front-left");
+//        printf("\nmap-mlab-front-right: %d\n", right); //1
+//        printf("\nmap-mlab-front-left: %d\n", left); //2
+//    
+//        //put this one in Object instance, prints rotation and translation
+//        metaio::Vector3d r = m_rn.getEulerAngleDegrees();
+//        metaio::Vector3d t = m_tn;
+//        
+//        metaio::Vector3d obj_t = m_obj->getTranslation();
+//        metaio::Vector3d obj_r = m_obj->getRotation().getEulerAngleDegrees();
+//
+//        printf("\n---------------------|%d|---------------------\n", m_frames); //NSLOG prints date and time and some junk
+//        printf("\n--|rotation: (%f, %f, %f) |---\n--|translation: (%f, %f, %f) |---\n",
+//        r.x, r.y, r.z, t.x, t.y, t.z);
+//        
+//        printf("\n-----|OBJ|--------------------\n");
+//        printf("\n--|rotation: (%f, %f, %f) |---\n--|translation: (%f, %f, %f) |---\n",
+//        obj_r.x, obj_r.y, obj_r.z, obj_t.x, obj_t.y, obj_t.z);
+//        printf("\n---------\n");
+//        printf("\n-----\n");
 }
 
 #pragma mark - Button handlers
@@ -336,6 +382,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 - (void)addPose: (int)name ToDebugContextT: (metaio::Vector4d)obj_t andR:(metaio::Rotation)obj_r
 {
     JSContext *ctx = [self.webView valueForKeyPath:@"documentView.webView.mainFrame.javaScriptContext"];
+    
     metaio::Vector3d obj_e = obj_r.getEulerAngleDegrees();
     /*http://www.bignerdranch.com/blog/objective-c-literals-part-1/*/
     /*simpler to do this by creating a new version of an existing object with params?*/
@@ -347,7 +394,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 }
 
 - (void)updateDebugViewWithCameraT: (metaio::Vector3d)c_t andR: (metaio::Rotation)c_r
-    andObjectT: (metaio::Vector4d)o_t andR: (metaio::Rotation)o_r
+    andObjectT: (metaio::Vector3d)o_t andR: (metaio::Rotation)o_r
 {
     JSContext *ctx = [self.webView valueForKeyPath:@"documentView.webView.mainFrame.javaScriptContext"];
     NSAssert([ctx isKindOfClass:[JSContextclass]], @"could not find context in web view");
@@ -361,40 +408,38 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 //        [self addPose:1 ToDebugContextT: o_t andR: o_r];
 //    }
     metaio::Vector3d c_e = c_r.getEulerAngleDegrees();
-    metaio::Vector3d o_e = c_r.getEulerAngleDegrees();
-    ctx[@"cx"] = @(50. + c_t.x/50.); //shorthand for NSNumber
-    ctx[@"cy"] = @(50. + c_t.y/50.);
-    ctx[@"ox"] = @(50. + o_t.x/50.);
-    ctx[@"oy"] = @(50. + o_t.y/50.);
+    metaio::Vector3d o_e = o_r.getEulerAngleDegrees();
+    
+    ctx[@"printToScreen"] = @(printToScreen);
+    ctx[@"c"][@"t"][@"x"] = @(((int) c_t.x/10) * 10);
+    ctx[@"c"][@"t"][@"y"] = @(((int) c_t.y/10) * 10);
+    ctx[@"c"][@"t"][@"z"] = @(((int) c_t.z/10) * 10);
+    
+    ctx[@"c"][@"r"][@"x"] = @(((int) c_e.x/10) * 10);
+    ctx[@"c"][@"r"][@"y"] = @(((int) c_e.y/10) * 10);
+    ctx[@"c"][@"r"][@"z"] = @(((int) c_e.z/10) * 10);
+    
+    ctx[@"o"][@"t"][@"x"] = @(((int) o_t.x/10) * 10);
+    ctx[@"o"][@"t"][@"y"] = @(((int) o_t.y/10) * 10);
+    ctx[@"o"][@"t"][@"z"] = @(((int) o_t.z/10) * 10);
+    
+    ctx[@"o"][@"r"][@"x"] = @(((int) o_e.x/10) * 10);
+    ctx[@"o"][@"r"][@"y"] = @(((int) o_e.y/10) * 10);
+    ctx[@"o"][@"r"][@"z"] = @(((int) o_e.z/10) * 10);
     
     ctx[@"console"][@"log"] = ^(JSValue *msg)
     {
         NSLog(@"JavaScript %@ log message: %@", [JSContext currentContext], msg);
     }; //works for all console.log messages
     
-    ctx[@"printToScreen"] = @(printToScreen);
-    ctx[@"c"][@"t"][@"x"] = @(c_t.x);
-    ctx[@"c"][@"t"][@"y"] = @(c_t.y);
-    ctx[@"c"][@"t"][@"z"] = @(c_t.z);
-    
-    ctx[@"c"][@"r"][@"x"] = @(c_e.x);
-    ctx[@"c"][@"r"][@"y"] = @(c_e.y);
-    ctx[@"c"][@"r"][@"z"] = @(c_e.z);
-    
-    ctx[@"o"][@"t"][@"x"] = @(o_t.x);
-    ctx[@"o"][@"t"][@"y"] = @(o_t.y);
-    ctx[@"o"][@"t"][@"z"] = @(o_t.z);
-    
-    ctx[@"o"][@"r"][@"x"] = @(o_e.x);
-    ctx[@"o"][@"r"][@"y"] = @(o_e.y);
-    ctx[@"o"][@"r"][@"z"] = @(o_e.z);
+
     
 }
 
 -(void)initPoseWithT:(metaio::Vector3d)t_ AndR:(metaio::Rotation)r_
 {
-    m_ti = metaio::Vector3d(t_);
-    m_ri = metaio::Rotation(r_);
+    metaio::Vector3d t_cam = r_.inverse().rotatePoint(t_ * 1.0f);
+    cam = Pose(t_cam, r_);
     
     hasInitPose = true;
 }
@@ -407,5 +452,35 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 - (IBAction)onPrintDown:(id)sender {
     printToScreen = (!printToScreen) && debugView;
 }
+
+- (IBAction)poseButtonDown:(id)sender {
+    if (! hasInitPose ) return;
+    metaio::Vector3d t = obj.getT_m();
+    switch ([sender tag]) {
+        case 1:
+            t.x = (int)(t.x - 40) % 800;
+            break;
+        case 2:
+            t.x = (int)(t.x + 40) % 800;
+            break;
+        case 3:
+            t.y = (int)(t.y - 40) % 800;
+            break;
+        case 4:
+            t.y = (int)(t.y + 40) % 800;
+            break;
+        case 5:
+            t.z = (int)(t.z - 40) % 800;
+            break;
+        case 6:
+            t.z = (int)(t.z + 40) % 800;
+            break;
+       default:
+           NSLog(@"???");
+            break;
+        }
+    obj.setT(t);
+}
+
 
 @end

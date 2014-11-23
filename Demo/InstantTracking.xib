@@ -7,6 +7,12 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="InstantTrackingViewController">
             <connections>
+                <outlet property="XmmButton" destination="pdw-ak-4Db" id="Riy-Rm-Vhb"/>
+                <outlet property="XppButton" destination="ZZX-Ax-mCC" id="Oor-5N-8pO"/>
+                <outlet property="YmmButton" destination="FeO-xW-D9R" id="aa9-tv-Vx2"/>
+                <outlet property="YppButton" destination="avK-VK-qGv" id="N8b-mB-6ib"/>
+                <outlet property="ZmmButton" destination="21l-iU-4Vc" id="AHX-Ox-0kt"/>
+                <outlet property="ZppButton" destination="HJl-6v-r18" id="sn1-wI-ab1"/>
                 <outlet property="debugPrintButton" destination="cIB-42-NRp" id="JRd-m6-5Gk"/>
                 <outlet property="debugViewToggle" destination="UU7-r0-Jts" id="4tW-Hc-ydk"/>
                 <outlet property="glView" destination="8" id="33"/>
@@ -39,14 +45,92 @@
                         <action selector="onDebugDown:" destination="-1" eventType="touchDown" id="Reh-IE-Fg1"/>
                     </connections>
                 </button>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="cIB-42-NRp">
-                    <rect key="frame" x="27" y="68" width="46" height="30"/>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" reversesTitleShadowWhenHighlighted="YES" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" id="cIB-42-NRp">
+                    <rect key="frame" x="27" y="60" width="46" height="30"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <state key="normal" title="PRINT">
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
                     <connections>
                         <action selector="onPrintDown:" destination="-1" eventType="touchDown" id="Nvq-l8-Ec8"/>
+                    </connections>
+                </button>
+                <button opaque="NO" alpha="0.5" tag="2" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" reversesTitleShadowWhenHighlighted="YES" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" id="ZZX-Ax-mCC">
+                    <rect key="frame" x="54" y="111" width="30" height="40"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <color key="backgroundColor" red="0.46966287359999997" green="0.2160573566" blue="0.26060394219999999" alpha="1" colorSpace="calibratedRGB"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    <state key="normal" title="X+">
+                        <color key="titleColor" red="1" green="0.43119932502745928" blue="0.38343731668332115" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="titleShadowColor" red="0.46966287364130432" green="0.21605735659236813" blue="0.26060394223857652" alpha="1" colorSpace="calibratedRGB"/>
+                    </state>
+                    <connections>
+                        <action selector="poseButtonDown:" destination="-1" eventType="touchDown" id="uLu-iA-GuW"/>
+                    </connections>
+                </button>
+                <button opaque="NO" alpha="0.5" tag="1" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" reversesTitleShadowWhenHighlighted="YES" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" id="pdw-ak-4Db">
+                    <rect key="frame" x="16" y="111" width="30" height="40"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <color key="backgroundColor" red="0.73738960597826086" green="0.33921874175651201" blue="0.40915867331350708" alpha="1" colorSpace="calibratedRGB"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    <state key="normal" title="X-">
+                        <color key="titleColor" red="0.97532857121492567" green="1" blue="0.98738646581623168" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="titleShadowColor" red="0.70654296875" green="0.32502847194099371" blue="0.39204266155774831" alpha="1" colorSpace="calibratedRGB"/>
+                    </state>
+                    <connections>
+                        <action selector="poseButtonDown:" destination="-1" eventType="touchDown" id="NlG-qW-wfb"/>
+                    </connections>
+                </button>
+                <button opaque="NO" alpha="0.5" tag="3" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" reversesTitleShadowWhenHighlighted="YES" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" id="FeO-xW-D9R">
+                    <rect key="frame" x="16" y="164" width="30" height="40"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <color key="backgroundColor" red="0.73738960597826086" green="0.33921874175651201" blue="0.40915867331350708" alpha="1" colorSpace="calibratedRGB"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    <state key="normal" title="Y-">
+                        <color key="titleColor" red="0.97532857121492567" green="1" blue="0.98738646581623168" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="titleShadowColor" red="0.70654296875" green="0.32502847194099371" blue="0.39204266155774831" alpha="1" colorSpace="calibratedRGB"/>
+                    </state>
+                    <connections>
+                        <action selector="poseButtonDown:" destination="-1" eventType="touchDown" id="kLk-O0-axS"/>
+                    </connections>
+                </button>
+                <button opaque="NO" alpha="0.5" tag="6" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" reversesTitleShadowWhenHighlighted="YES" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" id="HJl-6v-r18">
+                    <rect key="frame" x="54" y="217" width="30" height="40"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <color key="backgroundColor" red="0.46966287359999997" green="0.2160573566" blue="0.26060394219999999" alpha="1" colorSpace="calibratedRGB"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    <state key="normal" title="Z+">
+                        <color key="titleColor" red="1" green="0.43119932502745928" blue="0.38343731668332115" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="titleShadowColor" red="0.46966287359999997" green="0.2160573566" blue="0.26060394219999999" alpha="1" colorSpace="calibratedRGB"/>
+                    </state>
+                    <connections>
+                        <action selector="poseButtonDown:" destination="-1" eventType="touchDown" id="Kti-5o-2Ou"/>
+                    </connections>
+                </button>
+                <button opaque="NO" alpha="0.5" tag="5" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" reversesTitleShadowWhenHighlighted="YES" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" id="21l-iU-4Vc">
+                    <rect key="frame" x="16" y="217" width="30" height="40"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <color key="backgroundColor" red="0.73738960597826086" green="0.33921874175651201" blue="0.40915867331350708" alpha="1" colorSpace="calibratedRGB"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    <state key="normal" title="Z-">
+                        <color key="titleColor" red="0.97532857121492567" green="1" blue="0.98738646581623168" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="titleShadowColor" red="0.70654296875" green="0.32502847194099371" blue="0.39204266155774831" alpha="1" colorSpace="calibratedRGB"/>
+                    </state>
+                    <connections>
+                        <action selector="poseButtonDown:" destination="-1" eventType="touchDown" id="Qse-sw-p47"/>
+                    </connections>
+                </button>
+                <button opaque="NO" alpha="0.5" tag="4" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" reversesTitleShadowWhenHighlighted="YES" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" id="avK-VK-qGv">
+                    <rect key="frame" x="54" y="164" width="30" height="40"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <color key="backgroundColor" red="0.46966287359999997" green="0.2160573566" blue="0.26060394219999999" alpha="1" colorSpace="calibratedRGB"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    <state key="normal" title="Y+">
+                        <color key="titleColor" red="1" green="0.43119932502745928" blue="0.38343731668332115" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="titleShadowColor" red="0.46966287359999997" green="0.2160573566" blue="0.26060394219999999" alpha="1" colorSpace="calibratedRGB"/>
+                    </state>
+                    <connections>
+                        <action selector="poseButtonDown:" destination="-1" eventType="touchDown" id="5kt-Ms-okz"/>
                     </connections>
                 </button>
             </subviews>

@@ -17,7 +17,7 @@
 		9860DC281A1A72E5005626C0 /* metaioSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 986917CE1A08C72F00508D34 /* metaioSDK.framework */; };
 		9860DC2A1A1A865C005626C0 /* EventKitUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9860DC291A1A865C005626C0 /* EventKitUI.framework */; };
 		986917CD1A08C69A00508D34 /* Assets in Resources */ = {isa = PBXBuildFile; fileRef = 986917CC1A08C69A00508D34 /* Assets */; };
-		9899779D1A1D9B11000AB036 /* Object.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9899779C1A1D9B11000AB036 /* Object.mm */; };
+		9899779D1A1D9B11000AB036 /* Pose.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9899779C1A1D9B11000AB036 /* Pose.mm */; };
 		989977A41A1DFAB8000AB036 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 989977A31A1DFAB8000AB036 /* ImageIO.framework */; };
 		989977A61A1DFB31000AB036 /* common.mm in Sources */ = {isa = PBXBuildFile; fileRef = 989977A51A1DFB31000AB036 /* common.mm */; };
 		989977A81A1DFE26000AB036 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 989977A71A1DFE26000AB036 /* main.mm */; };
@@ -75,8 +75,8 @@
 		9860DC291A1A865C005626C0 /* EventKitUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKitUI.framework; path = System/Library/Frameworks/EventKitUI.framework; sourceTree = SDKROOT; };
 		986917CC1A08C69A00508D34 /* Assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Assets; path = Demo/Assets; sourceTree = "<group>"; };
 		986917CE1A08C72F00508D34 /* metaioSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = metaioSDK.framework; sourceTree = "<group>"; };
-		9899779B1A1D9B11000AB036 /* Object.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = Object.h; sourceTree = "<group>"; };
-		9899779C1A1D9B11000AB036 /* Object.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Object.mm; sourceTree = "<group>"; };
+		9899779B1A1D9B11000AB036 /* Pose.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = Pose.h; sourceTree = "<group>"; };
+		9899779C1A1D9B11000AB036 /* Pose.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Pose.mm; sourceTree = "<group>"; };
 		989977A11A1DC7C3000AB036 /* common.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = common.h; sourceTree = "<group>"; };
 		989977A31A1DFAB8000AB036 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
 		989977A51A1DFB31000AB036 /* common.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = common.mm; sourceTree = "<group>"; };
@@ -172,8 +172,8 @@
 			children = (
 				989977A51A1DFB31000AB036 /* common.mm */,
 				989977A11A1DC7C3000AB036 /* common.h */,
-				9899779B1A1D9B11000AB036 /* Object.h */,
-				9899779C1A1D9B11000AB036 /* Object.mm */,
+				9899779B1A1D9B11000AB036 /* Pose.h */,
+				9899779C1A1D9B11000AB036 /* Pose.mm */,
 				98A012401A1450BC005993B4 /* js */,
 				98BD77241A112C2F00CC9EAD /* slam.css */,
 				98BD77201A112B6C00CC9EAD /* slam.html */,
@@ -358,7 +358,7 @@
 			files = (
 				7CCB429D19582BAE007355FA /* InstantTrackingViewController.mm in Sources */,
 				989977A61A1DFB31000AB036 /* common.mm in Sources */,
-				9899779D1A1D9B11000AB036 /* Object.mm in Sources */,
+				9899779D1A1D9B11000AB036 /* Pose.mm in Sources */,
 				989977A81A1DFE26000AB036 /* main.mm in Sources */,
 				B9BC116015D8FA7C00713ED3 /* AppDelegate.mm in Sources */,
 				B9BC118B15D900D900713ED3 /* EAGLView.mm in Sources */,

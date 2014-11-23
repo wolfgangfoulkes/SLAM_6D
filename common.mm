@@ -15,22 +15,29 @@
 
 using namespace std;
 
-void rToMat(metaio::Rotation r_, cv::Mat& _r)
+void matToArray(cv::Mat m_, float * _m) //works with vectors too, if you pass in &vec[0]
+{
+    cv::Mat m(m_.rows, m_.cols, CV_32F, _m);
+    m_.copyTo(m);
+}
+
+void rToMat(metaio::Rotation r_, cv::Mat& _r) //works
 {
     float r_f[16];
     r_.getRotationMatrix4x4(r_f);
-    cv::Mat r_mat = cv::Mat(4, 4, CV_32F, r_f);
+    cv::Mat r_mat(4, 4, CV_32F, r_f);
     r_mat.copyTo(_r);
 }
 
-void matToR(cv::Mat r_, metaio::Rotation& _r)
+void matToR(cv::Mat r_, metaio::Rotation& _r) //seems to work
 {
-    cv::Vec4f r;
-    Rodrigues(r_, r);
-    _r = metaio::Rotation(r(0), r(1), r(2));
+    float r_f[16];
+    matToArray(r_, r_f);
+    metaio::Rotation r;
+    _r.setFromModelviewMatrix(r_f);
 }
 
-void matFromTandR(cv::Mat t_, cv::Mat r_, cv::Mat& _mat)
+void matFromTandR(cv::Mat t_, cv::Mat r_, cv::Mat& _mat) //works I think (only if rotation is around own axis)
 {
     cv::Mat mat = (cv::Mat_<float>(4, 4) <<
     r_.at<float>(0, 0), r_.at<float>(1, 0), r_.at<float>(2, 0), t_.at<float>(0, 0),
@@ -41,17 +48,7 @@ void matFromTandR(cv::Mat t_, cv::Mat r_, cv::Mat& _mat)
     mat.copyTo(_mat);
 }
 
-void matFromTandR(cv::Vec4f t_, cv::Vec4f r_, cv::Mat& _mat)
-{
-    cv::Mat t = cv::Mat::eye(4, 1, CV_32F);
-    cv::Mat r = cv::Mat::eye(4, 4, CV_32F);
-    cv::Rodrigues(r_, r);
-    pToMat(t_, t);
-    
-    matFromTandR(t, r, _mat);
-}
-
-void matFromTandR(metaio::Vector4d t_, metaio::Rotation r_, cv::Mat& _mat)
+void matFromTandR(metaio::Vector4d t_, metaio::Rotation r_, cv::Mat& _mat) //works I think (only if rotation is around own axis)
 {
     
     cv::Mat t = cv::Mat::eye(4, 1, CV_32F);
@@ -106,30 +103,32 @@ void pToMat(cv::Vec4f p_, cv::Mat& _mat)
     cv::Mat mat = (cv::Mat_<float>(4, 1) << p_(0), p_(1), p_(2), p_(3));
     if (_mat.cols == 4)
     {
-        mat.t();
+        mat = mat.t(); //opencv t() returns: http://docs.opencv.org/modules/core/doc/basic_structures.html
     }
     mat.copyTo(_mat);
 }
 
 void pToMat(metaio::Vector4d p_, cv::Mat& _mat)
 {
-    cv::Vec4f p;
-    p(0) = p_.x;
-    p(1) = p_.y;
-    p(2) = p_.z;
-    p(3) = p_.w;
-    pToMat(p, _mat);
+    cv::Mat mat = (cv::Mat_<float>(4, 1) << p_.x, p_.y, p_.z, 1);
+    mat.copyTo(_mat);
 }
+void pToMat(metaio::Vector3d p_, cv::Mat& _mat)
+{
+    cv::Mat mat = (cv::Mat_<float>(4, 1) << p_.x, p_.y, p_.z, 1);
+    mat.copyTo(_mat);
+}
+
 //change this to index array values so we can populate both row and column vectors
 //I think .data
 //see http://stackoverflow.com/questions/17569097/opencv-c-how-access-pixel-value-cv-32f-through-uchar-data-pointer
 
 void matToP(cv::Mat mat_, cv::Vec4f& _p)
 {
-    if (mat_.cols == 4)
-    {
-        mat_.t();
-    }
+//    if (mat_.cols == 4)
+//    {
+//        mat_.t(); //see above
+//    }
     _p(0) = mat_.at<float>(0, 0);
     _p(1) = mat_.at<float>(1, 0);
     _p(2) = mat_.at<float>(2, 0);
@@ -139,10 +138,15 @@ void matToP(cv::Mat mat_, cv::Vec4f& _p)
 
 void matToP(cv::Mat mat_, metaio::Vector4d& _p)
 {
-    cv::Vec4f p;
-    matToP(mat_, p);
-    _p.x = p(0);
-    _p.y = p(1);
-    _p.z = p(2);
-    _p.w = p(3);
+    _p.x = mat_.at<float>(0, 0);
+    _p.y = mat_.at<float>(1, 0);
+    _p.z = mat_.at<float>(2, 0);
+    _p.w = 1;
+}
+
+void matToP(cv::Mat mat_, metaio::Vector3d& _p)
+{
+    _p.x = mat_.at<float>(0, 0);
+    _p.y = mat_.at<float>(1, 0);
+    _p.z = mat_.at<float>(2, 0);
 }
