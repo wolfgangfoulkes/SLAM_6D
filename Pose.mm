@@ -31,13 +31,14 @@ Pose::Pose(metaio::Vector3d t_, metaio::Rotation r_) : Pose()
     r_world = metaio::Rotation(r_);
 }
 
-void Pose::initP(metaio::Vector3d t_, metaio::Rotation r_)
+void Pose::initP(metaio::Vector3d t_, metaio::Rotation r_, int cos_)
 {
-    t_init = r_.inverse().rotatePoint(mult(t_, -1.0f));
+    COS = cos_;
+    t_init = r_.inverse().rotatePoint(mult(t_, -1.0f)); //same as getInverseTranslation
     r_init = r_.inverse();
-    exit(1);
 
     hasInitPose = true;
+    isTracking = true;
 }
 
 void Pose::initP(metaio::TrackingValues tv_)
@@ -45,9 +46,8 @@ void Pose::initP(metaio::TrackingValues tv_)
     metaio::Vector3d t_ = tv_.translation;
     metaio::Rotation r_ = tv_.rotation;
     COS = tv_.coordinateSystemID;
-    t_init = r_.inverse().rotatePoint(mult(t_, -1.0f));
+    t_init = r_.inverse().rotatePoint(mult(t_, -1.0f)); //same as getInverseTranslation
     r_init = r_.inverse();
-    
     hasInitPose = true;
     isTracking = true;
 }
@@ -56,14 +56,11 @@ void Pose::updateP(metaio::Vector3d t_, metaio::Rotation r_)
 {
     metaio::Vector3d _t(0, 0, 0);
     metaio::Rotation _r(0, 0, 0);
-    _t = r_.rotatePoint(t_init) + t_;
-    //could replace t_init with t_offs, bc t_init is included in t_offs
+    _t = r_.inverse().rotatePoint(mult(t_, -1.0f)) - t_init;
     
-    t_world += _t - t;
     t = _t;
     
     _r = r_.inverse() * r_init.inverse();
-    r_world = r_world * (_r * r.inverse());
     r = _r;
 }
 

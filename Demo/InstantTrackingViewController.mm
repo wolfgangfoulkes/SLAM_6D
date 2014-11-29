@@ -132,12 +132,14 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         activeCOS = 0;
     }
     
-    bool isTracking = m_metaioSDK->getTrackingValues(activeCOS).isTrackingState();
+    metaio::TrackingValues tv = m_metaioSDK->getTrackingValues(activeCOS);
+    bool isTracking = tv.isTrackingState();
+    string state = tv.trackingStateToString(tv.state);
 
     printf("activeCOS: %d %s", activeCOS, (isTracking) ? "is tracking!" : "isn't tracking!");
     
     
-    [self updateDebugViewWithActiveCos:(activeCOS)];
+    [self updateDebugViewWithActiveCos:activeCOS AndStatus:state];
     
 }
 
@@ -244,15 +246,6 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 {
     float tvm[16];
     metaio::TrackingValues tv = m_metaioSDK->getTrackingValues(1);
-
-//    metaio::ETRACKING_STATE state_ = tv.state;
-//    if (trackingState != state_)
-//    {
-//        [self printETSState:state_];
-//        printf("quality: %f", tv.quality);
-//        printf("am tracking: %s", (tv.isTrackingState()) ? "YES!" : "NO!");
-//        trackingState = state_;
-//    }
     
     m_metaioSDK->getTrackingValues(1, tvm, true); //false if you want only modelMatrix. additional true to get a right-handed system
     //http://www.evl.uic.edu/ralph/508S98/coordinates.html
@@ -294,7 +287,6 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         m_obj->setScale(m_scale);
         m_obj->setRotation(obj.r_world);
         metaio::Vector3d t = newTranslation_r + obj.t_world;
-
         
         m_obj->setTranslation(t);
         
@@ -480,12 +472,9 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     {
         NSLog(@"JavaScript %@ log message: %@", [JSContext currentContext], msg);
     }; //works for all console.log messages
-    
-
-    
 }
 
-- (void)updateDebugViewWithActiveCos: (int)cos_
+- (void)updateDebugViewWithActiveCos: (int)cos_ AndStatus:(string)state_
 {
     JSContext *ctx = [self.webView valueForKeyPath:@"documentView.webView.mainFrame.javaScriptContext"];
     NSAssert([ctx isKindOfClass:[JSContextclass]], @"could not find context in web view");
@@ -494,7 +483,8 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     {
         return;
     }
-    ctx[@"activeCOS"] = @(cos_);
+    ctx[@"COS"][@"idx"] = @(cos_);
+    ctx[@"COS"][@"state"] = [NSString stringWithFormat:@"%s", state_.c_str()];
 }
 
 -(void)initPoseWithT:(metaio::Vector3d)t_ AndR:(metaio::Rotation)r_

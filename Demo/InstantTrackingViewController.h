@@ -60,7 +60,7 @@
 - (void)loadDebugView;
 - (void)updateDebugViewWithCameraT: (metaio::Vector3d)c_t andR: (metaio::Rotation)c_r
     andObjectT: (metaio::Vector3d)o_t andR: (metaio::Rotation)o_r;
-- (void)updateDebugViewWithActiveCos: (int)cos_;
+- (void)updateDebugViewWithActiveCos: (int)cos_ AndStatus:(string)state_;
 - (void)printDebugToConsole;
 - (void)addPose: (int)name ToDebugContextT: (metaio::Vector4d)obj_t andR:(metaio::Rotation)obj_r;
 

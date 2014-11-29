@@ -11,7 +11,11 @@ o = new Pose;
 
 poses = {}
 
-activeCOS = 0;
+COS =
+{
+    idx: 0,
+    state: "UNKNOWN",
+};
 
 isReady = false;
 
@@ -52,8 +56,10 @@ setReadout = function()
     $ory.text(o.r.y.toPrecision(6));
     $orz.text(o.r.z.toPrecision(6));
     
-    var $cos = $(".cos");
-    $cos.text(activeCOS);
+    var $cos_idx = $(".cos .idx");
+    var $cos_state = $(".cos .state");
+    $cos_idx.text(COS.idx);
+    $cos_state.text(COS.state);
 }
 
 setXY = function()

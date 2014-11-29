@@ -58,7 +58,7 @@ class Pose
     Pose();
     Pose(metaio::Vector3d t_, metaio::Rotation r_);
     
-    void initP(metaio::Vector3d t_, metaio::Rotation r_);
+    void initP(metaio::Vector3d t_, metaio::Rotation r_, int cos_);
     void initP(metaio::TrackingValues tv_);
     void updateP(metaio::Vector3d t_, metaio::Rotation r_);
     void updateP(metaio::TrackingValues tv_);
