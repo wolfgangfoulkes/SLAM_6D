@@ -62,8 +62,8 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     // Initial scaling for the models
     m_scale = 1;
     
-    cam = Pose(metaio::Vector4d(0,0,0,1), metaio::Rotation(0,0,0));
-    obj = Pose(metaio::Vector4d(-100,0,-100,1), metaio::Rotation(0,0,0));
+    cam = Pose(metaio::Vector3d(0,0,0), metaio::Rotation(0,0,0));
+    obj = Pose(metaio::Vector3d(-100,0,-100), metaio::Rotation(0,0,0));
     //from front-left of room
     
     //Initialize frame count
@@ -71,10 +71,10 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     
     // Load content //FLAG CHANGED RENDER ORDER TO SAME
     
-    m_obj           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:obj.getT_m() modelScaling:m_scale modelCos:0];
+    m_obj           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:obj.t modelScaling:m_scale modelCos:0];
 //    m_obj1           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:m_obj1_t modelScaling:m_scale modelCos:0];
     
-    hasInitPose = false;
+    activeCOS = 0;
     debugView = true;
     printToScreen = false;
     
@@ -100,36 +100,44 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 - (void) onTrackingEvent:(const metaio::stlcompat::Vector<metaio::TrackingValues>&)poses
 {
     if (poses.empty())
-		return;
-    
-    // If tracking initialization failed or tracking is lost
-	if (poses[0].state == metaio::ETS_INITIALIZATION_FAILED || poses[0].state == metaio::ETS_LOST)
-	{
-		// Force immediate reset of tracking
-		//NSLog(@"SLAM initialization cannot continue, resetting tracking...");
-		mapTransitionHelper.prepareForTransitionToNewMap();
-		//[self setTrackingConfiguration];
-	}
-    else //updating mapTransitionHelper should be contingent on this being positive
     {
-        lastCOS = activeCOS;
-        metaio::TrackingValues cos1 = m_metaioSDK->getTrackingValues(1);
-        metaio::TrackingValues cos2 = m_metaioSDK->getTrackingValues(2);
-        metaio::TrackingValues cos3 = m_metaioSDK->getTrackingValues(3);
-        if (cos1.isTrackingState()) {activeCOS = 1;}
-        else if (cos2.isTrackingState()) {activeCOS = 2;}
-        else if (cos3.isTrackingState()) {activeCOS = 3;}
-        else {activeCOS = 0;}
-        
-        if (!activeCOS)
+        printf("poses is empty");
+		return;
+    }
+    
+    //[self printETSState:poses[0].state];
+    
+    if (poses[0].state == metaio::ETS_LOST)
+    {
+        mapTransitionHelper.prepareForTransitionToNewMap();
+    }
+	else
+	{
+		if (poses[0].state == metaio::ETS_INITIALIZATION_FAILED) //this can mean we are transitioning to a new map
         {
-            printf("\nactiveCOS == 0\n");
-        }
-        else
-        {
-            printf("\nactiveCOS == %d", activeCOS);
+            mapTransitionHelper.prepareForTransitionToNewMap();
+            printf("init failed!");
         }
     }
+
+    lastCOS = activeCOS; //the janky thing is this was sometimes zero when I had it enclosed in some checks
+    //but my checks may have been wrong
+    metaio::TrackingValues cos1 = m_metaioSDK->getTrackingValues(1);
+    metaio::TrackingValues cos2 = m_metaioSDK->getTrackingValues(2);
+    metaio::TrackingValues cos3 = m_metaioSDK->getTrackingValues(3);
+    if (cos1.isTrackingState()) {activeCOS = 1;}
+    else if (cos2.isTrackingState()) {activeCOS = 2;}
+    else if (cos3.isTrackingState()) {activeCOS = 3;}
+    else {
+        activeCOS = 0;
+    }
+    
+    bool isTracking = m_metaioSDK->getTrackingValues(activeCOS).isTrackingState();
+
+    printf("activeCOS: %d %s", activeCOS, (isTracking) ? "is tracking!" : "isn't tracking!");
+    
+    
+    [self updateDebugViewWithActiveCos:(activeCOS)];
     
 }
 
@@ -145,6 +153,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 	{
 		//NSLog(@"SLAM has timed out!");
 	}
+    printf("\ninstant tracking!1!?\n");
 	
 }
 
@@ -235,18 +244,16 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 {
     float tvm[16];
     metaio::TrackingValues tv = m_metaioSDK->getTrackingValues(1);
-    if (activeCOS)
-    {
-        if (lastCOS)
-        {
-            COS_offs = tv;
-            lastCOS = activeCOS;
-        }
-        else
-        {
-            
-        }
-    }
+
+//    metaio::ETRACKING_STATE state_ = tv.state;
+//    if (trackingState != state_)
+//    {
+//        [self printETSState:state_];
+//        printf("quality: %f", tv.quality);
+//        printf("am tracking: %s", (tv.isTrackingState()) ? "YES!" : "NO!");
+//        trackingState = state_;
+//    }
+    
     m_metaioSDK->getTrackingValues(1, tvm, true); //false if you want only modelMatrix. additional true to get a right-handed system
     //http://www.evl.uic.edu/ralph/508S98/coordinates.html
     //right-handed right:x+, up:y+, screen:z-, rotation is counterclockwise around axis
@@ -258,59 +265,42 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 
     // Update the internal state with the lastest tracking values from the SDK.
     mapTransitionHelper.update(m_metaioSDK->getTrackingValues(1), m_metaioSDK->getRegisteredSensorsComponent()->getLastSensorValues());
-    
 
     
     // If the last frame could be tracked successfully
     if(mapTransitionHelper.lastFrameWasTracked())
     {
-        
         metaio::Rotation newRotation = mapTransitionHelper.getRotationCameraFromWorld();//tv.rotation;
         metaio::Vector3d newTranslation = mapTransitionHelper.getTranslationCameraFromWorld();//tv.translation;
         metaio::Vector3d newTranslation_r = metaio::Rotation(0, 0, dToR(180.)).rotatePoint(newTranslation);
         
-//        if (activeCOS)
-//        {
-//            if (activeCOS == lastCOS)
-//            {
-//            }
-//            else if (activeCOS)
-//            {
-////                metaio::TrackingValues co;
-////                m_metaioSDK->getCosRelation(activeCOS, COS_offs.coordinateSystemID, co);
-////                m_metaioSDK->setCosOffset(activeCOS, co);
-////                cam.translate(co.translation);
-////                cam.rotate(co.rotation);
-//            }
-//            
-////            COS_offs = tv;
-//        }
-        
-        
-        if(!hasInitPose)
+        if(!cam.hasInitPose)
         {
-            [self initPoseWithT:newTranslation AndR: newRotation];
+            if(tv.quality == 1.)
+            {
+                cam.initP(tv);
+                obj.t_init = tv.translation;
+                printf("hasInitPose!");
+            }
         }
         else
         {
-            metaio::Vector3d t_cam = newRotation.inverse().rotatePoint(newTranslation * 1.0f);
-            cam.setT(t_cam);
-            cam.setR(newRotation);
+            cam.updateP(tv);
+            obj.t = tv.translation - obj.t_init;
         }
 
         //set global vars
         
-        [self updateObjectsWithCameraT:cam.getT_m() AndR:cam.getR_m()];
         m_obj->setScale(m_scale);
-        m_obj->setRotation(obj.getR_m());
-        metaio::Vector3d t = newTranslation_r + obj.getT_m();
+        m_obj->setRotation(obj.r_world);
+        metaio::Vector3d t = newTranslation_r + obj.t_world;
 
         
         m_obj->setTranslation(t);
         
         if (debugView) //replace this with button press!
         {
-            [self updateDebugViewWithCameraT:cam.getT_m() andR:cam.getR_m() andObjectT:m_obj->getTranslation() andR:m_obj->getRotation()];
+            [self updateDebugViewWithCameraT:cam.t andR:cam.r andObjectT:obj.t andR:obj.r];
         }
     }
     
@@ -367,6 +357,65 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 //        obj_r.x, obj_r.y, obj_r.z, obj_t.x, obj_t.y, obj_t.z);
 //        printf("\n---------\n");
 //        printf("\n-----\n");
+}
+
+
+- (void) printETSState: (metaio::ETRACKING_STATE)state_ //in the future: trackingValues.trackingStateToString
+{
+    switch (state_)
+    {
+        case metaio::ETS_EXTRAPOLATED:
+        {
+            printf("ETS_EXTRAPOLATED");
+            break;
+        }
+        case metaio::ETS_FOUND:
+        {
+            printf("ETS_FOUND");
+            break;
+        }
+        case metaio::ETS_INITIALIZATION_FAILED:
+        {
+            printf("ETS_INITIALIZATION_FAILED");
+            break;
+        }
+        case metaio::ETS_INITIALIZED:
+        {
+            printf("ETS_INITIALIZZED");
+            break;
+        }
+        case metaio::ETS_LOST:
+        {
+            printf("ETS_LOST");
+            break;
+        }
+        case metaio::ETS_NOT_TRACKING:
+        {
+            printf("ETS_NOT_TRACKING");
+            break;
+        }
+        case metaio::ETS_REGISTERED:
+        {
+            printf("ETS_REGISTERED");
+            break;
+        }
+        case metaio::ETS_TRACKING:
+        {
+            printf("ETS_TRACKING");
+            break;
+        }
+        case metaio::ETS_UNKNOWN:
+        {
+            printf("ETS_UNKNOWN");
+            break;
+        }
+        default:
+        {
+            printf("ETS_???");
+            break;
+        }
+    }
+
 }
 
 #pragma mark - Button handlers
@@ -436,13 +485,32 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     
 }
 
+- (void)updateDebugViewWithActiveCos: (int)cos_
+{
+    JSContext *ctx = [self.webView valueForKeyPath:@"documentView.webView.mainFrame.javaScriptContext"];
+    NSAssert([ctx isKindOfClass:[JSContextclass]], @"could not find context in web view");
+    JSValue *isReady = ctx[@"isReady"];
+    if (!isReady.toBool)
+    {
+        return;
+    }
+    ctx[@"activeCOS"] = @(cos_);
+}
+
 -(void)initPoseWithT:(metaio::Vector3d)t_ AndR:(metaio::Rotation)r_
 {
-    metaio::Vector3d t_cam = r_.inverse().rotatePoint(t_ * 1.0f);
-    cam = Pose(t_cam, r_);
-    
-    hasInitPose = true;
 }
+
+-(void)initRadar {
+//    m_radar = m_metaioSDK->createRadar();
+//    m_radar->setBackgroundTexture([[[NSBundle mainBundle] pathForResource:@"radar"	ofType:@"jpg" inDirectory:@"Assets"] UTF8String]);
+//    m_radar->setObjectsDefaultTexture([[[NSBundle mainBundle] pathForResource:@"elephant_skin"	ofType:@"jpg" inDirectory:@"Assets"] UTF8String]);
+//    m_radar->setRelativeToScreen(metaio::IGeometry::ANCHOR_BR);
+//    
+//    m_radar->add(m_obj);
+}
+
+/***** IF CALLBACKS *****/
 
 - (IBAction)onDebugDown:(id)sender {
     debugView = !debugView;
@@ -454,32 +522,33 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 }
 
 - (IBAction)poseButtonDown:(id)sender {
-    if (! hasInitPose ) return;
-    metaio::Vector3d t = obj.getT_m();
+    if (! cam.hasInitPose ) return;
+    metaio::Vector3d _t = obj.t;
     switch ([sender tag]) {
         case 1:
-            t.x = (int)(t.x - 40) % 800;
+            _t.x = (int)(_t.x - 40) % 800;
             break;
         case 2:
-            t.x = (int)(t.x + 40) % 800;
+            _t.x = (int)(_t.x + 40) % 800;
             break;
         case 3:
-            t.y = (int)(t.y - 40) % 800;
+            _t.y = (int)(_t.y - 40) % 800;
             break;
         case 4:
-            t.y = (int)(t.y + 40) % 800;
+            _t.y = (int)(_t.y + 40) % 800;
             break;
         case 5:
-            t.z = (int)(t.z - 40) % 800;
+            _t.z = (int)(_t.z - 40) % 800;
             break;
         case 6:
-            t.z = (int)(t.z + 40) % 800;
+            _t.z = (int)(_t.z + 40) % 800;
             break;
        default:
            NSLog(@"???");
             break;
         }
-    obj.setT(t);
+    obj.t = _t;
+    
 }
 
 

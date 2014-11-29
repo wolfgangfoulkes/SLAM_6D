@@ -31,4 +31,10 @@ void matToP(cv::Mat mat_, cv::Vec4f& _p);
 void matToP(cv::Mat mat_, metaio::Vector4d& _p);
 void matToP(cv::Mat mat_, metaio::Vector3d& _p);
 
+metaio::TrackingValues toTrackingValues(metaio::Rotation r_, metaio::Vector3d t_);
+metaio::TrackingValues toTrackingValues(cv::Mat r_, cv::Mat t_);
+
+metaio::Vector3d mult(metaio::Vector3d v_, float f_);
+
+
 #endif /* defined(__Demo__common__) */

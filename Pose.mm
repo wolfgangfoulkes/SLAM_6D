@@ -12,108 +12,87 @@
 
 Pose::Pose()
 {
-    t  = cv::Mat::eye(4, 1, CV_32F);
-    t_init = cv::Mat::eye(4, 1, CV_32F);
-    r  = cv::Mat::eye(4, 4, CV_32F);
-    r_init  = cv::Mat::eye(4, 4, CV_32F);
-}
-
-Pose::Pose(cv::Mat t_, cv::Mat r_) : Pose()
-{
-    t_.copyTo(t);
-    r_.copyTo(r);
-    t.copyTo(t_init);
-    r.copyTo(r_init);
-}
-
-Pose::Pose(metaio::Vector4d t_, metaio::Rotation r_) : Pose()
-{
-    pToMat(t_, t);
-    rToMat(r_, r);
-    t.copyTo(t_init);
-    r.copyTo(r_init);
+    t = metaio::Vector3d(0, 0, 0);
+    t_init = metaio::Vector3d(0, 0, 0);
+    t_world = metaio::Vector3d(0, 0, 0);
+    
+    r = metaio::Rotation(0, 0, 0);
+    r_init = metaio::Rotation(0, 0, 0);
+    r_world = metaio::Rotation(0, 0, 0);
+    
+    isTracking = false;
+    hasInitPose = false;
+    COS = 0;
 }
 
 Pose::Pose(metaio::Vector3d t_, metaio::Rotation r_) : Pose()
 {
-    pToMat(t_, t);
-    rToMat(r_, r);
-    t.copyTo(t_init);
-    r.copyTo(r_init);
+    t_world = metaio::Vector3d(t_);
+    r_world = metaio::Rotation(r_);
 }
 
-void Pose::setT(metaio::Vector3d t_)
+void Pose::initP(metaio::Vector3d t_, metaio::Rotation r_)
 {
-    pToMat(t_, t);
+    t_init = r_.inverse().rotatePoint(mult(t_, -1.0f));
+    r_init = r_.inverse();
+    exit(1);
+
+    hasInitPose = true;
 }
 
-void Pose::setR(metaio::Rotation r_)
+void Pose::initP(metaio::TrackingValues tv_)
 {
-    rToMat(r_, r);
-}
-
-metaio::Vector3d Pose::getT_m()
-{
-    return metaio::Vector3d(t.at<float>(0,0), t.at<float>(1,0), t.at<float>(2,0));
-}
-
-metaio::Rotation Pose::getR_m()
-{
-    metaio::Rotation r_m;
-    matToR(r, r_m);
-    return r_m;
-}
-
-metaio::Vector3d Pose::getT_world()
-{
-    metaio::Vector3d _t;
-    cv::Mat t_world = t - t_init;
-    matToP(t_world, _t);
-    return _t;
-}
-
-metaio::Rotation Pose::getR_world()
-{
-    metaio::Rotation r0;
-    metaio::Rotation r1;
-
-    matToR(r_init, r0);
-    matToR(r, r1);
+    metaio::Vector3d t_ = tv_.translation;
+    metaio::Rotation r_ = tv_.rotation;
+    COS = tv_.coordinateSystemID;
+    t_init = r_.inverse().rotatePoint(mult(t_, -1.0f));
+    r_init = r_.inverse();
     
-    metaio::Rotation _r = r0.inverse() * r1;
-    return _r;
+    hasInitPose = true;
+    isTracking = true;
 }
 
-void Pose::translate(metaio::Vector3d t_) //rotation is relative to self //seems to work
+void Pose::updateP(metaio::Vector3d t_, metaio::Rotation r_)
 {
-    metaio::Vector3d _t;
-    matToP(t, _t);
-    _t += t_;
-    pToMat(_t, t);
-}
-
-void Pose::transform(metaio::Vector4d t_, metaio::Rotation r_) //rotation is relative to self //seems to work
-{
-    cv::Mat mat = cv::Mat::eye(4, 4, CV_32F);
-    matFromTandR(t_, r_, mat);
-    t = mat * t_init;
-}
-
-void Pose::transform(metaio::Rotation r_, metaio::Vector3d t_, metaio::Rotation r1_)
-{
-    metaio::Vector3d t_m;
-    matToP(t, t_m);
-    t_m = r_.rotatePoint(t_m);
-    t_m += t_;
-    pToMat(t_m, t);
-    //rotate(r1_);
+    metaio::Vector3d _t(0, 0, 0);
+    metaio::Rotation _r(0, 0, 0);
+    _t = r_.rotatePoint(t_init) + t_;
+    //could replace t_init with t_offs, bc t_init is included in t_offs
+    
+    t_world += _t - t;
+    t = _t;
+    
+    _r = r_.inverse() * r_init.inverse();
+    r_world = r_world * (_r * r.inverse());
+    r = _r;
 }
 
 
-
-void Pose::rotate(metaio::Rotation r_) //rotation relative to self //seems to work
+void Pose::updateP(metaio::TrackingValues tv_)
 {
-    cv::Mat mat = cv::Mat::eye(4, 4, CV_32F);
-    rToMat(r_, mat);
-    r = r * mat;
+    if (!hasInitPose)
+    {
+        return;
+    }
+    
+    if (tv_.quality > 0.) //not lost, not extrapolated
+    {
+        metaio::Vector3d t_ = tv_.translation;
+        metaio::Rotation r_ = tv_.rotation;
+//        if (!isTracking) //last frame was not tracked
+//        {
+//            metaio::Vector3d t_init_ = r_.inverse().rotatePoint(t_ * -1.0);
+//            metaio::Rotation r_init_ = r_;
+//            t_init = t_init_ + t; //new init point + distance already traveled
+//            r_init = r_init_ * r;
+//            COS = tv_.coordinateSystemID;
+//            isTracking = true;
+//        }
+        updateP(t_, r_);
+    }
+    else
+    {
+        isTracking = false;
+    }
+    
 }

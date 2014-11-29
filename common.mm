@@ -150,3 +150,27 @@ void matToP(cv::Mat mat_, metaio::Vector3d& _p)
     _p.y = mat_.at<float>(1, 0);
     _p.z = mat_.at<float>(2, 0);
 }
+
+metaio::TrackingValues toTrackingValues(metaio::Rotation r_, metaio::Vector3d t_)
+{
+    metaio::TrackingValues _tv;
+    _tv.rotation = r_;
+    _tv.translation = t_;
+    return _tv;
+}
+
+metaio::TrackingValues toTrackingValues(cv::Mat r_, cv::Mat t_)
+{
+    metaio::Rotation r(0, 0, 0);
+    metaio::Vector3d t(0, 0, 0);
+    matToR(r_, r);
+    matToP(t_, t);
+    metaio::TrackingValues _tv = metaio::TrackingValues(toTrackingValues(r, t));
+    return _tv;
+}
+
+metaio::Vector3d mult(metaio::Vector3d v_, float f_)
+{
+    metaio::Vector3d _v(v_.x * f_, v_.y * f_, v_.z * f_);
+    return _v;
+}

@@ -14,17 +14,25 @@ html, body {
     height: 100vh;
 }
 
-.poses {
+.readout {
     position: absolute;
     bottom: 0;
     right: 0;
     height: 100%;
     visibility: transparent;
 }
+
 .p {
     display: inline-block;
     font-size: 1em;
     min-width: 2em;
+}
+
+.cos {
+    display: inline-block;
+    font-size: 1em;
+    min-width: 2em;
+    color: rgba(100, 0, 0, 1); 
 }
 
 #xy-outer {

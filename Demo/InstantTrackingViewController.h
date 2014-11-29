@@ -19,11 +19,11 @@
     
     //Pose obj;
     
-    bool hasInitPose;
-    
     int activeCOS;
     int lastCOS;
     metaio::TrackingValues COS_offs; //can replace with pose
+    
+    metaio::IRadar * m_radar;
     
     bool debugView;
     bool printToScreen;
@@ -55,12 +55,16 @@
 - (IBAction)poseButtonDown:(id)sender;
 
 - (void)initPoseWithT: (metaio::Vector3d)t AndR:(metaio::Rotation)r;
+- (void)initRadar;
 - (void) updateObjectsWithCameraT: (metaio::Vector3d)t AndR:(metaio::Rotation)r;
 - (void)loadDebugView;
 - (void)updateDebugViewWithCameraT: (metaio::Vector3d)c_t andR: (metaio::Rotation)c_r
     andObjectT: (metaio::Vector3d)o_t andR: (metaio::Rotation)o_r;
+- (void)updateDebugViewWithActiveCos: (int)cos_;
 - (void)printDebugToConsole;
 - (void)addPose: (int)name ToDebugContextT: (metaio::Vector4d)obj_t andR:(metaio::Rotation)obj_r;
+
+- (void)printETSState:(metaio::ETRACKING_STATE)state_;
 
 
 @end

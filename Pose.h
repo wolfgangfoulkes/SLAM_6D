@@ -6,6 +6,27 @@
 //  Copyright (c) 2014 metaio GmbH. All rights reserved.
 //
 
+/*
+t_init: from metaio
+t: difference from t_init
+t_world: t + world coordinates
+t_offs: new init for changing COS's
+*/
+
+/* for camera, this needs:
+a boolean value to tell whether tracking is lost or not
+offset, set to 0, each time we lose tracking, then updated (+= t_ - t) until we regain tracking
+it wouldn't be the actual COSoffset, but you could extrapolate that using camera distance-to-object for each COS
+better done in a global function.
+*/
+
+
+/* when you create a child-class for camera, object
+object should have a projection t/r and a world t/r, with projection computed using input and world, but world updated separately
+camera should have what we have here, but with distinction in naming if something varies strongly in use
+perhaps both should have a "getProjection" and overload that functionally
+add only what you need
+*/
 
 
 #ifndef __Demo__Pose__
@@ -27,31 +48,26 @@ class Pose
 {
     public:
     
-    //Point3f t; //be easier if you changed this to column vector
-    //Point3f r; //be easier if you changed this to matrix
+    metaio::Vector3d t, t_init, t_world;
+    metaio::Rotation r, r_init, r_world;
     
-    cv::Mat t_init;
-    cv::Mat r_init;
-    
-    cv::Mat t;
-    cv::Mat r;
+    bool hasInitPose;
+    bool isTracking;
+    bool COS;
     
     Pose();
-    Pose(cv::Mat t_, cv::Mat r_);
-    Pose(metaio::Vector4d t, metaio::Rotation r);
-    Pose(metaio::Vector3d t, metaio::Rotation r);
+    Pose(metaio::Vector3d t_, metaio::Rotation r_);
     
-    void setT(metaio::Vector3d t_);
-    void setR(metaio::Rotation r_);
-    metaio::Vector3d getT_m();
-    metaio::Rotation getR_m();
-    metaio::Vector3d getT_world();
-    metaio::Rotation getR_world();
-    
-    void translate(metaio::Vector3d t_);
-    void transform(metaio::Vector4d t_, metaio::Rotation r_);
-    void transform(metaio::Rotation r_, metaio::Vector3d t_, metaio::Rotation r1_= metaio::Rotation(0, 0, 0));
-    void rotate(metaio::Rotation r_);
+    void initP(metaio::Vector3d t_, metaio::Rotation r_);
+    void initP(metaio::TrackingValues tv_);
+    void updateP(metaio::Vector3d t_, metaio::Rotation r_);
+    void updateP(metaio::TrackingValues tv_);
+    //void updateP(metaio::TrackingValues tv_, metaio::SensorValues sv_);
 };
+
+//class camPose : public Pose
+//{
+//    
+//};
 
 #endif /* defined(__Demo__Pose__) */

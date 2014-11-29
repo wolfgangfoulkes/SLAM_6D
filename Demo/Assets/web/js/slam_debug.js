@@ -11,6 +11,8 @@ o = new Pose;
 
 poses = {}
 
+activeCOS = 0;
+
 isReady = false;
 
 update = function()
@@ -49,6 +51,9 @@ setReadout = function()
     $orx.text(o.r.x.toPrecision(6));
     $ory.text(o.r.y.toPrecision(6));
     $orz.text(o.r.z.toPrecision(6));
+    
+    var $cos = $(".cos");
+    $cos.text(activeCOS);
 }
 
 setXY = function()
@@ -57,7 +62,7 @@ setXY = function()
     {
         bottom: ((50. + c.t.y/50).toString() + "%"),
         left: ((50. + c.t.x/50).toString() + "%"),
-        transform: "rotateZ(" + c.r.y + "deg)"
+        transform: "rotateZ(" + c.r.z + "deg)"
     };
     
     var ot =
