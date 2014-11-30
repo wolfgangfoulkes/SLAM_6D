@@ -8,10 +8,10 @@
                 <MaxObjectsToTrackInParallel>1</MaxObjectsToTrackInParallel>
             </Parameters>
             <SensorCOS>
-                <SensorCosID>modular2</SensorCosID>
+                <SensorCosID>modular1</SensorCosID>
                 <Parameters>
                     <Initialization Type="map">
-                        <Map>modular2.slam</Map>
+                        <Map>modular1.slam</Map>
                     </Initialization>
                     <Learning Enabled="true">
                         <!-- both near middle, but this one with more "precise"-->
@@ -24,25 +24,10 @@
                 </Parameters>
             </SensorCOS>
             <SensorCOS>
-                <SensorCosID>modular1</SensorCosID>
+                <SensorCosID>modular2</SensorCosID>
                 <Parameters>
                     <Initialization Type="map">
-                        <Map>modular1.slam</Map>
-                    </Initialization>
-                    <Learning Enabled="true">
-                        <MinNumberOfObservations>4</MinNumberOfObservations>
-                        <MinTriangulationAngle>5.0</MinTriangulationAngle>
-                    </Learning>
-                    <Tracking>
-                        <AlignZAxisWithGravity>false</AlignZAxisWithGravity>
-                    </Tracking>
-                </Parameters>
-            </SensorCOS>
-            <SensorCOS>
-                <SensorCosID>mlab_back</SensorCosID>
-                <Parameters>
-                    <Initialization Type="map">
-                        <Map>mlab_back.slam</Map>
+                        <Map>modular2.slam</Map>
                     </Initialization>
                     <Learning Enabled="true">
                         <MinNumberOfObservations>4</MinNumberOfObservations>
@@ -57,7 +42,7 @@
     </Sensors>
     <Connections>
         <COS>
-            <Name>map-modular2</Name>
+            <Name>map-modular1</Name>
             <Fuser Type="SmoothingFuser">
                 <Parameters>
                     <AlphaRotation>0.8</AlphaRotation>
@@ -71,7 +56,7 @@
             </Fuser>
             <SensorSource>
                 <SensorID>SLAM</SensorID>
-                <SensorCosID>modular2</SensorCosID>
+                <SensorCosID>modular1</SensorCosID>
                 <HandEyeCalibration>
                     <TranslationOffset>
                         <x>0.0</x>
@@ -101,7 +86,7 @@
             </SensorSource>
         </COS>
         <COS>
-            <Name>map-modular1</Name>
+            <Name>map-modular2</Name>
             <Fuser Type="SmoothingFuser">
                 <Parameters>
                     <AlphaRotation>0.8</AlphaRotation>
@@ -114,7 +99,7 @@
             </Fuser>
             <SensorSource>
                 <SensorID>SLAM</SensorID>
-                <SensorCosID>modular1</SensorCosID>
+                <SensorCosID>modular2</SensorCosID>
                 <HandEyeCalibration>
                     <TranslationOffset>
                         <x>0.0</x>

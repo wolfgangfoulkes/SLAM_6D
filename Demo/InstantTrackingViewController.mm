@@ -74,7 +74,9 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     m_obj           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:obj.t modelScaling:m_scale modelCos:0];
 //    m_obj1           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:m_obj1_t modelScaling:m_scale modelCos:0];
     
-    activeCOS = 0;
+    activeCOS = -1;
+    isTracking = false;
+    
     debugView = true;
     printToScreen = false;
     
@@ -119,27 +121,6 @@ int printf(const char * __restrict format, ...) //printf don't print to console
             printf("init failed!");
         }
     }
-
-    lastCOS = activeCOS; //the janky thing is this was sometimes zero when I had it enclosed in some checks
-    //but my checks may have been wrong
-    metaio::TrackingValues cos1 = m_metaioSDK->getTrackingValues(1);
-    metaio::TrackingValues cos2 = m_metaioSDK->getTrackingValues(2);
-    metaio::TrackingValues cos3 = m_metaioSDK->getTrackingValues(3);
-    if (cos1.isTrackingState()) {activeCOS = 1;}
-    else if (cos2.isTrackingState()) {activeCOS = 2;}
-    else if (cos3.isTrackingState()) {activeCOS = 3;}
-    else {
-        activeCOS = 0;
-    }
-    
-    metaio::TrackingValues tv = m_metaioSDK->getTrackingValues(activeCOS);
-    bool isTracking = tv.isTrackingState();
-    string state = tv.trackingStateToString(tv.state);
-
-    printf("activeCOS: %d %s", activeCOS, (isTracking) ? "is tracking!" : "isn't tracking!");
-    
-    
-    [self updateDebugViewWithActiveCos:activeCOS AndStatus:state];
     
 }
 
@@ -239,25 +220,53 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     return geometry;
 }
 
+- (void) updateTrackingState
+{
+    int COSs = m_metaioSDK->getNumberOfValidCoordinateSystems();
+    if (COSs)
+    {
+        metaio::TrackingValues cos1 = m_metaioSDK->getTrackingValues(1);
+        metaio::TrackingValues cos2 = m_metaioSDK->getTrackingValues(2);
+        if (cos1.isTrackingState()) {activeCOS = 1;}
+        else if (cos2.isTrackingState()) {activeCOS = 2;}
+        
+        metaio::TrackingValues tv = m_metaioSDK->getTrackingValues(activeCOS);
+        string state = tv.trackingStateToString(tv.state);
+        [self updateDebugViewWithActiveCos:activeCOS AndStatus:state];
+        
+        isTracking = true;
+    }
+    else {
+        mapTransitionHelper.prepareForTransitionToNewMap();
+        activeCOS = -1;
+        isTracking = false;
+    }
+}
+
 /**
  * Update the scale, rotation and translation of the models
  */
 - (void) update
 {
-    float tvm[16];
-    metaio::TrackingValues tv = m_metaioSDK->getTrackingValues(1);
+    //float tvm[16];
+    metaio::TrackingValues tv = m_metaioSDK->getTrackingValues(activeCOS);
     
-    m_metaioSDK->getTrackingValues(1, tvm, true); //false if you want only modelMatrix. additional true to get a right-handed system
+    //m_metaioSDK->getTrackingValues(activeCOS, tvm, true); //false if you want only modelMatrix. additional true to get a right-handed system
     //http://www.evl.uic.edu/ralph/508S98/coordinates.html
     //right-handed right:x+, up:y+, screen:z-, rotation is counterclockwise around axis
     //left-handed right:x+, up:y+, screen:z+, rotation is clockwise around axis
     
     //matrix maps object onto tracked object.
-    cv::Mat tv_mat = cv::Mat::Mat(4, 4, CV_32F, tvm);
+    //cv::Mat tv_mat = cv::Mat::Mat(4, 4, CV_32F, tvm);
     //metaio::stlcompat::String points = m_metaioSDK->sensorCommand((metaio::stlcompat::String)"getNewMapFeatures");
 
     // Update the internal state with the lastest tracking values from the SDK.
-    mapTransitionHelper.update(m_metaioSDK->getTrackingValues(1), m_metaioSDK->getRegisteredSensorsComponent()->getLastSensorValues());
+    mapTransitionHelper.update(m_metaioSDK->getTrackingValues(activeCOS), m_metaioSDK->getRegisteredSensorsComponent()->getLastSensorValues());
+    
+    if (tv.quality == 1.0)
+    {
+        cam.updateP(tv);
+    }
 
     
     // If the last frame could be tracked successfully
@@ -266,34 +275,17 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         metaio::Rotation newRotation = mapTransitionHelper.getRotationCameraFromWorld();//tv.rotation;
         metaio::Vector3d newTranslation = mapTransitionHelper.getTranslationCameraFromWorld();//tv.translation;
         metaio::Vector3d newTranslation_r = metaio::Rotation(0, 0, dToR(180.)).rotatePoint(newTranslation);
-        
-        if(!cam.hasInitPose)
-        {
-            if(tv.quality == 1.)
-            {
-                cam.initP(tv);
-                obj.t_init = tv.translation;
-                printf("hasInitPose!");
-            }
-        }
-        else
-        {
-            cam.updateP(tv);
-            obj.t = tv.translation - obj.t_init;
-        }
 
-        //set global vars
         
         m_obj->setScale(m_scale);
-        m_obj->setRotation(obj.r_world);
+        m_obj->setRotation(newRotation);
         metaio::Vector3d t = newTranslation_r + obj.t_world;
         
         m_obj->setTranslation(t);
-        
-        if (debugView) //replace this with button press!
-        {
-            [self updateDebugViewWithCameraT:cam.t andR:cam.r andObjectT:obj.t andR:obj.r];
-        }
+    }
+    if (debugView) //replace this with button press!
+    {
+        [self updateDebugViewWithCameraT:cam.t andR:cam.r andObjectT:obj.t andR:obj.r];
     }
     
     
