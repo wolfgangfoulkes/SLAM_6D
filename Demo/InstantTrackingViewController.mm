@@ -248,6 +248,8 @@ int printf(const char * __restrict format, ...) //printf don't print to console
  */
 - (void) update
 {
+    [self updateTrackingState];
+    if (!activeCOS) {return;}
     //float tvm[16];
     metaio::TrackingValues tv = m_metaioSDK->getTrackingValues(activeCOS);
     
@@ -483,14 +485,6 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 {
 }
 
--(void)initRadar {
-//    m_radar = m_metaioSDK->createRadar();
-//    m_radar->setBackgroundTexture([[[NSBundle mainBundle] pathForResource:@"radar"	ofType:@"jpg" inDirectory:@"Assets"] UTF8String]);
-//    m_radar->setObjectsDefaultTexture([[[NSBundle mainBundle] pathForResource:@"elephant_skin"	ofType:@"jpg" inDirectory:@"Assets"] UTF8String]);
-//    m_radar->setRelativeToScreen(metaio::IGeometry::ANCHOR_BR);
-//    
-//    m_radar->add(m_obj);
-}
 
 /***** IF CALLBACKS *****/
 

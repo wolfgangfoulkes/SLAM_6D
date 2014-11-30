@@ -305,6 +305,11 @@
 			attributes = {
 				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = "metaio GmbH";
+				TargetAttributes = {
+					B9BC114A15D8FA7B00713ED3 = {
+						DevelopmentTeam = 9W9S5K5QUF;
+					};
+				};
 			};
 			buildConfigurationList = B9BC114515D8FA7B00713ED3 /* Build configuration list for PBXProject "Demo" */;
 			compatibilityVersion = "Xcode 3.2";
