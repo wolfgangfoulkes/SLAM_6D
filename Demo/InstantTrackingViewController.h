@@ -2,13 +2,18 @@
 //
 // Copyright 2007-2014 metaio GmbH. All rights reserved.
 //
-
+#import <WebKit/WebKit.h>
+#import <JavaScriptCore/JavaScriptCore.h>
 
 #import "Pose.h"
 #import "MetaioSDKViewController.h"
 
 @interface InstantTrackingViewController : MetaioSDKViewController
 {
+    NSMutableArray * ma_log;
+    JSContext * ctx;
+    bool debugViewIsInit;
+
     int                 m_frames;
     NSInteger           m_scale;             // model scale
     
@@ -65,12 +70,14 @@
 - (void)updateDebugViewWithCameraT: (metaio::Vector3d)c_t andR: (metaio::Rotation)c_r
     andObjectT: (metaio::Vector3d)o_t andR: (metaio::Rotation)o_r;
 
+- (void) initDebugView;
 
 - (void)updateDebugViewWithActiveCos: (int)cos_ AndStatus:(string)state_;
 
 
 - (void)printDebugToConsole;
 
+- (void)printLogToConsole;
 
 - (void)addPose: (int)name ToDebugContextT: (metaio::Vector4d)obj_t andR:(metaio::Rotation)obj_r;
 

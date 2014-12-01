@@ -47,13 +47,14 @@ using namespace cv;
 class Pose
 {
     public:
+    NSMutableArray * ma_log;
     
     metaio::Vector3d t, t_init, t_world;
     metaio::Rotation r, r_init, r_world;
     
     bool hasInitPose;
     bool isTracking;
-    bool COS;
+    int COS;
     
     Pose();
     Pose(metaio::Vector3d t_, metaio::Rotation r_);

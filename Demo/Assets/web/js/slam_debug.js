@@ -9,13 +9,16 @@ Pose = function()
 c = new Pose;
 o = new Pose;
 
-poses = {}
+poses = {};
 
 COS =
 {
     idx: 0,
-    state: "UNKNOWN",
+    state: "UNINIT"
 };
+
+log = [];
+print_log = false;
 
 isReady = false;
 
@@ -60,6 +63,11 @@ setReadout = function()
     var $cos_state = $(".cos .state");
     $cos_idx.text(COS.idx);
     $cos_state.text(COS.state);
+    
+    if (print_log)
+    {
+        printLog();
+    }
 }
 
 setXY = function()
@@ -82,17 +90,17 @@ setXY = function()
     
     $("#camera").css(ct);
     $("#object").css(ot);
-    
-    
-//    var _cy = $("#camera").css("bottom");
-//    var _cx = $("#camera").css("left");
-//    
-//    var _oy = $("#object").css("bottom");
-//    var _ox = $("#object").css("left");
-    
-    //console.log("camera: " + _cx + ", " + _cy);
-    //console.log("object: " + _ox + ", " + _oy);
+};
 
+printLog = function()
+{
+    var $log_dom = $(".log");
+    $log_dom.empty();
+    for (i = 0; i < log.length; i++)
+    {
+        var log_entry = "<div class='log-entry'>" + i + ": " + log[i] + "</div>";
+        $log_dom.prepend(log_entry);
+    }
 };
 
 
@@ -100,4 +108,11 @@ jQuery(document).ready(function(){
 //    $("#xy-outer").css("background-color", "blue");
     isReady = true;
     setInterval(update, rate);
+    console.log("javascript is ready!");
+    $(".printLog").click(function(){
+        print_log = !print_log;
+
+        $(".log").toggleClass("hidden", !print_log);
+        $(this).toggleClass("active", print_log);
     });
+});

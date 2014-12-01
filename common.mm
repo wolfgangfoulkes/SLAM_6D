@@ -174,3 +174,21 @@ metaio::Vector3d mult(metaio::Vector3d v_, float f_)
     metaio::Vector3d _v(v_.x * f_, v_.y * f_, v_.z * f_);
     return _v;
 }
+
+void logMA(NSString * s_, NSMutableArray * ma_)
+{
+    [ma_ addObject: s_];
+}
+
+metaio::Vector3d loPassXYZ(metaio::Vector3d v0_, metaio::Vector3d v1_)
+{
+    metaio::Vector3d _v(0, 0, 0);
+    double dt = (1.0/20); //time interval
+    double RC = 0.3; //time constant
+    double alpha = dt / (RC + dt); //alpha is the smoothing factor (cutoff)
+    _v.x = (alpha * v1_.x) + (1.0 - alpha) * v0_.x;
+    _v.y = (alpha * v1_.y) + (1.0 - alpha) * v0_.y;
+    _v.z = (alpha * v1_.z) + (1.0 - alpha) * v0_.z;
+    
+    return _v;
+}

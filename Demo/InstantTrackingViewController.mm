@@ -14,6 +14,7 @@
 #import <JavaScriptCore/JavaScriptCore.h>
 #import "MapTransitionHelper.h"
 
+#import "common.h"
 #import "Pose.h"
 
 
@@ -56,6 +57,10 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 	[super viewDidLoad];
     printf("view did load! version: %s", m_metaioSDK->getVersion().c_str());
     
+    webView.scrollView.scrollEnabled = NO;
+    
+    ma_log = [[NSMutableArray alloc] init];
+    
     // Set the rendering clipping plane
     m_metaioSDK->setRendererClippingPlaneLimits(10, 30000);
     
@@ -63,6 +68,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     m_scale = 1;
     
     cam = Pose(metaio::Vector3d(0,0,0), metaio::Rotation(0,0,0));
+    cam.ma_log = ma_log;
     obj = Pose(metaio::Vector3d(-100,0,-100), metaio::Rotation(0,0,0));
     //from front-left of room
     
@@ -77,6 +83,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     activeCOS = -1;
     isTracking = false;
     
+    debugViewIsInit = false;
     debugView = true;
     printToScreen = false;
     
@@ -248,11 +255,17 @@ int printf(const char * __restrict format, ...) //printf don't print to console
  */
 - (void) update
 {
+    if (!debugViewIsInit)
+    {
+        [self initDebugView];
+    }
+    [self printLogToConsole];
     [self updateTrackingState];
     if (!activeCOS) {return;}
-    //float tvm[16];
+    
     metaio::TrackingValues tv = m_metaioSDK->getTrackingValues(activeCOS);
     
+    //float tvm[16];
     //m_metaioSDK->getTrackingValues(activeCOS, tvm, true); //false if you want only modelMatrix. additional true to get a right-handed system
     //http://www.evl.uic.edu/ralph/508S98/coordinates.html
     //right-handed right:x+, up:y+, screen:z-, rotation is counterclockwise around axis
@@ -265,7 +278,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     // Update the internal state with the lastest tracking values from the SDK.
     mapTransitionHelper.update(m_metaioSDK->getTrackingValues(activeCOS), m_metaioSDK->getRegisteredSensorsComponent()->getLastSensorValues());
     
-    if (tv.quality == 1.0)
+    if (tv.quality > 0.0)
     {
         cam.updateP(tv);
     }
@@ -281,7 +294,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         
         m_obj->setScale(m_scale);
         m_obj->setRotation(newRotation);
-        metaio::Vector3d t = newTranslation_r + obj.t_world;
+        metaio::Vector3d t = newTranslation + obj.t_world;
         
         m_obj->setTranslation(t);
     }
@@ -414,11 +427,25 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     [self.webView loadRequest:request];
 }
 
+- (void) initDebugView {
+    ctx = [self.webView valueForKeyPath:@"documentView.webView.mainFrame.javaScriptContext"];
+    
+    NSAssert([ctx isKindOfClass:[JSContextclass]], @"could not find context in web view");
+    
+    [ctx setExceptionHandler:^(JSContext *context, JSValue *value) {
+        NSLog(@"%@", value);
+    }];
+    
+    ctx[@"console"][@"log"] = ^(JSValue *msg)
+    {
+        NSLog(@"JavaScript %@ log message: %@", [JSContext currentContext], msg);
+    }; //works for all console.log messages
+    
+}
+
 - (void)addPose: (int)name ToDebugContextT: (metaio::Vector4d)obj_t andR:(metaio::Rotation)obj_r
 {
-    JSContext *ctx = [self.webView valueForKeyPath:@"documentView.webView.mainFrame.javaScriptContext"];
-    
-    metaio::Vector3d obj_e = obj_r.getEulerAngleDegrees();
+      metaio::Vector3d obj_e = obj_r.getEulerAngleDegrees();
     /*http://www.bignerdranch.com/blog/objective-c-literals-part-1/*/
     /*simpler to do this by creating a new version of an existing object with params?*/
     ctx[@"poses"][[NSString stringWithFormat:@"%d", name]] =
@@ -431,8 +458,6 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 - (void)updateDebugViewWithCameraT: (metaio::Vector3d)c_t andR: (metaio::Rotation)c_r
     andObjectT: (metaio::Vector3d)o_t andR: (metaio::Rotation)o_r
 {
-    JSContext *ctx = [self.webView valueForKeyPath:@"documentView.webView.mainFrame.javaScriptContext"];
-    NSAssert([ctx isKindOfClass:[JSContextclass]], @"could not find context in web view");
     JSValue *isReady = ctx[@"isReady"];
     if (!isReady.toBool)
     {
@@ -470,8 +495,6 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 
 - (void)updateDebugViewWithActiveCos: (int)cos_ AndStatus:(string)state_
 {
-    JSContext *ctx = [self.webView valueForKeyPath:@"documentView.webView.mainFrame.javaScriptContext"];
-    NSAssert([ctx isKindOfClass:[JSContextclass]], @"could not find context in web view");
     JSValue *isReady = ctx[@"isReady"];
     if (!isReady.toBool)
     {
@@ -481,10 +504,26 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     ctx[@"COS"][@"state"] = [NSString stringWithFormat:@"%s", state_.c_str()];
 }
 
+- (void) printLogToConsole
+{
+    JSValue *isReady = ctx[@"isReady"];
+    if (!isReady.toBool)
+    {
+        return;
+    }
+    
+    Boolean print_log = [ctx[@"print_log"] toBool];
+    
+    if (print_log)
+    {
+        ctx[@"log"] = ma_log;
+    }
+}
+
+
 -(void)initPoseWithT:(metaio::Vector3d)t_ AndR:(metaio::Rotation)r_
 {
 }
-
 
 /***** IF CALLBACKS *****/
 

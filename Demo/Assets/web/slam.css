@@ -14,12 +14,50 @@ html, body {
     height: 100vh;
 }
 
+.hidden {
+    display: none !important;
+}
+
+.button {
+    display: inline-block;
+    width: 6vw;
+    height: 6vh;
+    margin: 1vw;
+    background-color: rgba(0, 0, 255, 1);
+}
+
+.button.active {
+    background-color: rgba(0, 100, 100, 1);
+}
+
 .readout {
     position: absolute;
     bottom: 0;
     right: 0;
-    height: 100%;
+    top: 0;
+    width: 50vw;
     visibility: transparent;
+}
+
+.log {
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    height: 75%;
+    text-align: right;
+}
+
+.log-entry {
+    display: block;
+    font-size: .5em;
+    margin-right: 1em;
+}
+
+.controls {
+    display: inline-block;
+    width: 100%;
+    display: -webkit-flex;
+    -webkit-justify-content: flex-end;
 }
 
 .p {
@@ -74,3 +112,4 @@ html, body {
 	border-right: 5px solid transparent;
 	border-bottom: 5px solid black;
 }
+

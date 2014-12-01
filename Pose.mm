@@ -33,7 +33,6 @@ Pose::Pose(metaio::Vector3d t_, metaio::Rotation r_) : Pose()
 
 void Pose::initP(metaio::Vector3d t_, metaio::Rotation r_, int cos_)
 {
-    
     t_init = r_.inverse().rotatePoint(mult(t_, -1.0f)); //same as getInverseTranslation
     r_init = r_.inverse();
     
@@ -74,6 +73,7 @@ void Pose::updateP(metaio::TrackingValues tv_)
         if (!hasInitPose || tv_.coordinateSystemID != COS)
         {
             initP(tv_);
+            logMA([NSString stringWithFormat:@"init: %i => %i",tv_.coordinateSystemID, COS], ma_log);
         }
         metaio::Vector3d t_ = tv_.translation;
         metaio::Rotation r_ = tv_.rotation;
