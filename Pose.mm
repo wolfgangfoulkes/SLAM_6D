@@ -35,7 +35,7 @@ Pose::Pose(metaio::Vector3d t_, metaio::Rotation r_) : Pose()
 
 void Pose::initP(metaio::Vector3d t_, metaio::Rotation r_, int cos_)
 {
-    metaio::Vector3d t_p_ = r_.inverse().rotatePoint(mult(t_, -1.));
+    metaio::Vector3d t_p_ = r_.inverse().rotatePoint(mult(t_, -1.0f));
     r_offs = r_.inverse() * r_last;
     t_offs = r_.inverse().rotatePoint(t_last) + t_p_;
     

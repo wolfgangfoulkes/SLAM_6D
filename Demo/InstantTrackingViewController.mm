@@ -147,14 +147,14 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         
     }
 
-//    metaio::Vector3d t_o = mapTransitionHelper.getTranslationCameraFromWorld();
-//    metaio::Vector3d t_c = mapTransitionHelper.getRotationCameraFromWorld().inverse().rotatePoint(mult(t_o, -1.0));
-//    metaio::Rotation r_o = mapTransitionHelper.getRotationCameraFromWorld();
-//    metaio::Rotation r_c = r_o.inverse();
+    metaio::Vector3d t_o = mapTransitionHelper.getTranslationCameraFromWorld();
+    metaio::Vector3d t_c = mapTransitionHelper.getRotationCameraFromWorld().inverse().rotatePoint(mult(t_o, -1.0));
+    metaio::Rotation r_o = mapTransitionHelper.getRotationCameraFromWorld();
+    metaio::Rotation r_c = r_o.inverse();
 
     if (debugView)
     {
-        [self updateDebugViewWithCameraT:cam_test.t_last andR:cam_test.r_last andObjectT:cam_test.t_p andR:cam_test.r_p];
+        [self updateDebugViewWithCameraT:t_c andR:r_c andObjectT:t_o andR:r_o];
     }
 }
 
@@ -189,15 +189,6 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     {
         mapTransitionHelper.prepareForTransitionToNewMap();
     }
-	else
-	{
-		if (poses[0].state == metaio::ETS_INITIALIZATION_FAILED) //this can mean we are transitioning to a new map
-        {
-            mapTransitionHelper.prepareForTransitionToNewMap();
-            logMA(@"init failed!", ma_log);
-        }
-    }
-    
 }
 
 - (void) onInstantTrackingEvent:(bool)success file:(NSString*)file
