@@ -20,7 +20,7 @@
     metaio::IGeometry*  m_obj;            // pointer to the model
     metaio::IGeometry*  m_obj1;           // pointer to the model
     
-    Pose obj, cam;
+    Pose obj, cam, obj_test, cam_test;
     
     int activeCOS;
     bool isTracking;
@@ -30,6 +30,7 @@
     
     bool debugView;
     bool printToScreen;
+    bool updateMetaio;
     
     IBOutlet UIWebView* webView;
     IBOutlet UIButton* debugViewToggle;
@@ -74,10 +75,13 @@
 
 - (void)updateDebugViewWithActiveCos: (int)cos_ AndStatus:(string)state_;
 
+- (void)updateDebugViewForPose: (NSString*)pose_ WithT: (metaio::Vector3d)t_ andR: (metaio::Rotation)r_;
 
 - (void)printDebugToConsole;
 
 - (void)printLogToConsole;
+
+- (void)getTFromDebugView;
 
 - (void)addPose: (int)name ToDebugContextT: (metaio::Vector4d)obj_t andR:(metaio::Rotation)obj_r;
 

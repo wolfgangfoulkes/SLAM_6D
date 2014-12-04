@@ -7,6 +7,7 @@
         <link rel="stylesheet" href="js/libs/jquery-ui.min.css">
         <script src="js/libs/jquery-1.11.1.min.js" type="text/javascript"></script>
         <script src="js/libs/jquery-ui.min.js" type="text/javascript"></script>
+        <script src="js/libs/jquery.mobile-1.4.5.min.js" type="text/javascript"></script>
         
 		<link rel="stylesheet" type="text/css" href="slam.css">
 
@@ -16,6 +17,10 @@
         <div class="readout">
             <div class="controls">
                 <div class="button printLog">print log</div>
+                <div class="button setP">set</div>
+                <div class="button setPInit">init</div>
+                <div class="button rLeft">r--</div>
+                <div class="button rRight">r++</div>
             </div>
             <div class="pose cam">
                 camera:
@@ -60,6 +65,48 @@
                     <div class= "z">00000.0</div>
                 </div>
             </div>
+            <div class="pose init">
+                init:
+                <div class = "p t"> t.x
+                    <div class= "x">00000.0</div>
+                </div>
+                <div class = "p t"> t.y
+                    <div class= "y">00000.0</div>
+                </div>
+                <div class = "p t"> t.z
+                    <div class= "z">00000.0</div>
+                </div>
+                <div class = "p r"> r.x
+                    <div class= "x">00000.0</div>
+                </div>
+                <div class = "p r"> r.y
+                    <div class= "y">00000.0</div>
+                </div>
+                <div class = "p r"> r.z
+                    <div class= "z">00000.0</div>
+                </div>
+            </div>
+            <div class="pose touch">
+                touch:
+                <div class = "p t"> t.x
+                    <div class= "x">00000.0</div>
+                </div>
+                <div class = "p t"> t.y
+                    <div class= "y">00000.0</div>
+                </div>
+                <div class = "p t"> t.z
+                    <div class= "z">00000.0</div>
+                </div>
+                <div class = "p r"> r.x
+                    <div class= "x">00000.0</div>
+                </div>
+                <div class = "p r"> r.y
+                    <div class= "y">00000.0</div>
+                </div>
+                <div class = "p r"> r.z
+                    <div class= "z">00000.0</div>
+                </div>
+            </div>
             <div class="cos"> active COS:
                 <div class="idx">0</div>
                 <div class="state">0</div>
@@ -69,6 +116,10 @@
 
         <div id="xy-outer">
             <div id="xy-inner">
+                <div class="axes"> </div>
+                <div class="axes init"> </div>
+                <div class="axes touch"> </div>
+                <div id="touch" class="arrow-up"></div>
                 <div id="object" class="arrow-up"></div>
                 <div id="camera" class="arrow-up"></div>
             </div>

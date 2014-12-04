@@ -11,7 +11,7 @@
                 <SensorCosID>modular1</SensorCosID>
                 <Parameters>
                     <Initialization Type="map">
-                        <Map>modular1.slam</Map>
+                        <Map>mlab_front_left.slam</Map>
                     </Initialization>
                     <Learning Enabled="true">
                         <!-- both near middle, but this one with more "precise"-->
@@ -27,7 +27,7 @@
                 <SensorCosID>modular2</SensorCosID>
                 <Parameters>
                     <Initialization Type="map">
-                        <Map>modular2.slam</Map>
+                        <Map>mlab_front_right.slam</Map>
                     </Initialization>
                     <Learning Enabled="true">
                         <MinNumberOfObservations>4</MinNumberOfObservations>

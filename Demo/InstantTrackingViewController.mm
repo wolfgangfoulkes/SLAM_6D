@@ -69,15 +69,14 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     
     cam = Pose(metaio::Vector3d(0,0,0), metaio::Rotation(0,0,0));
     cam.ma_log = ma_log;
-    obj = Pose(metaio::Vector3d(-100,0,-100), metaio::Rotation(0,0,0));
-    //from front-left of room
+    obj = Pose(metaio::Vector3d(-25,0,-100), metaio::Rotation(0,0,0));
     
-    //Initialize frame count
-    m_frames = 0;
+    cam_test = Pose(metaio::Vector3d(0,0,0), metaio::Rotation(0,0,0));
+    obj_test = Pose(metaio::Vector3d(0,0,0), metaio::Rotation(0,0,0));
     
     // Load content //FLAG CHANGED RENDER ORDER TO SAME
     
-    m_obj           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:obj.t modelScaling:m_scale modelCos:0];
+    m_obj           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:obj.t_world modelScaling:m_scale modelCos:0];
 //    m_obj1           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:m_obj1_t modelScaling:m_scale modelCos:0];
     
     activeCOS = -1;
@@ -87,9 +86,78 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     debugView = true;
     printToScreen = false;
     
+    updateMetaio = true;
+    
     [self loadDebugView];
     
 }
+
+/**
+ * Update the scale, rotation and translation of the models
+ */
+- (void) update
+{
+    if (!debugViewIsInit)
+    {
+        [self initDebugView];
+        debugViewIsInit = true;
+    }
+    [self printLogToConsole];
+    [self updateTrackingState];
+    [self getTFromDebugView];
+    if (activeCOS && updateMetaio)
+    {
+        
+        
+        metaio::TrackingValues tv = m_metaioSDK->getTrackingValues(activeCOS);
+        
+        //float tvm[16];
+        //m_metaioSDK->getTrackingValues(activeCOS, tvm, true); //false if you want only modelMatrix. additional true to get a right-handed system
+        //http://www.evl.uic.edu/ralph/508S98/coordinates.html
+        //right-handed right:x+, up:y+, screen:z-, rotation is counterclockwise around axis
+        //left-handed right:x+, up:y+, screen:z+, rotation is clockwise around axis
+        
+        //matrix maps object onto tracked object.
+        //cv::Mat tv_mat = cv::Mat::Mat(4, 4, CV_32F, tvm);
+        //metaio::stlcompat::String points = m_metaioSDK->sensorCommand((metaio::stlcompat::String)"getNewMapFeatures");
+
+        // Update the internal state with the lastest tracking values from the SDK.
+        mapTransitionHelper.update(m_metaioSDK->getTrackingValues(activeCOS), m_metaioSDK->getRegisteredSensorsComponent()->getLastSensorValues());
+        
+
+        cam.updateP(tv);
+
+        
+        // If the last frame could be tracked successfully
+        if(mapTransitionHelper.lastFrameWasTracked())
+        {
+            metaio::Rotation newRotation = mapTransitionHelper.getRotationCameraFromWorld();//tv.rotation;
+            metaio::Vector3d newTranslation = mapTransitionHelper.getTranslationCameraFromWorld();//tv.translation;
+            metaio::Vector3d newTranslation_r = metaio::Rotation(0, 0, dToR(180.)).rotatePoint(newTranslation);
+
+            
+            m_obj->setScale(m_scale);
+            m_obj->setRotation(newRotation);
+            metaio::Vector3d t = newTranslation;
+            
+            m_obj->setTranslation(t);
+        }
+        
+        
+        
+    }
+
+//    metaio::Vector3d t_o = mapTransitionHelper.getTranslationCameraFromWorld();
+//    metaio::Vector3d t_c = mapTransitionHelper.getRotationCameraFromWorld().inverse().rotatePoint(mult(t_o, -1.0));
+//    metaio::Rotation r_o = mapTransitionHelper.getRotationCameraFromWorld();
+//    metaio::Rotation r_c = r_o.inverse();
+
+    if (debugView)
+    {
+        [self updateDebugViewWithCameraT:cam_test.t_last andR:cam_test.r_last andObjectT:cam_test.t_p andR:cam_test.r_p];
+    }
+}
+
 
 -(void)viewDidAppear:(BOOL)animated
 {
@@ -126,7 +194,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 		if (poses[0].state == metaio::ETS_INITIALIZATION_FAILED) //this can mean we are transitioning to a new map
         {
             mapTransitionHelper.prepareForTransitionToNewMap();
-            printf("init failed!");
+            logMA(@"init failed!", ma_log);
         }
     }
     
@@ -144,7 +212,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 	{
 		//NSLog(@"SLAM has timed out!");
 	}
-    printf("\ninstant tracking!1!?\n");
+    logMA(@"\ninstant tracking!1!?\n", ma_log);
 	
 }
 
@@ -238,6 +306,9 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         metaio::TrackingValues cos2 = m_metaioSDK->getTrackingValues(2);
         if (cos1.isTrackingState()) {activeCOS = 1;}
         else if (cos2.isTrackingState()) {activeCOS = 2;}
+        else {
+            logMA(@"unknownCOS", ma_log);
+        }
         metaio::TrackingValues tv = m_metaioSDK->getTrackingValues(activeCOS);
         state = tv.trackingStateToString(tv.state);
         
@@ -252,70 +323,6 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     [self updateDebugViewWithActiveCos:activeCOS AndStatus:state];
 }
 
-/**
- * Update the scale, rotation and translation of the models
- */
-- (void) update
-{
-    if (!debugViewIsInit)
-    {
-        [self initDebugView];
-    }
-    [self printLogToConsole];
-    [self updateTrackingState];
-    if (activeCOS)
-    {
-        
-        
-        metaio::TrackingValues tv = m_metaioSDK->getTrackingValues(activeCOS);
-        
-        //float tvm[16];
-        //m_metaioSDK->getTrackingValues(activeCOS, tvm, true); //false if you want only modelMatrix. additional true to get a right-handed system
-        //http://www.evl.uic.edu/ralph/508S98/coordinates.html
-        //right-handed right:x+, up:y+, screen:z-, rotation is counterclockwise around axis
-        //left-handed right:x+, up:y+, screen:z+, rotation is clockwise around axis
-        
-        //matrix maps object onto tracked object.
-        //cv::Mat tv_mat = cv::Mat::Mat(4, 4, CV_32F, tvm);
-        //metaio::stlcompat::String points = m_metaioSDK->sensorCommand((metaio::stlcompat::String)"getNewMapFeatures");
-
-        // Update the internal state with the lastest tracking values from the SDK.
-        mapTransitionHelper.update(m_metaioSDK->getTrackingValues(activeCOS), m_metaioSDK->getRegisteredSensorsComponent()->getLastSensorValues());
-        
-
-        cam.updateP(tv);
-
-        
-        // If the last frame could be tracked successfully
-        if(mapTransitionHelper.lastFrameWasTracked())
-        {
-            metaio::Rotation newRotation = mapTransitionHelper.getRotationCameraFromWorld();//tv.rotation;
-            metaio::Vector3d newTranslation = mapTransitionHelper.getTranslationCameraFromWorld();//tv.translation;
-            metaio::Vector3d newTranslation_r = metaio::Rotation(0, 0, dToR(180.)).rotatePoint(newTranslation);
-
-            
-            m_obj->setScale(m_scale);
-            m_obj->setRotation(newRotation);
-            metaio::Vector3d t = newTranslation + obj.t_world;
-            
-            m_obj->setTranslation(t);
-        }
-        
-        
-        
-    }
-//    m_frames++; //update frame count.
-
-    metaio::Vector3d t_o = mapTransitionHelper.getTranslationCameraFromWorld();
-    metaio::Vector3d t_c = mapTransitionHelper.getRotationCameraFromWorld().inverse().rotatePoint(mult(t_o, -1.0));
-    metaio::Rotation r_o = mapTransitionHelper.getRotationCameraFromWorld();
-    metaio::Rotation r_c = r_o.inverse();
-
-    if (debugView)
-    {
-        [self updateDebugViewWithCameraT:t_c andR:r_c andObjectT:t_o andR:r_o];
-    }
-}
 
 - (void) updateObjectsWithCameraT: (metaio::Vector3d)t AndR:(metaio::Rotation)r
 {
@@ -450,7 +457,6 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     {
         NSLog(@"JavaScript %@ log message: %@", [JSContext currentContext], msg);
     }; //works for all console.log messages
-    
 }
 
 //- (void)addPose: (int)name ToDebugContextT: (metaio::Vector4d)obj_t andR:(metaio::Rotation)obj_r
@@ -464,6 +470,50 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 //        @"r" : @{ @"x" : @(obj_e.x), @"y" : @(obj_e.y), @"z" : @(obj_e.z) }
 //        };
 //}
+
+- (void)getTFromDebugView
+{
+    JSValue *isReady = ctx[@"isReady"];
+    if (!isReady.toBool)
+    {
+        return;
+    }
+    
+    if (!([ctx[@"setP"] toBool] || [ctx[@"setPInit"] toBool]))
+    {
+        return;
+    }
+    
+    double t_x = [ctx[@"db"][@"t"][@"x"] toDouble] - 0.5;
+    double t_y = [ctx[@"db"][@"t"][@"y"] toDouble] - 0.5;
+    double t_z = [ctx[@"db"][@"t"][@"z"] toDouble] - 0.5;
+    double r_x = [ctx[@"db"][@"r"][@"x"] toDouble];
+    double r_y = [ctx[@"db"][@"r"][@"y"] toDouble];
+    double r_z = [ctx[@"db"][@"r"][@"z"] toDouble];
+    t_x *= 1000;
+    t_y *= -1000;
+    t_z *= 1;
+    metaio::Vector3d t_ = metaio::Vector3d(t_x, t_y, t_z);
+    metaio::Rotation r_ = metaio::Rotation(dToR(r_x), dToR(r_y), dToR(r_z));
+    
+    [self updateDebugViewForPose:@"touch" WithT:t_ andR:r_];
+    
+    if ([ctx[@"setPInit"] toBool])
+    {
+        logMA(@"init!", ma_log);
+        logMA(tRToS(t_,r_), ma_log);
+        
+        cam_test.initP(t_, r_, 1);
+        
+        [self updateDebugViewForPose:@"init" WithT:cam_test.t_offs andR:cam_test.r_offs];
+        logMA([NSString stringWithUTF8String: tRToS(cam_test.t_offs, cam_test.r_offs).c_str()], ma_log);
+    }
+    
+    if ([ctx[@"setP"] toBool])
+    {
+        cam_test.updateP(t_, r_);
+    }
+}
 
 - (void)updateDebugViewWithCameraT: (metaio::Vector3d)c_t andR: (metaio::Rotation)c_r
     andObjectT: (metaio::Vector3d)o_t andR: (metaio::Rotation)o_r
@@ -485,17 +535,36 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     ctx[@"c"][@"t"][@"y"] = @(((int) c_t.y/10) * 10);
     ctx[@"c"][@"t"][@"z"] = @(((int) c_t.z/10) * 10);
     
-    ctx[@"c"][@"r"][@"x"] = @(c_e.x);
-    ctx[@"c"][@"r"][@"y"] = @(c_e.y);
-    ctx[@"c"][@"r"][@"z"] = @(c_e.z);
+    ctx[@"c"][@"r"][@"x"] = @(((int)c_e.x/10) * 10);
+    ctx[@"c"][@"r"][@"y"] = @(((int)c_e.y/10) * 10);
+    ctx[@"c"][@"r"][@"z"] = @(((int)c_e.z/10) * 10);
     
     ctx[@"o"][@"t"][@"x"] = @(((int) o_t.x/10) * 10);
     ctx[@"o"][@"t"][@"y"] = @(((int) o_t.y/10) * 10);
     ctx[@"o"][@"t"][@"z"] = @(((int) o_t.z/10) * 10);
     
-    ctx[@"o"][@"r"][@"x"] = @(o_e.x);
-    ctx[@"o"][@"r"][@"y"] = @(o_e.y);
-    ctx[@"o"][@"r"][@"z"] = @(o_e.z);
+    ctx[@"o"][@"r"][@"x"] = @(((int)o_e.x/10) * 10);
+    ctx[@"o"][@"r"][@"y"] = @(((int)o_e.y/10) * 10);
+    ctx[@"o"][@"r"][@"z"] = @(((int)o_e.z/10) * 10);
+}
+
+- (void)updateDebugViewForPose: (NSString *)pose_ WithT: (metaio::Vector3d)t_ andR: (metaio::Rotation)r_
+{
+    JSValue *isReady = ctx[@"isReady"];
+    if (!isReady.toBool)
+    {
+        return;
+    }
+    metaio::Vector3d r_e_ = r_.getEulerAngleDegrees();
+
+    ctx[@"printToScreen"] = @(printToScreen);
+    ctx[pose_][@"t"][@"x"] = @(((int) t_.x/10) * 10);
+    ctx[pose_][@"t"][@"y"] = @(((int) t_.y/10) * 10);
+    ctx[pose_][@"t"][@"z"] = @(((int) t_.z/10) * 10);
+    
+    ctx[pose_][@"r"][@"x"] = @(((int) r_e_.x/10) * 10);
+    ctx[pose_][@"r"][@"y"] = @(((int) r_e_.y/10) * 10);
+    ctx[pose_][@"r"][@"z"] = @(((int) r_e_.z/10) * 10);
 }
 
 - (void)updateDebugViewWithActiveCos: (int)cos_ AndStatus:(string)state_
@@ -541,9 +610,10 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     printToScreen = (!printToScreen) && debugView;
 }
 
+
 - (IBAction)poseButtonDown:(id)sender {
     if (! cam.hasInitPose ) return;
-    metaio::Vector3d _t = obj.t;
+    metaio::Vector3d _t = obj.t_last;
     switch ([sender tag]) {
         case 1:
             _t.x = (int)(_t.x - 40) % 800;
@@ -567,7 +637,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
            NSLog(@"???");
             break;
         }
-    obj.t = _t;
+    obj.t_last = _t;
     
 }
 

@@ -12,12 +12,14 @@
 
 Pose::Pose()
 {
-    t = metaio::Vector3d(0, 0, 0);
-    t_init = metaio::Vector3d(0, 0, 0);
+    t_p = metaio::Vector3d(0, 0, 0);
+    t_last = metaio::Vector3d(0, 0, 0);
+    t_offs = metaio::Vector3d(0, 0, 0);
     t_world = metaio::Vector3d(0, 0, 0);
     
-    r = metaio::Rotation(0, 0, 0);
-    r_init = metaio::Rotation(0, 0, 0);
+    r_p = metaio::Rotation(0, 0, 0);
+    r_last = metaio::Rotation(0, 0, 0);
+    r_offs = metaio::Rotation(0, 0, 0);
     r_world = metaio::Rotation(0, 0, 0);
     
     isTracking = false;
@@ -33,13 +35,10 @@ Pose::Pose(metaio::Vector3d t_, metaio::Rotation r_) : Pose()
 
 void Pose::initP(metaio::Vector3d t_, metaio::Rotation r_, int cos_)
 {
-    t_init = r_.inverse().rotatePoint(mult(t_, -1.0f)); //same as getInverseTranslation
-    r_init = r_.inverse();
+    metaio::Vector3d t_p_ = r_.inverse().rotatePoint(mult(t_, -1.));
+    r_offs = r_.inverse() * r_last;
+    t_offs = r_.inverse().rotatePoint(t_last) + t_p_;
     
-    t_init += t;
-    r_init = r_init * r;
-    t = t_init;
-    r = r_init;
     COS = cos_;
 
     hasInitPose = true;
@@ -58,12 +57,15 @@ void Pose::updateP(metaio::Vector3d t_, metaio::Rotation r_)
 {
     metaio::Vector3d _t(0, 0, 0);
     metaio::Rotation _r(0, 0, 0);
-    _t = r_.inverse().rotatePoint(mult(t_, -1.0f)) - t_init;
+    _t = t_ + r_.rotatePoint(t_offs);
+    t_last = _t;
+    //t_last =  loPassXYZ(t_last, _t);
     
-    t =  loPassXYZ(t, _t);
+    _r = r_offs * r_;
+    r_last = _r; //lo-pass this too, this especially
     
-    _r = r_.inverse() * r_init.inverse();
-    r = _r;
+    t_p = _r.inverse().rotatePoint(mult(_t, -1.));
+    r_p = _r.inverse();
 }
 
 
@@ -76,7 +78,7 @@ void Pose::updateP(metaio::TrackingValues tv_)
     
     if (tv_.quality > 0.) //not lost, could be extrapolated
     {
-        if (!hasInitPose && tv_.quality == 1.0f)
+        if (!hasInitPose)
         {
             initP(tv_);
             logMA([NSString stringWithFormat:@"init: %i => %i",tv_.coordinateSystemID, COS], ma_log);

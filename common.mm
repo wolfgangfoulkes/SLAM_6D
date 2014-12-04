@@ -8,6 +8,7 @@
 #import <stdlib.h>
 #import <stdio.h>
 #import <iostream>
+#import <sstream>
 #import <opencv2/core.hpp>
 #import <opencv2/core/core.hpp>
 #import <opencv2/calib3d.hpp>
@@ -180,6 +181,11 @@ void logMA(NSString * s_, NSMutableArray * ma_)
     [ma_ addObject: s_];
 }
 
+void logMA(std::string s_, NSMutableArray * ma_)
+{
+    [ma_ addObject: [NSString stringWithUTF8String:s_.c_str()]];
+}
+
 metaio::Vector3d loPassXYZ(metaio::Vector3d v0_, metaio::Vector3d v1_)
 {
     //original time constant was 0.3, original dt was 1/20. did 0.3 / (1/20), got 6. multiplied by 1/30 to get 0.199...
@@ -193,4 +199,18 @@ metaio::Vector3d loPassXYZ(metaio::Vector3d v0_, metaio::Vector3d v1_)
     _v.z = (alpha * v1_.z) + (1.0 - alpha) * v0_.z;
     
     return _v;
+}
+
+std::string tRToS(metaio::Vector3d t_, metaio::Rotation r_)
+{
+    double _t_x = t_.x;
+    double _t_y = t_.y;
+    double _t_z = t_.z;
+    double _r_x = r_.getEulerAngleDegrees().x;
+    double _r_y = r_.getEulerAngleDegrees().y;
+    double _r_z = r_.getEulerAngleDegrees().z;
+    
+    std::stringstream _ss;
+    _ss << "t: (" << _t_x << ", " << _t_y << ", " << ", " << _t_z << "); r: ("<< _r_x << ", " << _r_y << ", " << ", " << _r_z << ");";
+    return _ss.str();
 }

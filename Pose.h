@@ -49,8 +49,8 @@ class Pose
     public:
     NSMutableArray * ma_log;
     
-    metaio::Vector3d t, t_init, t_world;
-    metaio::Rotation r, r_init, r_world;
+    metaio::Vector3d t_p, t_last, t_offs, t_world;
+    metaio::Rotation r_p, r_last, r_offs, r_world;
     
     bool hasInitPose;
     bool isTracking;

@@ -73,6 +73,29 @@ html, body {
     color: rgba(100, 0, 0, 1); 
 }
 
+.axes {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 50%;
+    bottom: 50%;
+    border-bottom: 1px solid black;
+    border-left: 1px solid black;
+    -webkit-transform-origin: bottom left 0;
+    transform: rotate(0deg);
+}
+
+.axes.init {
+    border-bottom: 1px solid rgba(0, 255, 255, 1.0);
+    border-left: 1px solid rgba(255, 255, 255, 1.0);
+}
+
+.axes.touch {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+
 #xy-outer {
     display: inline-block;
     position: absolute;
@@ -102,6 +125,16 @@ html, body {
     bottom: 50%;
     left: 50%;
     border-bottom-color: yellow;
+    transform: rotate(0deg);
+}
+
+#touch {
+    position: absolute;
+    bottom: 50%;
+    left: 50%;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-bottom: 15px solid rgba(255, 255, 255, 0.2);
     transform: rotate(0deg);
 }
 
