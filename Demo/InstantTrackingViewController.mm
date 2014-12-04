@@ -6,12 +6,13 @@
 #import <opencv2/core.hpp>
 #import <opencv2/calib3d.hpp>
 #import <QuartzCore/QuartzCore.h>
-
-#import "InstantTrackingViewController.h"
-#import "EAGLView.h"
 #import <AudioToolbox/AudioToolbox.h>
 #import <WebKit/WebKit.h>
 #import <JavaScriptCore/JavaScriptCore.h>
+#import <CoreMotion/CoreMotion.h>
+
+#import "InstantTrackingViewController.h"
+#import "EAGLView.h"
 #import "MapTransitionHelper.h"
 
 #import "common.h"
@@ -76,7 +77,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     
     // Load content //FLAG CHANGED RENDER ORDER TO SAME
     
-    m_obj           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:obj.t_world modelScaling:m_scale modelCos:0];
+    m_obj           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:obj.t_world modelScaling:m_scale modelCos:1];
 //    m_obj1           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:m_obj1_t modelScaling:m_scale modelCos:0];
     
     activeCOS = -1;
@@ -111,6 +112,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         
         metaio::TrackingValues tv = m_metaioSDK->getTrackingValues(activeCOS);
         
+        
         //float tvm[16];
         //m_metaioSDK->getTrackingValues(activeCOS, tvm, true); //false if you want only modelMatrix. additional true to get a right-handed system
         //http://www.evl.uic.edu/ralph/508S98/coordinates.html
@@ -133,7 +135,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         {
             metaio::Rotation newRotation = mapTransitionHelper.getRotationCameraFromWorld();//tv.rotation;
             metaio::Vector3d newTranslation = mapTransitionHelper.getTranslationCameraFromWorld();//tv.translation;
-            metaio::Vector3d newTranslation_r = metaio::Rotation(0, 0, dToR(180.)).rotatePoint(newTranslation);
+            //metaio::Vector3d newTranslation_r = metaio::Rotation(0, 0, dToR(180.)).rotatePoint(newTranslation);
 
             
             m_obj->setScale(m_scale);
@@ -168,6 +170,16 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 - (void)viewDidUnload
 {
 	[super viewDidUnload];
+}
+
+- (CMMotionManager *)motionManager
+{
+   CMMotionManager *motionManager = nil;
+   id appDelegate = [UIApplication sharedApplication].delegate;
+   if ([appDelegate respondsToSelector:@selector(motionManager)]) {
+     motionManager = [appDelegate motionManager];
+   }
+   return motionManager;
 }
 
 
