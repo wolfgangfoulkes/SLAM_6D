@@ -74,15 +74,15 @@ setXY = function()
 {
     var ct =
     {
-        bottom: ((50. + c.t.y/50).toString() + "%"),
-        left: ((50. + c.t.x/50).toString() + "%"),
+        bottom: ((50. + c.t.y/25).toString() + "%"),
+        left: ((50. + c.t.x/25).toString() + "%"),
         transform: "rotateZ(" + c.r.z + "deg)"
     };
     
     var ot =
     {
-        bottom: ((50. + o.t.z/50).toString() + "%"),
-        left: ((50. + o.t.x/50).toString() + "%"),
+        bottom: ((50. + o.t.z/25).toString() + "%"),
+        left: ((50. + o.t.x/25).toString() + "%"),
         transform: "rotateZ(" + c.r.y + "deg)"
         
     };

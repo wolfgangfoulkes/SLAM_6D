@@ -182,9 +182,11 @@ void logMA(NSString * s_, NSMutableArray * ma_)
 
 metaio::Vector3d loPassXYZ(metaio::Vector3d v0_, metaio::Vector3d v1_)
 {
+    //original time constant was 0.3, original dt was 1/20. did 0.3 / (1/20), got 6. multiplied by 1/30 to get 0.199...
+
     metaio::Vector3d _v(0, 0, 0);
-    double dt = (1.0/20); //time interval
-    double RC = 0.3; //time constant
+    double dt = (1.0/30); //metaio time interval
+    double RC = 0.2; //time constant, "decay time", usually time constant is what's here represented by RC + dt, so it's an offset
     double alpha = dt / (RC + dt); //alpha is the smoothing factor (cutoff)
     _v.x = (alpha * v1_.x) + (1.0 - alpha) * v0_.x;
     _v.y = (alpha * v1_.y) + (1.0 - alpha) * v0_.y;

@@ -38,6 +38,8 @@ void Pose::initP(metaio::Vector3d t_, metaio::Rotation r_, int cos_)
     
     t_init += t;
     r_init = r_init * r;
+    t = t_init;
+    r = r_init;
     COS = cos_;
 
     hasInitPose = true;
@@ -58,7 +60,7 @@ void Pose::updateP(metaio::Vector3d t_, metaio::Rotation r_)
     metaio::Rotation _r(0, 0, 0);
     _t = r_.inverse().rotatePoint(mult(t_, -1.0f)) - t_init;
     
-    t = _t;
+    t =  loPassXYZ(t, _t);
     
     _r = r_.inverse() * r_init.inverse();
     r = _r;
@@ -67,10 +69,14 @@ void Pose::updateP(metaio::Vector3d t_, metaio::Rotation r_)
 
 void Pose::updateP(metaio::TrackingValues tv_)
 {
+    if (tv_.coordinateSystemID != COS)
+    {
+        hasInitPose = false;
+    }
     
     if (tv_.quality > 0.) //not lost, could be extrapolated
     {
-        if (!hasInitPose || tv_.coordinateSystemID != COS)
+        if (!hasInitPose && tv_.quality == 1.0f)
         {
             initP(tv_);
             logMA([NSString stringWithFormat:@"init: %i => %i",tv_.coordinateSystemID, COS], ma_log);

@@ -15,8 +15,8 @@
                     </Initialization>
                     <Learning Enabled="true">
                         <!-- both near middle, but this one with more "precise"-->
-                        <MinNumberOfObservations>5</MinNumberOfObservations>
-                        <MinTriangulationAngle>6.0</MinTriangulationAngle>
+                        <MinNumberOfObservations>4</MinNumberOfObservations>
+                        <MinTriangulationAngle>5.0</MinTriangulationAngle>
                     </Learning>
                     <Tracking>
                         <AlignZAxisWithGravity>false</AlignZAxisWithGravity>
@@ -95,6 +95,7 @@
                     <GammaTranslation>1.0</GammaTranslation>
                     <KeepPoseForNumberOfFrames>24</KeepPoseForNumberOfFrames>
                     <ContinueLostTrackingWithOrientationSensor>true</ContinueLostTrackingWithOrientationSensor>
+                    <GravityAssistance>replaceZAxis</GravityAssistance>
                 </Parameters>
             </Fuser>
             <SensorSource>

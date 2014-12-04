@@ -110,11 +110,12 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 {
     if (poses.empty())
     {
-        printf("poses is empty");
+        logMA(@"poses is empty", ma_log);
 		return;
     }
     
-    //[self printETSState:poses[0].state];
+    string _state = poses[0].trackingStateToString(poses[0].state);
+    logMA([NSString stringWithUTF8String: _state.c_str()], ma_log);
     
     if (poses[0].state == metaio::ETS_LOST)
     {
@@ -230,16 +231,15 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 - (void) updateTrackingState
 {
     int COSs = m_metaioSDK->getNumberOfValidCoordinateSystems();
+    string state = "not tracking";
     if (COSs)
     {
         metaio::TrackingValues cos1 = m_metaioSDK->getTrackingValues(1);
         metaio::TrackingValues cos2 = m_metaioSDK->getTrackingValues(2);
         if (cos1.isTrackingState()) {activeCOS = 1;}
         else if (cos2.isTrackingState()) {activeCOS = 2;}
-        
         metaio::TrackingValues tv = m_metaioSDK->getTrackingValues(activeCOS);
-        string state = tv.trackingStateToString(tv.state);
-        [self updateDebugViewWithActiveCos:activeCOS AndStatus:state];
+        state = tv.trackingStateToString(tv.state);
         
         isTracking = true;
     }
@@ -248,6 +248,8 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         activeCOS = -1;
         isTracking = false;
     }
+    
+    [self updateDebugViewWithActiveCos:activeCOS AndStatus:state];
 }
 
 /**
@@ -261,50 +263,58 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     }
     [self printLogToConsole];
     [self updateTrackingState];
-    if (!activeCOS) {return;}
-    
-    metaio::TrackingValues tv = m_metaioSDK->getTrackingValues(activeCOS);
-    
-    //float tvm[16];
-    //m_metaioSDK->getTrackingValues(activeCOS, tvm, true); //false if you want only modelMatrix. additional true to get a right-handed system
-    //http://www.evl.uic.edu/ralph/508S98/coordinates.html
-    //right-handed right:x+, up:y+, screen:z-, rotation is counterclockwise around axis
-    //left-handed right:x+, up:y+, screen:z+, rotation is clockwise around axis
-    
-    //matrix maps object onto tracked object.
-    //cv::Mat tv_mat = cv::Mat::Mat(4, 4, CV_32F, tvm);
-    //metaio::stlcompat::String points = m_metaioSDK->sensorCommand((metaio::stlcompat::String)"getNewMapFeatures");
-
-    // Update the internal state with the lastest tracking values from the SDK.
-    mapTransitionHelper.update(m_metaioSDK->getTrackingValues(activeCOS), m_metaioSDK->getRegisteredSensorsComponent()->getLastSensorValues());
-    
-    if (tv.quality > 0.0)
+    if (activeCOS)
     {
+        
+        
+        metaio::TrackingValues tv = m_metaioSDK->getTrackingValues(activeCOS);
+        
+        //float tvm[16];
+        //m_metaioSDK->getTrackingValues(activeCOS, tvm, true); //false if you want only modelMatrix. additional true to get a right-handed system
+        //http://www.evl.uic.edu/ralph/508S98/coordinates.html
+        //right-handed right:x+, up:y+, screen:z-, rotation is counterclockwise around axis
+        //left-handed right:x+, up:y+, screen:z+, rotation is clockwise around axis
+        
+        //matrix maps object onto tracked object.
+        //cv::Mat tv_mat = cv::Mat::Mat(4, 4, CV_32F, tvm);
+        //metaio::stlcompat::String points = m_metaioSDK->sensorCommand((metaio::stlcompat::String)"getNewMapFeatures");
+
+        // Update the internal state with the lastest tracking values from the SDK.
+        mapTransitionHelper.update(m_metaioSDK->getTrackingValues(activeCOS), m_metaioSDK->getRegisteredSensorsComponent()->getLastSensorValues());
+        
+
         cam.updateP(tv);
-    }
-
-    
-    // If the last frame could be tracked successfully
-    if(mapTransitionHelper.lastFrameWasTracked())
-    {
-        metaio::Rotation newRotation = mapTransitionHelper.getRotationCameraFromWorld();//tv.rotation;
-        metaio::Vector3d newTranslation = mapTransitionHelper.getTranslationCameraFromWorld();//tv.translation;
-        metaio::Vector3d newTranslation_r = metaio::Rotation(0, 0, dToR(180.)).rotatePoint(newTranslation);
 
         
-        m_obj->setScale(m_scale);
-        m_obj->setRotation(newRotation);
-        metaio::Vector3d t = newTranslation + obj.t_world;
+        // If the last frame could be tracked successfully
+        if(mapTransitionHelper.lastFrameWasTracked())
+        {
+            metaio::Rotation newRotation = mapTransitionHelper.getRotationCameraFromWorld();//tv.rotation;
+            metaio::Vector3d newTranslation = mapTransitionHelper.getTranslationCameraFromWorld();//tv.translation;
+            metaio::Vector3d newTranslation_r = metaio::Rotation(0, 0, dToR(180.)).rotatePoint(newTranslation);
+
+            
+            m_obj->setScale(m_scale);
+            m_obj->setRotation(newRotation);
+            metaio::Vector3d t = newTranslation + obj.t_world;
+            
+            m_obj->setTranslation(t);
+        }
         
-        m_obj->setTranslation(t);
+        
+        
     }
-    if (debugView) //replace this with button press!
+//    m_frames++; //update frame count.
+
+    metaio::Vector3d t_o = mapTransitionHelper.getTranslationCameraFromWorld();
+    metaio::Vector3d t_c = mapTransitionHelper.getRotationCameraFromWorld().inverse().rotatePoint(mult(t_o, -1.0));
+    metaio::Rotation r_o = mapTransitionHelper.getRotationCameraFromWorld();
+    metaio::Rotation r_c = r_o.inverse();
+
+    if (debugView)
     {
-        [self updateDebugViewWithCameraT:cam.t andR:cam.r andObjectT:obj.t andR:obj.r];
+        [self updateDebugViewWithCameraT:t_c andR:r_c andObjectT:t_o andR:r_o];
     }
-    
-    
-    m_frames++; //update frame count.
 }
 
 - (void) updateObjectsWithCameraT: (metaio::Vector3d)t AndR:(metaio::Rotation)r
@@ -443,17 +453,17 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     
 }
 
-- (void)addPose: (int)name ToDebugContextT: (metaio::Vector4d)obj_t andR:(metaio::Rotation)obj_r
-{
-      metaio::Vector3d obj_e = obj_r.getEulerAngleDegrees();
-    /*http://www.bignerdranch.com/blog/objective-c-literals-part-1/*/
-    /*simpler to do this by creating a new version of an existing object with params?*/
-    ctx[@"poses"][[NSString stringWithFormat:@"%d", name]] =
-    @{
-        @"t" : @{ @"x" : @(obj_t.x), @"y" : @(obj_t.y), @"z" : @(obj_t.z) },
-        @"r" : @{ @"x" : @(obj_e.x), @"y" : @(obj_e.y), @"z" : @(obj_e.z) }
-        };
-}
+//- (void)addPose: (int)name ToDebugContextT: (metaio::Vector4d)obj_t andR:(metaio::Rotation)obj_r
+//{
+//      metaio::Vector3d obj_e = obj_r.getEulerAngleDegrees();
+//    /*http://www.bignerdranch.com/blog/objective-c-literals-part-1/*/
+//    /*simpler to do this by creating a new version of an existing object with params?*/
+//    ctx[@"poses"][[NSString stringWithFormat:@"%d", name]] =
+//    @{
+//        @"t" : @{ @"x" : @(obj_t.x), @"y" : @(obj_t.y), @"z" : @(obj_t.z) },
+//        @"r" : @{ @"x" : @(obj_e.x), @"y" : @(obj_e.y), @"z" : @(obj_e.z) }
+//        };
+//}
 
 - (void)updateDebugViewWithCameraT: (metaio::Vector3d)c_t andR: (metaio::Rotation)c_r
     andObjectT: (metaio::Vector3d)o_t andR: (metaio::Rotation)o_r
@@ -475,22 +485,17 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     ctx[@"c"][@"t"][@"y"] = @(((int) c_t.y/10) * 10);
     ctx[@"c"][@"t"][@"z"] = @(((int) c_t.z/10) * 10);
     
-    ctx[@"c"][@"r"][@"x"] = @(((int) c_e.x/10) * 10);
-    ctx[@"c"][@"r"][@"y"] = @(((int) c_e.y/10) * 10);
-    ctx[@"c"][@"r"][@"z"] = @(((int) c_e.z/10) * 10);
+    ctx[@"c"][@"r"][@"x"] = @(c_e.x);
+    ctx[@"c"][@"r"][@"y"] = @(c_e.y);
+    ctx[@"c"][@"r"][@"z"] = @(c_e.z);
     
     ctx[@"o"][@"t"][@"x"] = @(((int) o_t.x/10) * 10);
     ctx[@"o"][@"t"][@"y"] = @(((int) o_t.y/10) * 10);
     ctx[@"o"][@"t"][@"z"] = @(((int) o_t.z/10) * 10);
     
-    ctx[@"o"][@"r"][@"x"] = @(((int) o_e.x/10) * 10);
-    ctx[@"o"][@"r"][@"y"] = @(((int) o_e.y/10) * 10);
-    ctx[@"o"][@"r"][@"z"] = @(((int) o_e.z/10) * 10);
-    
-    ctx[@"console"][@"log"] = ^(JSValue *msg)
-    {
-        NSLog(@"JavaScript %@ log message: %@", [JSContext currentContext], msg);
-    }; //works for all console.log messages
+    ctx[@"o"][@"r"][@"x"] = @(o_e.x);
+    ctx[@"o"][@"r"][@"y"] = @(o_e.y);
+    ctx[@"o"][@"r"][@"z"] = @(o_e.z);
 }
 
 - (void)updateDebugViewWithActiveCos: (int)cos_ AndStatus:(string)state_

@@ -135,10 +135,8 @@ class MapTransitionHelper
 		return (m_last_camera_pose.quality > 0 &&
 				m_last_camera_pose.state != metaio::ETS_INITIALIZATION_FAILED);
 	}
-	
-private:
-	
-	// storing the last pose and attitude/orientation to update the pose while initializing.
+    
+    // storing the last pose and attitude/orientation to update the pose while initializing.
 	bool m_last_camera_pose_valid;
 	
 	// to stay in the same cos, we need one cos offset (6DoF only, scale is not being considered for now).
@@ -147,6 +145,10 @@ private:
 
 	metaio::TrackingValues m_last_camera_pose;
 	metaio::SensorValues m_last_sensor_values;
+	
+private:
+	
+	
 	
 	
 };
