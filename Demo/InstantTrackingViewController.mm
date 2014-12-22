@@ -340,7 +340,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 	return YES;
 }
 
-- (void)printDebugToConsole //call on button press
+- (void)printDebugToConsole
 {
 //        //prints defined vs. valid (active) COS's
 //        printf("/nCOS's: %i of %i", m_metaioSDK->getNumberOfValidCoordinateSystems(), m_metaioSDK->getNumberOfDefinedCoordinateSystems());
@@ -359,83 +359,9 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 //        int left = m_metaioSDK->getCoordinateSystemID("map-mlab-front-left");
 //        printf("\nmap-mlab-front-right: %d\n", right); //1
 //        printf("\nmap-mlab-front-left: %d\n", left); //2
-//    
-//        //put this one in Object instance, prints rotation and translation
-//        metaio::Vector3d r = m_rn.getEulerAngleDegrees();
-//        metaio::Vector3d t = m_tn;
-//        
-//        metaio::Vector3d obj_t = m_obj->getTranslation();
-//        metaio::Vector3d obj_r = m_obj->getRotation().getEulerAngleDegrees();
-//
-//        printf("\n---------------------|%d|---------------------\n", m_frames); //NSLOG prints date and time and some junk
-//        printf("\n--|rotation: (%f, %f, %f) |---\n--|translation: (%f, %f, %f) |---\n",
-//        r.x, r.y, r.z, t.x, t.y, t.z);
-//        
-//        printf("\n-----|OBJ|--------------------\n");
-//        printf("\n--|rotation: (%f, %f, %f) |---\n--|translation: (%f, %f, %f) |---\n",
-//        obj_r.x, obj_r.y, obj_r.z, obj_t.x, obj_t.y, obj_t.z);
-//        printf("\n---------\n");
-//        printf("\n-----\n");
 }
 
 
-- (void) printETSState: (metaio::ETRACKING_STATE)state_ //in the future: trackingValues.trackingStateToString
-{
-    switch (state_)
-    {
-        case metaio::ETS_EXTRAPOLATED:
-        {
-            printf("ETS_EXTRAPOLATED");
-            break;
-        }
-        case metaio::ETS_FOUND:
-        {
-            printf("ETS_FOUND");
-            break;
-        }
-        case metaio::ETS_INITIALIZATION_FAILED:
-        {
-            printf("ETS_INITIALIZATION_FAILED");
-            break;
-        }
-        case metaio::ETS_INITIALIZED:
-        {
-            printf("ETS_INITIALIZZED");
-            break;
-        }
-        case metaio::ETS_LOST:
-        {
-            printf("ETS_LOST");
-            break;
-        }
-        case metaio::ETS_NOT_TRACKING:
-        {
-            printf("ETS_NOT_TRACKING");
-            break;
-        }
-        case metaio::ETS_REGISTERED:
-        {
-            printf("ETS_REGISTERED");
-            break;
-        }
-        case metaio::ETS_TRACKING:
-        {
-            printf("ETS_TRACKING");
-            break;
-        }
-        case metaio::ETS_UNKNOWN:
-        {
-            printf("ETS_UNKNOWN");
-            break;
-        }
-        default:
-        {
-            printf("ETS_???");
-            break;
-        }
-    }
-
-}
 
 #pragma mark - Button handlers
 
