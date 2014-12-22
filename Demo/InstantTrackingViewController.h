@@ -85,6 +85,4 @@
 
 //- (void)addPose: (int)name ToDebugContextT: (metaio::Vector4d)obj_t andR:(metaio::Rotation)obj_r;
 
-- (void)printETSState:(metaio::ETRACKING_STATE)state_;
-
 @end
