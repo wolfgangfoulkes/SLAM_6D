@@ -8,10 +8,10 @@
                 <MaxObjectsToTrackInParallel>1</MaxObjectsToTrackInParallel>
             </Parameters>
             <SensorCOS>
-                <SensorCosID>modular1</SensorCosID>
+                <SensorCosID>map1</SensorCosID>
                 <Parameters>
                     <Initialization Type="map">
-                        <Map>mlab_front_left.slam</Map>
+                        <Map>foulkes_vision/chairInBackLeftCorner.slam</Map>
                     </Initialization>
                     <Learning Enabled="true">
                         <!-- both near middle, but this one with more "precise"-->
@@ -24,10 +24,10 @@
                 </Parameters>
             </SensorCOS>
             <SensorCOS>
-                <SensorCosID>modular2</SensorCosID>
+                <SensorCosID>map2</SensorCosID>
                 <Parameters>
                     <Initialization Type="map">
-                        <Map>mlab_front_right.slam</Map>
+                        <Map>foulkes_vision/eyeChair.slam</Map>
                     </Initialization>
                     <Learning Enabled="true">
                         <MinNumberOfObservations>4</MinNumberOfObservations>
@@ -42,7 +42,7 @@
     </Sensors>
     <Connections>
         <COS>
-            <Name>map-modular1</Name>
+            <Name>map-map1</Name>
             <Fuser Type="SmoothingFuser">
                 <Parameters>
                     <AlphaRotation>0.8</AlphaRotation>
@@ -56,7 +56,7 @@
             </Fuser>
             <SensorSource>
                 <SensorID>SLAM</SensorID>
-                <SensorCosID>modular1</SensorCosID>
+                <SensorCosID>map1</SensorCosID>
                 <HandEyeCalibration>
                     <TranslationOffset>
                         <x>0.0</x>
@@ -86,7 +86,7 @@
             </SensorSource>
         </COS>
         <COS>
-            <Name>map-modular2</Name>
+            <Name>map-map2</Name>
             <Fuser Type="SmoothingFuser">
                 <Parameters>
                     <AlphaRotation>0.8</AlphaRotation>
@@ -100,7 +100,7 @@
             </Fuser>
             <SensorSource>
                 <SensorID>SLAM</SensorID>
-                <SensorCosID>modular2</SensorCosID>
+                <SensorCosID>map2</SensorCosID>
                 <HandEyeCalibration>
                     <TranslationOffset>
                         <x>0.0</x>

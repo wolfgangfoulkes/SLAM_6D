@@ -12,6 +12,7 @@
 		7CCB429C19582BAE007355FA /* InstantTracking.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7CCB429919582BAE007355FA /* InstantTracking.xib */; };
 		7CCB429D19582BAE007355FA /* InstantTrackingViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7CCB429B19582BAE007355FA /* InstantTrackingViewController.mm */; };
 		9839FB0F1A1C12660076D4A8 /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9839FB0E1A1C12660076D4A8 /* opencv2.framework */; };
+		984660A41A48D36E002818C5 /* DebugHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 984660A21A48D36E002818C5 /* DebugHandler.cpp */; };
 		9860DC251A1A7236005626C0 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9860DC241A1A7236005626C0 /* Accelerate.framework */; };
 		9860DC271A1A7271005626C0 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9860DC261A1A7271005626C0 /* GLKit.framework */; };
 		9860DC281A1A72E5005626C0 /* metaioSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 986917CE1A08C72F00508D34 /* metaioSDK.framework */; };
@@ -72,6 +73,8 @@
 		7CCB429B19582BAE007355FA /* InstantTrackingViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = InstantTrackingViewController.mm; sourceTree = "<group>"; };
 		7CFED0811950650E006E88AE /* MapTransitionHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapTransitionHelper.h; sourceTree = "<group>"; };
 		9839FB0E1A1C12660076D4A8 /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = opencv2.framework; sourceTree = "<group>"; };
+		984660A21A48D36E002818C5 /* DebugHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DebugHandler.cpp; sourceTree = "<group>"; };
+		984660A31A48D36E002818C5 /* DebugHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugHandler.h; sourceTree = "<group>"; };
 		9860DC241A1A7236005626C0 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		9860DC261A1A7271005626C0 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		9860DC291A1A865C005626C0 /* EventKitUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKitUI.framework; path = System/Library/Frameworks/EventKitUI.framework; sourceTree = SDKROOT; };
@@ -176,6 +179,8 @@
 		B9BC114015D8FA7B00713ED3 = {
 			isa = PBXGroup;
 			children = (
+				984660A21A48D36E002818C5 /* DebugHandler.cpp */,
+				984660A31A48D36E002818C5 /* DebugHandler.h */,
 				986B18771A30FE2900CD7C5A /* Kalman.mm */,
 				986B18781A30FE2900CD7C5A /* Kalman.h */,
 				986B18741A2BEF8700CD7C5A /* js.mm */,
@@ -371,6 +376,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				984660A41A48D36E002818C5 /* DebugHandler.cpp in Sources */,
 				7CCB429D19582BAE007355FA /* InstantTrackingViewController.mm in Sources */,
 				989977A61A1DFB31000AB036 /* common.mm in Sources */,
 				9899779D1A1D9B11000AB036 /* Pose.mm in Sources */,
