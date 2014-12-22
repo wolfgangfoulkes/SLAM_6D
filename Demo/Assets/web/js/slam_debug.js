@@ -155,12 +155,11 @@ printLog = function()
     }
 };
 
-getXY = function(e)
+getXY = function($node, e)
 {
-    var node = $(this);
-    var position = node.offset();
-    var n_width = node.innerWidth();
-    var n_height = node.innerHeight();
+    var position = $node.offset();
+    var n_width = $node.innerWidth();
+    var n_height = $node.innerHeight();
     var handlers = {
         vmousemove : function(e){
             var normX =  (e.pageX - position.left) / n_width;
@@ -204,13 +203,26 @@ jQuery(document).ready(function(){
     
     $(".rLeft").click(function()
     {
-        db.r.z = db.r.z - 10;
+        if (setP || setPInit)
+        {
+            db.r.z = db.r.z - 10;
+        }
     });
     
     $(".rRight").click(function()
     {
-        db.r.z = db.r.z + 10;
+        if (setP || setPInit)
+        {
+            db.r.z = db.r.z + 10;
+        }
     });
 
-    $("#xy-outer").on("vmousedown", getXY);
+    $("#xy-outer").on("vmousedown", function(e)
+    {
+        if (setP || setPInit)
+        {
+            getXY($(this), e);
+        }
+    }
+    );
 });

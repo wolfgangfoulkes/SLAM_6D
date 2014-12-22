@@ -156,7 +156,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 
     if (debugView)
     {
-        [self updateDebugViewWithCameraT:t_c andR:r_c andObjectT:t_o andR:r_o];
+        [self updateDebugViewWithCameraT:cam_test.t_p andR:cam_test.r_p andObjectT:cam_test.t_last andR:cam_test.r_last];
     }
 }
 
