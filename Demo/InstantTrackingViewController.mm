@@ -402,6 +402,10 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 
 - (void)getTFromDebugView
 {
+    double DEBUG_X_COEFF = 1000;
+    double DEBUG_Y_COEFF = -1000;
+    double DEBUG_Z_COEFF = 1;
+    
     JSValue *isReady = ctx[@"isReady"];
     if (!isReady.toBool)
     {
@@ -419,9 +423,9 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     double r_x = [ctx[@"db"][@"r"][@"x"] toDouble];
     double r_y = [ctx[@"db"][@"r"][@"y"] toDouble];
     double r_z = [ctx[@"db"][@"r"][@"z"] toDouble];
-    t_x *= 1000;
-    t_y *= -1000;
-    t_z *= 1;
+    t_x *= DEBUG_X_COEFF;
+    t_y *= DEBUG_Y_COEFF;
+    t_z *= DEBUG_Z_COEFF;
     metaio::Vector3d t_ = metaio::Vector3d(t_x, t_y, t_z);
     metaio::Rotation r_ = metaio::Rotation(dToR(r_x), dToR(r_y), dToR(r_z));
     
@@ -447,6 +451,8 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 - (void)updateDebugViewWithCameraT: (metaio::Vector3d)c_t andR: (metaio::Rotation)c_r
     andObjectT: (metaio::Vector3d)o_t andR: (metaio::Rotation)o_r
 {
+    double ROUND = 100;
+    
     JSValue *isReady = ctx[@"isReady"];
     if (!isReady.toBool)
     {
@@ -460,25 +466,27 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     metaio::Vector3d o_e = o_r.getEulerAngleDegrees();
     
     ctx[@"printToScreen"] = @(printToScreen);
-    ctx[@"c"][@"t"][@"x"] = @(((int) c_t.x/10) * 10);
-    ctx[@"c"][@"t"][@"y"] = @(((int) c_t.y/10) * 10);
-    ctx[@"c"][@"t"][@"z"] = @(((int) c_t.z/10) * 10);
+    ctx[@"c"][@"t"][@"x"] = @(((int) c_t.x/ROUND) * ROUND);
+    ctx[@"c"][@"t"][@"y"] = @(((int) c_t.y/ROUND) * ROUND);
+    ctx[@"c"][@"t"][@"z"] = @(((int) c_t.z/ROUND) * ROUND);
     
-    ctx[@"c"][@"r"][@"x"] = @(((int)c_e.x/10) * 10);
-    ctx[@"c"][@"r"][@"y"] = @(((int)c_e.y/10) * 10);
-    ctx[@"c"][@"r"][@"z"] = @(((int)c_e.z/10) * 10);
+    ctx[@"c"][@"r"][@"x"] = @(((int)c_e.x/ROUND) * ROUND);
+    ctx[@"c"][@"r"][@"y"] = @(((int)c_e.y/ROUND) * ROUND);
+    ctx[@"c"][@"r"][@"z"] = @(((int)c_e.z/ROUND) * ROUND);
     
-    ctx[@"o"][@"t"][@"x"] = @(((int) o_t.x/10) * 10);
-    ctx[@"o"][@"t"][@"y"] = @(((int) o_t.y/10) * 10);
-    ctx[@"o"][@"t"][@"z"] = @(((int) o_t.z/10) * 10);
+    ctx[@"o"][@"t"][@"x"] = @(((int) o_t.x/ROUND) * ROUND);
+    ctx[@"o"][@"t"][@"y"] = @(((int) o_t.y/ROUND) * ROUND);
+    ctx[@"o"][@"t"][@"z"] = @(((int) o_t.z/ROUND) * ROUND);
     
-    ctx[@"o"][@"r"][@"x"] = @(((int)o_e.x/10) * 10);
-    ctx[@"o"][@"r"][@"y"] = @(((int)o_e.y/10) * 10);
-    ctx[@"o"][@"r"][@"z"] = @(((int)o_e.z/10) * 10);
+    ctx[@"o"][@"r"][@"x"] = @(((int)o_e.x/ROUND) * ROUND);
+    ctx[@"o"][@"r"][@"y"] = @(((int)o_e.y/ROUND) * ROUND);
+    ctx[@"o"][@"r"][@"z"] = @(((int)o_e.z/ROUND) * ROUND);
 }
 
 - (void)updateDebugViewForPose: (NSString *)pose_ WithT: (metaio::Vector3d)t_ andR: (metaio::Rotation)r_
 {
+    double ROUND = 100;
+
     JSValue *isReady = ctx[@"isReady"];
     if (!isReady.toBool)
     {
@@ -487,13 +495,13 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     metaio::Vector3d r_e_ = r_.getEulerAngleDegrees();
 
     ctx[@"printToScreen"] = @(printToScreen);
-    ctx[pose_][@"t"][@"x"] = @(((int) t_.x/10) * 10);
-    ctx[pose_][@"t"][@"y"] = @(((int) t_.y/10) * 10);
-    ctx[pose_][@"t"][@"z"] = @(((int) t_.z/10) * 10);
+    ctx[pose_][@"t"][@"x"] = @(((int) t_.x/ROUND) * ROUND);
+    ctx[pose_][@"t"][@"y"] = @(((int) t_.y/ROUND) * ROUND);
+    ctx[pose_][@"t"][@"z"] = @(((int) t_.z/ROUND) * ROUND);
     
-    ctx[pose_][@"r"][@"x"] = @(((int) r_e_.x/10) * 10);
-    ctx[pose_][@"r"][@"y"] = @(((int) r_e_.y/10) * 10);
-    ctx[pose_][@"r"][@"z"] = @(((int) r_e_.z/10) * 10);
+    ctx[pose_][@"r"][@"x"] = @(((int) r_e_.x/ROUND) * ROUND);
+    ctx[pose_][@"r"][@"y"] = @(((int) r_e_.y/ROUND) * ROUND);
+    ctx[pose_][@"r"][@"z"] = @(((int) r_e_.z/ROUND) * ROUND);
 }
 
 - (void)updateDebugViewWithActiveCos: (int)cos_ AndStatus:(string)state_

@@ -1,4 +1,3 @@
-
 rate = 240;
 printToScreen = true;
 Pose = function()
@@ -175,6 +174,15 @@ getXY = function($node, e)
     $(document).on(handlers);
 };
 
+whichDevice = function()
+{
+    	var isPhone = (/android|webos|iphone/i.test(navigator.userAgent.toLowerCase()));
+        var isTablet = (/ipad/i.test(navigator.userAgent.toLowerCase()));
+        var _which = "unknown";
+        _which = (isPhone && (!isTablet)) || (!(isPhone) && isTablet) ? "phone" : "tablet";
+        return _which;
+}
+
 
 jQuery(document).ready(function(){
 //    $("#xy-outer").css("background-color", "blue");
@@ -182,6 +190,10 @@ jQuery(document).ready(function(){
     setInterval(update, rate);
     $.vmouse.moveDistanceThreshold = 1000000;
     console.log("javascript is ready!");
+
+    var device = whichDevice();
+    $("body").addClass(device);
+
     $(".printLog").click(function(){
         print_log = !print_log;
 
