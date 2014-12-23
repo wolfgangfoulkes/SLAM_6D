@@ -31,18 +31,6 @@ void DebugHandler::initJS(JSContext * ctx_)
     jsIsInit = true;
 }
 
-//- (void)addPose: (int)name ToDebugContextT: (metaio::Vector4d)obj_t andR:(metaio::Rotation)obj_r
-//{
-//      metaio::Vector3d obj_e = obj_r.getEulerAngleDegrees();
-//    /*http://www.bignerdranch.com/blog/objective-c-literals-part-1/*/
-//    /*simpler to do this by creating a new version of an existing object with params?*/
-//    ctx[@"poses"][[NSString stringWithFormat:@"%d", name]] =
-//    @{
-//        @"t" : @{ @"x" : @(obj_t.x), @"y" : @(obj_t.y), @"z" : @(obj_t.z) },
-//        @"r" : @{ @"x" : @(obj_e.x), @"y" : @(obj_e.y), @"z" : @(obj_e.z) }
-//        };
-//}
-
 void DebugHandler::getJS()
 {
     
@@ -121,4 +109,16 @@ void DebugHandler::updatePose(NSString * pose_, metaio::Vector3d t_, metaio::Rot
     ctx[pose_][@"r"][@"y"] = @(((int) r_e_.y/ROUND) * ROUND);
     ctx[pose_][@"r"][@"z"] = @(((int) r_e_.z/ROUND) * ROUND);
 }
+
+//- (void)addPose: (int)name ToDebugContextT: (metaio::Vector4d)obj_t andR:(metaio::Rotation)obj_r
+//{
+//      metaio::Vector3d obj_e = obj_r.getEulerAngleDegrees();
+//    /*http://www.bignerdranch.com/blog/objective-c-literals-part-1/*/
+//    /*simpler to do this by creating a new version of an existing object with params?*/
+//    ctx[@"poses"][[NSString stringWithFormat:@"%d", name]] =
+//    @{
+//        @"t" : @{ @"x" : @(obj_t.x), @"y" : @(obj_t.y), @"z" : @(obj_t.z) },
+//        @"r" : @{ @"x" : @(obj_e.x), @"y" : @(obj_e.y), @"z" : @(obj_e.z) }
+//        };
+//}
 
