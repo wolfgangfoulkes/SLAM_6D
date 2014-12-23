@@ -23,7 +23,7 @@ public:
     NSMutableArray * log;
     JSContext * ctx;
     
-    Pose cam, obj;
+    Pose cam;
     metaio::Vector3d t0_out, t1_out;
     metaio::Rotation r0_out, r1_out;
     int COS;

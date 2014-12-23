@@ -51,7 +51,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 @synthesize ZppButton;
 @synthesize ZmmButton;
 
-#pragma mark - UIViewController lifecycle
+#pragma mark - UIView(s)Controller lifecycle
 
 /***** INITIALIZE VARIABLES, LOAD MODEL *****/
 - (void) viewDidLoad
@@ -61,8 +61,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     
     ma_log = [[NSMutableArray alloc] init];
     debugHandler.log = ma_log;
-    
-    webView.scrollView.scrollEnabled = NO;
+    cam.ma_log = ma_log; //be careful, you gotta initialize this with every instance!
     
     // Set the rendering clipping plane
     m_metaioSDK->setRendererClippingPlaneLimits(10, 30000);
@@ -70,23 +69,24 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     // Initial scaling for the models
     m_scale = 1;
     
-    cam = Pose(metaio::Vector3d(0,0,0), metaio::Rotation(0,0,0));
-    cam.ma_log = ma_log; //be careful, you gotta initialize this with every instance!
-    obj = Pose(metaio::Vector3d(-25,0,-100), metaio::Rotation(0,0,0));
+    // Load content
+    metaio::Vector3d obj_t_offset(50, 0, 50);
+    m_obj           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:obj_t_offset modelScaling:m_scale modelCos:1];
+//    m_obj1           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:m_obj1_t modelScaling:m_scale modelCos:1];
     
-    // Load content //FLAG CHANGED RENDER ORDER TO SAME
-    
-    m_obj           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:obj.t_world modelScaling:m_scale modelCos:1];
-//    m_obj1           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:m_obj1_t modelScaling:m_scale modelCos:0];
-    
+    //init tracking vars
     activeCOS = -1;
     isTracking = false;
     
-    updateMetaio = true;
-    
+    //debug view shows on launch
     showDebugView = true;
     debugHandler.print = showDebugView;
     
+    //should the loop update metaio?
+    updateMetaio = true;
+    
+    //Web View
+    webView.scrollView.scrollEnabled = NO;
     self.webView.delegate = self;
     [self loadDebugView];
     
@@ -108,6 +108,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     [self initDebugView];
 }
 
+# pragma mark - LOOP
 
 /**
  * Update the scale, rotation and translation of the models
@@ -174,6 +175,8 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     }
 }
 
+#pragma mark - CMMotionManager
+
 
 - (CMMotionManager *)motionManager
 {
@@ -239,11 +242,6 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         [self update];
 	}
 }
-
-
-
-
-#pragma mark - App Logic
 
 /**
  * Set the tracking configuration file
@@ -360,32 +358,32 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 
 
 - (IBAction)poseButtonDown:(id)sender {
-    if (! cam.hasInitPose ) return;
-    metaio::Vector3d _t = obj.t_last;
-    switch ([sender tag]) {
-        case 1:
-            _t.x = (int)(_t.x - 40) % 800;
-            break;
-        case 2:
-            _t.x = (int)(_t.x + 40) % 800;
-            break;
-        case 3:
-            _t.y = (int)(_t.y - 40) % 800;
-            break;
-        case 4:
-            _t.y = (int)(_t.y + 40) % 800;
-            break;
-        case 5:
-            _t.z = (int)(_t.z - 40) % 800;
-            break;
-        case 6:
-            _t.z = (int)(_t.z + 40) % 800;
-            break;
-       default:
-           NSLog(@"???");
-            break;
-        }
-    obj.t_last = _t;
+//    if (! cam.hasInitPose ) return;
+//    metaio::Vector3d _t = obj.t_last;
+//    switch ([sender tag]) {
+//        case 1:
+//            _t.x = (int)(_t.x - 40) % 800;
+//            break;
+//        case 2:
+//            _t.x = (int)(_t.x + 40) % 800;
+//            break;
+//        case 3:
+//            _t.y = (int)(_t.y - 40) % 800;
+//            break;
+//        case 4:
+//            _t.y = (int)(_t.y + 40) % 800;
+//            break;
+//        case 5:
+//            _t.z = (int)(_t.z - 40) % 800;
+//            break;
+//        case 6:
+//            _t.z = (int)(_t.z + 40) % 800;
+//            break;
+//       default:
+//           NSLog(@"???");
+//            break;
+//        }
+//    obj.t_last = _t;
     
 }
 

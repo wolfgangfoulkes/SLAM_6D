@@ -23,7 +23,7 @@
     metaio::IGeometry*  m_obj;            // pointer to the model
     metaio::IGeometry*  m_obj1;           // pointer to the model
     
-    Pose obj, cam;
+    Pose cam;
     
     int activeCOS;
     bool isTracking;
@@ -55,12 +55,14 @@
 @property (nonatomic, retain) IBOutlet UIButton* YmmButton;
 @property (nonatomic, retain) IBOutlet UIButton* ZppButton;
 @property (nonatomic, retain) IBOutlet UIButton* ZmmButton;
+/*****/
 
 - (IBAction)onDebugDown:(id)sender;
 
 /*****UNUSED*****/
 - (IBAction)onPrintDown:(id)sender;
 - (IBAction)poseButtonDown:(id)sender;
+/*****/
 
 - (void) updateTrackingState;
 - (void) updateObjectsWithCameraT: (metaio::Vector3d)t AndR:(metaio::Rotation)r; 
