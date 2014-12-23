@@ -10,13 +10,12 @@
 
 #import "DebugHandler.h"
 
-@interface InstantTrackingViewController : MetaioSDKViewController
+@interface InstantTrackingViewController : MetaioSDKViewController <UIWebViewDelegate>
 {
     DebugHandler debugHandler;
     
     NSMutableArray * ma_log;
     JSContext * ctx;
-    bool debugViewIsInit;
 
     int                 m_frames;
     NSInteger           m_scale;             // model scale
@@ -24,14 +23,13 @@
     metaio::IGeometry*  m_obj;            // pointer to the model
     metaio::IGeometry*  m_obj1;           // pointer to the model
     
-    Pose obj, cam, obj_test, cam_test;
+    Pose obj, cam;
     
     int activeCOS;
     bool isTracking;
     metaio::TrackingValues COS_offs; //can replace with pose
     
     bool showDebugView;
-    bool printToScreen;
     bool updateMetaio;
     
     IBOutlet UIWebView* webView;

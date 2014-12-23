@@ -47,7 +47,7 @@ using namespace cv;
 class Pose
 {
     public:
-    NSMutableArray * ma_log;
+    NSMutableArray * ma_log; //be careful, you gotta initialize this with every instance!
     
     metaio::Vector3d t_p, t_last, t_offs, t_world;
     metaio::Rotation r_p, r_last, r_offs, r_world;

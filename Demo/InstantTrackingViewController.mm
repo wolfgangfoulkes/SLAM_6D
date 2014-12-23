@@ -71,39 +71,50 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     m_scale = 1;
     
     cam = Pose(metaio::Vector3d(0,0,0), metaio::Rotation(0,0,0));
-    cam.ma_log = ma_log;
+    cam.ma_log = ma_log; //be careful, you gotta initialize this with every instance!
     obj = Pose(metaio::Vector3d(-25,0,-100), metaio::Rotation(0,0,0));
-    
-    cam_test = Pose(metaio::Vector3d(0,0,0), metaio::Rotation(0,0,0));
-    obj_test = Pose(metaio::Vector3d(0,0,0), metaio::Rotation(0,0,0));
     
     // Load content //FLAG CHANGED RENDER ORDER TO SAME
     
     m_obj           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:obj.t_world modelScaling:m_scale modelCos:1];
 //    m_obj1           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:m_obj1_t modelScaling:m_scale modelCos:0];
     
-    showDebugView = true;
-    debugHandler.print = true;
-    debugViewIsInit = false;
     activeCOS = -1;
     isTracking = false;
     
     updateMetaio = true;
     
+    showDebugView = true;
+    debugHandler.print = showDebugView;
+    
+    self.webView.delegate = self;
     [self loadDebugView];
     
 }
+
+-(void)viewDidAppear:(BOOL)animated
+{
+    [self setTrackingConfiguration];
+}
+
+
+- (void)viewDidUnload
+{
+	[super viewDidUnload];
+}
+
+-(void)webViewDidFinishLoad:(UIWebView *)webView{
+    NSLog(@"Web View did load!");
+    [self initDebugView];
+}
+
 
 /**
  * Update the scale, rotation and translation of the models
  */
 - (void) update
 {
-    if (!debugViewIsInit)
-    {
-        [self initDebugView];
-        debugViewIsInit = true;
-    }
+    [self updateTrackingState];
     debugHandler.update();
     if (activeCOS && updateMetaio)
     {
@@ -164,17 +175,6 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 }
 
 
--(void)viewDidAppear:(BOOL)animated
-{
-    [self setTrackingConfiguration];
-}
-
-
-- (void)viewDidUnload
-{
-	[super viewDidUnload];
-}
-
 - (CMMotionManager *)motionManager
 {
    CMMotionManager *motionManager = nil;
@@ -199,6 +199,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     
     string _state = poses[0].trackingStateToString(poses[0].state);
     logMA([NSString stringWithUTF8String: _state.c_str()], ma_log);
+    [self updateTrackingState];
     
     if (poses[0].state == metaio::ETS_LOST)
     {

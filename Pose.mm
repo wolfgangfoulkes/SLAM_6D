@@ -81,7 +81,6 @@ void Pose::updateP(metaio::TrackingValues tv_)
         if (!hasInitPose)
         {
             initP(tv_);
-            logMA([NSString stringWithFormat:@"init: %i => %i",tv_.coordinateSystemID, COS], ma_log);
         }
         metaio::Vector3d t_ = tv_.translation;
         metaio::Rotation r_ = tv_.rotation;
