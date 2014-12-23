@@ -8,8 +8,12 @@
 #import "Pose.h"
 #import "MetaioSDKViewController.h"
 
+#import "DebugHandler.h"
+
 @interface InstantTrackingViewController : MetaioSDKViewController
 {
+    DebugHandler debugHandler;
+    
     NSMutableArray * ma_log;
     JSContext * ctx;
     bool debugViewIsInit;
@@ -26,9 +30,7 @@
     bool isTracking;
     metaio::TrackingValues COS_offs; //can replace with pose
     
-    metaio::IRadar * m_radar;
-    
-    bool debugView;
+    bool showDebugView;
     bool printToScreen;
     bool updateMetaio;
     
@@ -47,6 +49,8 @@
 @property (nonatomic, retain) IBOutlet UIButton *debugViewToggle;
 @property (nonatomic, retain) IBOutlet UIButton *debugPrintButton;
 
+
+/*****UNUSED*****/
 @property (nonatomic, retain) IBOutlet UIButton* XppButton;
 @property (nonatomic, retain) IBOutlet UIButton* XmmButton;
 @property (nonatomic, retain) IBOutlet UIButton* YppButton;
@@ -55,33 +59,16 @@
 @property (nonatomic, retain) IBOutlet UIButton* ZmmButton;
 
 - (IBAction)onDebugDown:(id)sender;
+
+/*****UNUSED*****/
 - (IBAction)onPrintDown:(id)sender;
 - (IBAction)poseButtonDown:(id)sender;
 
-- (void)initPoseWithT: (metaio::Vector3d)t AndR:(metaio::Rotation)r;
-
 - (void) updateTrackingState;
+- (void) updateObjectsWithCameraT: (metaio::Vector3d)t AndR:(metaio::Rotation)r; 
 
-- (void) updateObjectsWithCameraT: (metaio::Vector3d)t AndR:(metaio::Rotation)r;
-
-
-- (void)loadDebugView;
-
-
-- (void)updateDebugViewWithCameraT: (metaio::Vector3d)c_t andR: (metaio::Rotation)c_r
-    andObjectT: (metaio::Vector3d)o_t andR: (metaio::Rotation)o_r;
-
+- (void) loadDebugView;
 - (void) initDebugView;
-
-- (void)updateDebugViewWithActiveCos: (int)cos_ AndStatus:(string)state_;
-
-- (void)updateDebugViewForPose: (NSString*)pose_ WithT: (metaio::Vector3d)t_ andR: (metaio::Rotation)r_;
-
-- (void)printDebugToConsole;
-
-- (void)printLogToConsole;
-
-- (void)getTFromDebugView;
 
 //- (void)addPose: (int)name ToDebugContextT: (metaio::Vector4d)obj_t andR:(metaio::Rotation)obj_r;
 

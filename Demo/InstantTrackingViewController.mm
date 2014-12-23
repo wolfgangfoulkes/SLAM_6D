@@ -24,7 +24,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 { 
     va_list args;
     va_start(args,format);
-    NSLogv([NSString stringWithUTF8String:format], args) ;    
+    NSLogv([NSString stringWithUTF8String:format], args) ;
     va_end(args);
     return 1;
 }
@@ -34,7 +34,6 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     // Instance of a class that helps moving from one map to the next one, without the user noticing it
     metaio::MapTransitionHelper mapTransitionHelper;
 }
-
 @end
 
 
@@ -42,6 +41,8 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 
 @synthesize webView;
 @synthesize debugViewToggle;
+
+/*****UNUSED*****/
 @synthesize debugPrintButton;
 @synthesize XppButton;
 @synthesize XmmButton;
@@ -58,9 +59,10 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 	[super viewDidLoad];
     printf("view did load! version: %s", m_metaioSDK->getVersion().c_str());
     
-    webView.scrollView.scrollEnabled = NO;
-    
     ma_log = [[NSMutableArray alloc] init];
+    debugHandler.log = ma_log;
+    
+    webView.scrollView.scrollEnabled = NO;
     
     // Set the rendering clipping plane
     m_metaioSDK->setRendererClippingPlaneLimits(10, 30000);
@@ -80,12 +82,11 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     m_obj           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:obj.t_world modelScaling:m_scale modelCos:1];
 //    m_obj1           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:m_obj1_t modelScaling:m_scale modelCos:0];
     
+    showDebugView = true;
+    debugHandler.print = true;
+    debugViewIsInit = false;
     activeCOS = -1;
     isTracking = false;
-    
-    debugViewIsInit = false;
-    debugView = true;
-    printToScreen = false;
     
     updateMetaio = true;
     
@@ -103,9 +104,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         [self initDebugView];
         debugViewIsInit = true;
     }
-    [self printLogToConsole];
-    [self updateTrackingState];
-    [self getTFromDebugView];
+    debugHandler.update();
     if (activeCOS && updateMetaio)
     {
         
@@ -154,9 +153,13 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     metaio::Rotation r_o = mapTransitionHelper.getRotationCameraFromWorld();
     metaio::Rotation r_c = r_o.inverse();
 
-    if (debugView)
+    if (showDebugView)
     {
-        [self updateDebugViewWithCameraT:cam_test.t_p andR:cam_test.r_p andObjectT:cam_test.t_last andR:cam_test.r_last];
+        debugHandler.t0_out = metaio::Vector3d(debugHandler.cam.t_p);
+        debugHandler.r0_out = metaio::Rotation(debugHandler.cam.r_p);
+        debugHandler.t1_out = metaio::Vector3d(debugHandler.cam.t_last);
+        debugHandler.r1_out = metaio::Rotation(debugHandler.cam.r_last);
+        
     }
 }
 
@@ -323,7 +326,8 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         isTracking = false;
     }
     
-    [self updateDebugViewWithActiveCos:activeCOS AndStatus:state];
+    debugHandler.COS = activeCOS;
+    debugHandler.tracking_state = state;
 }
 
 
@@ -340,211 +344,17 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 	return YES;
 }
 
-- (void)printDebugToConsole
-{
-//        //prints defined vs. valid (active) COS's
-//        printf("/nCOS's: %i of %i", m_metaioSDK->getNumberOfValidCoordinateSystems(), m_metaioSDK->getNumberOfDefinedCoordinateSystems());
-//        metaio::TrackingValues cos0 = m_metaioSDK->getTrackingValues(0);
-//        metaio::TrackingValues cos1 = m_metaioSDK->getTrackingValues(1);
-//        metaio::TrackingValues cos2 = m_metaioSDK->getTrackingValues(2);
-//        if (cos0.isTrackingState()) {printf("COS0: is tracking!");}
-//        else {printf("COS0: is not tracking!");}
-//        if (cos1.isTrackingState()) {printf("COS1: is tracking!");}
-//        else {printf("COS1: is not tracking!");}
-//        if (cos2.isTrackingState()) {printf("COS2: is tracking!");}
-//        else {printf("COS2: is not tracking!");}
-//
-//        //prints COS's IDs from name
-//        int right = m_metaioSDK->getCoordinateSystemID("map-mlab-front-right");
-//        int left = m_metaioSDK->getCoordinateSystemID("map-mlab-front-left");
-//        printf("\nmap-mlab-front-right: %d\n", right); //1
-//        printf("\nmap-mlab-front-left: %d\n", left); //2
-}
-
 
 
 #pragma mark - Button handlers
 
-
-- (void)loadDebugView {
-    NSURL *url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"Assets/web/slam" ofType:@"html"] isDirectory:NO];
-    NSURLRequest *request = [NSURLRequest requestWithURL:url];
-    
-    [self.webView loadRequest:request];
-}
-
-- (void) initDebugView {
-    ctx = [self.webView valueForKeyPath:@"documentView.webView.mainFrame.javaScriptContext"];
-    
-    NSAssert([ctx isKindOfClass:[JSContextclass]], @"could not find context in web view");
-    
-    [ctx setExceptionHandler:^(JSContext *context, JSValue *value) {
-        NSLog(@"%@", value);
-    }];
-    
-    ctx[@"console"][@"log"] = ^(JSValue *msg)
-    {
-        NSLog(@"JavaScript %@ log message: %@", [JSContext currentContext], msg);
-    }; //works for all console.log messages
-}
-
-//- (void)addPose: (int)name ToDebugContextT: (metaio::Vector4d)obj_t andR:(metaio::Rotation)obj_r
-//{
-//      metaio::Vector3d obj_e = obj_r.getEulerAngleDegrees();
-//    /*http://www.bignerdranch.com/blog/objective-c-literals-part-1/*/
-//    /*simpler to do this by creating a new version of an existing object with params?*/
-//    ctx[@"poses"][[NSString stringWithFormat:@"%d", name]] =
-//    @{
-//        @"t" : @{ @"x" : @(obj_t.x), @"y" : @(obj_t.y), @"z" : @(obj_t.z) },
-//        @"r" : @{ @"x" : @(obj_e.x), @"y" : @(obj_e.y), @"z" : @(obj_e.z) }
-//        };
-//}
-
-- (void)getTFromDebugView
-{
-    double DEBUG_X_COEFF = 1000;
-    double DEBUG_Y_COEFF = -1000;
-    double DEBUG_Z_COEFF = 1;
-    
-    JSValue *isReady = ctx[@"isReady"];
-    if (!isReady.toBool)
-    {
-        return;
-    }
-    
-    if (!([ctx[@"setP"] toBool] || [ctx[@"setPInit"] toBool]))
-    {
-        return;
-    }
-    
-    double t_x = [ctx[@"db"][@"t"][@"x"] toDouble] - 0.5;
-    double t_y = [ctx[@"db"][@"t"][@"y"] toDouble] - 0.5;
-    double t_z = [ctx[@"db"][@"t"][@"z"] toDouble] - 0.5;
-    double r_x = [ctx[@"db"][@"r"][@"x"] toDouble];
-    double r_y = [ctx[@"db"][@"r"][@"y"] toDouble];
-    double r_z = [ctx[@"db"][@"r"][@"z"] toDouble];
-    t_x *= DEBUG_X_COEFF;
-    t_y *= DEBUG_Y_COEFF;
-    t_z *= DEBUG_Z_COEFF;
-    metaio::Vector3d t_ = metaio::Vector3d(t_x, t_y, t_z);
-    metaio::Rotation r_ = metaio::Rotation(dToR(r_x), dToR(r_y), dToR(r_z));
-    
-    [self updateDebugViewForPose:@"touch" WithT:t_ andR:r_];
-    
-    if ([ctx[@"setPInit"] toBool])
-    {
-        logMA(@"init!", ma_log);
-        logMA(tRToS(t_,r_), ma_log);
-        
-        cam_test.initP(t_, r_, 1);
-        
-        [self updateDebugViewForPose:@"init" WithT:cam_test.t_offs andR:cam_test.r_offs];
-        logMA([NSString stringWithUTF8String: tRToS(cam_test.t_offs, cam_test.r_offs).c_str()], ma_log);
-    }
-    
-    if ([ctx[@"setP"] toBool])
-    {
-        cam_test.updateP(t_, r_);
-    }
-}
-
-- (void)updateDebugViewWithCameraT: (metaio::Vector3d)c_t andR: (metaio::Rotation)c_r
-    andObjectT: (metaio::Vector3d)o_t andR: (metaio::Rotation)o_r
-{
-    double ROUND = 100;
-    
-    JSValue *isReady = ctx[@"isReady"];
-    if (!isReady.toBool)
-    {
-        return;
-    }
-//    if (!( [ctx[@"poses"] hasProperty:[NSString stringWithFormat:@"%d", 1] ]))
-//    {
-//        [self addPose:1 ToDebugContextT: o_t andR: o_r];
-//    }
-    metaio::Vector3d c_e = c_r.getEulerAngleDegrees();
-    metaio::Vector3d o_e = o_r.getEulerAngleDegrees();
-    
-    ctx[@"printToScreen"] = @(printToScreen);
-    ctx[@"c"][@"t"][@"x"] = @(((int) c_t.x/ROUND) * ROUND);
-    ctx[@"c"][@"t"][@"y"] = @(((int) c_t.y/ROUND) * ROUND);
-    ctx[@"c"][@"t"][@"z"] = @(((int) c_t.z/ROUND) * ROUND);
-    
-    ctx[@"c"][@"r"][@"x"] = @(((int)c_e.x/ROUND) * ROUND);
-    ctx[@"c"][@"r"][@"y"] = @(((int)c_e.y/ROUND) * ROUND);
-    ctx[@"c"][@"r"][@"z"] = @(((int)c_e.z/ROUND) * ROUND);
-    
-    ctx[@"o"][@"t"][@"x"] = @(((int) o_t.x/ROUND) * ROUND);
-    ctx[@"o"][@"t"][@"y"] = @(((int) o_t.y/ROUND) * ROUND);
-    ctx[@"o"][@"t"][@"z"] = @(((int) o_t.z/ROUND) * ROUND);
-    
-    ctx[@"o"][@"r"][@"x"] = @(((int)o_e.x/ROUND) * ROUND);
-    ctx[@"o"][@"r"][@"y"] = @(((int)o_e.y/ROUND) * ROUND);
-    ctx[@"o"][@"r"][@"z"] = @(((int)o_e.z/ROUND) * ROUND);
-}
-
-- (void)updateDebugViewForPose: (NSString *)pose_ WithT: (metaio::Vector3d)t_ andR: (metaio::Rotation)r_
-{
-    double ROUND = 100;
-
-    JSValue *isReady = ctx[@"isReady"];
-    if (!isReady.toBool)
-    {
-        return;
-    }
-    metaio::Vector3d r_e_ = r_.getEulerAngleDegrees();
-
-    ctx[@"printToScreen"] = @(printToScreen);
-    ctx[pose_][@"t"][@"x"] = @(((int) t_.x/ROUND) * ROUND);
-    ctx[pose_][@"t"][@"y"] = @(((int) t_.y/ROUND) * ROUND);
-    ctx[pose_][@"t"][@"z"] = @(((int) t_.z/ROUND) * ROUND);
-    
-    ctx[pose_][@"r"][@"x"] = @(((int) r_e_.x/ROUND) * ROUND);
-    ctx[pose_][@"r"][@"y"] = @(((int) r_e_.y/ROUND) * ROUND);
-    ctx[pose_][@"r"][@"z"] = @(((int) r_e_.z/ROUND) * ROUND);
-}
-
-- (void)updateDebugViewWithActiveCos: (int)cos_ AndStatus:(string)state_
-{
-    JSValue *isReady = ctx[@"isReady"];
-    if (!isReady.toBool)
-    {
-        return;
-    }
-    ctx[@"COS"][@"idx"] = @(cos_);
-    ctx[@"COS"][@"state"] = [NSString stringWithFormat:@"%s", state_.c_str()];
-}
-
-- (void) printLogToConsole
-{
-    JSValue *isReady = ctx[@"isReady"];
-    if (!isReady.toBool)
-    {
-        return;
-    }
-    
-    Boolean print_log = [ctx[@"print_log"] toBool];
-    
-    if (print_log)
-    {
-        ctx[@"log"] = ma_log;
-    }
-}
-
-
--(void)initPoseWithT:(metaio::Vector3d)t_ AndR:(metaio::Rotation)r_
-{
-}
-
-/***** IF CALLBACKS *****/
-
 - (IBAction)onDebugDown:(id)sender {
-    debugView = !debugView;
     [self.webView setHidden:![self.webView isHidden] ];
+    showDebugView = !showDebugView;
+    debugHandler.print = showDebugView;
 }
 
 - (IBAction)onPrintDown:(id)sender {
-    printToScreen = (!printToScreen) && debugView;
 }
 
 
@@ -576,6 +386,45 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         }
     obj.t_last = _t;
     
+}
+
+# pragma mark - JS Debug
+
+- (void)loadDebugView {
+    NSURL *url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"Assets/web/slam" ofType:@"html"] isDirectory:NO];
+    NSURLRequest *request = [NSURLRequest requestWithURL:url];
+    
+    [self.webView loadRequest:request];
+}
+
+- (void) initDebugView {
+    ctx = [self.webView valueForKeyPath:@"documentView.webView.mainFrame.javaScriptContext"];
+    
+    NSAssert([ctx isKindOfClass:[JSContextclass]], @"could not find context in web view");
+    
+    debugHandler.initJS(ctx);
+}
+
+
+- (void)printDebugToConsole
+{
+//        //prints defined vs. valid (active) COS's
+//        printf("/nCOS's: %i of %i", m_metaioSDK->getNumberOfValidCoordinateSystems(), m_metaioSDK->getNumberOfDefinedCoordinateSystems());
+//        metaio::TrackingValues cos0 = m_metaioSDK->getTrackingValues(0);
+//        metaio::TrackingValues cos1 = m_metaioSDK->getTrackingValues(1);
+//        metaio::TrackingValues cos2 = m_metaioSDK->getTrackingValues(2);
+//        if (cos0.isTrackingState()) {printf("COS0: is tracking!");}
+//        else {printf("COS0: is not tracking!");}
+//        if (cos1.isTrackingState()) {printf("COS1: is tracking!");}
+//        else {printf("COS1: is not tracking!");}
+//        if (cos2.isTrackingState()) {printf("COS2: is tracking!");}
+//        else {printf("COS2: is not tracking!");}
+//
+//        //prints COS's IDs from name
+//        int right = m_metaioSDK->getCoordinateSystemID("map-mlab-front-right");
+//        int left = m_metaioSDK->getCoordinateSystemID("map-mlab-front-left");
+//        printf("\nmap-mlab-front-right: %d\n", right); //1
+//        printf("\nmap-mlab-front-left: %d\n", left); //2
 }
 
 
