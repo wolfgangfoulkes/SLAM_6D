@@ -32,6 +32,8 @@ isReady = false;
 setP = false;
 setPInit = false;
 
+scale_xy = 1.0;
+
 update = function()
 {
     setXY();
@@ -58,7 +60,7 @@ setXYItem = function(name, x_, y_, angle_)
 {
     var _css =
     {
-        left: ((50. + x_).toString() + "%"),
+        left: ((50. + x_ ).toString() + "%"),
         bottom: ((50. + y_).toString() + "%"),
         transform: "rotateZ(" + angle_ + "deg)"
     };
@@ -87,10 +89,10 @@ setReadout = function()
 
 setXY = function()
 {
-    setXYItem("#touch", touch.t.x, touch.t.y);
-    setXYItem(".axes.init", init.t.x, init.t.z);
-    setXYItem("#camera", c.t.x, c.t.z);
-    setXYItem("#object", o.t.x, o.t.z);
+    setXYItem("#touch", touch.t.x, touch.t.y, touch.r.z);
+    setXYItem(".axes.init", init.t.x, init.t.z, init.r.y);
+    setXYItem("#camera",    c.t.x, c.t.z, c.r.y);
+    setXYItem("#object",    o.t.x, o.t.z, o.r.y);
 };
 
 printLog = function()
@@ -114,8 +116,8 @@ getXY = function($node, e)
             var normX =  (e.pageX - position.left) / n_width;
             var normY =  (e.pageY - position.top) / n_height;
             
-            db.t.x = normX.toPrecision(6);
-            db.t.y = normY.toPrecision(6);
+            db.t.x = normX.toPrecision(6) - 0.5;
+            db.t.y = normY.toPrecision(6) - 0.5;
         },
         vmouseup : function(e){
             $(this).off(handlers);

@@ -10,6 +10,7 @@ DebugHandler::DebugHandler()
     print = false;
     printLog = false;
     
+    pose = nil;
     t1_out = t0_out = metaio::Vector3d(0, 0, 0);
     t_touch = metaio::Vector2d(0, 0);
     r0_out.setNoRotation();
@@ -42,10 +43,8 @@ void DebugHandler::getJS()
     metaio::Vector3d _t(0, 0, 0);
     metaio::Rotation _r; _r.setNoRotation();
 
-    double t_x = [ctx[@"db"][@"t"][@"x"] toDouble] - 0.5;
-    double t_y = [ctx[@"db"][@"t"][@"y"] toDouble] - 0.5;
-    double r_x = [ctx[@"db"][@"r"][@"x"] toDouble];
-    double r_y = [ctx[@"db"][@"r"][@"y"] toDouble];
+    double t_x = [ctx[@"db"][@"t"][@"x"] toDouble];
+    double t_y = [ctx[@"db"][@"t"][@"y"] toDouble];
     double r_z = [ctx[@"db"][@"r"][@"z"] toDouble];
     
     t_touch.x = t_x;
@@ -54,20 +53,9 @@ void DebugHandler::getJS()
     _t.x = t_x * TOUCH_X_COEFF;
     _t.y = t_y * TOUCH_Y_COEFF;
     
-    _r = metaio::Rotation(dToR(r_x), dToR(r_y), dToR(r_z));
+    _r = metaio::Rotation(dToR(0), dToR(0), dToR(r_z));
 
     updatePose(@"touch", _t, _r);
-}
-
-void DebugHandler::reset()
-{
-    metaio::Vector3d _t(0, 0, 0);
-    metaio::Rotation _r; _r.setNoRotation();
-    metaio::Vector3d _t_db(0.5, 0.5, 0.5);
-    
-    this->pose = Pose();
-    this->t_touch = metaio::Vector2d(0, 0);
-    updatePose(@"db", _t_db, _r);
 }
 
 void DebugHandler::update()
@@ -77,28 +65,32 @@ void DebugHandler::update()
         return;
     }
 
-//    jsIsReady = ctx[@"isReady"].toBool;
     if (!jsIsReady)
     {
         jsIsReady = ctx[@"isReady"].toBool;
         return;
     }
-
-    getJS();
     
-    updatePose(@"init", this->pose.t_offs, this->pose.r_offs);
+    if (!pose || !this->print)
+    {
+        return;
+    }
     
     ctx[@"printToScreen"] = @(this->print);
     
-    if (this->print)
-    {
-        metaio::Vector3d SCALE(X_COEFF, Y_COEFF, Z_COEFF);
-        updatePose(@"c", scale(t0_out, SCALE) , r0_out);
-        updatePose(@"o", scale(t1_out, SCALE), r1_out);
-        ctx[@"COS"][@"idx"] = @(COS);
-        ctx[@"COS"][@"state"] = [NSString stringWithFormat:@"%s", tracking_state.c_str()];
-
-    }
+    getJS();
+    
+    metaio::Vector3d SCALE(X_COEFF, Y_COEFF, Z_COEFF);
+    metaio::Vector3d _offs = metaio::Vector3d(this->pose->t_offs); _offs = round(_offs, SIG_FIGS);  _offs = scale(_offs, SCALE);
+    metaio::Vector3d _cam = metaio::Vector3d(this->pose->t_p);      _cam = round(_cam, SIG_FIGS);    _cam = scale(_cam, SCALE);
+    metaio::Vector3d _obj = metaio::Vector3d(this->pose->t_last);   _obj = round(_obj, SIG_FIGS);    _obj = scale(_obj, SCALE);
+    
+    updatePose(@"init", _offs, this->pose->r_offs);
+    updatePose(@"c", _cam , this->pose->r_p);
+    updatePose(@"o", _obj , this->pose->r_last);
+    
+    ctx[@"COS"][@"idx"] = @(COS); //@(this->pose->COS);
+    ctx[@"COS"][@"state"] = [NSString stringWithFormat:@"%s", tracking_state.c_str()];
     
     if (printLog)
     {

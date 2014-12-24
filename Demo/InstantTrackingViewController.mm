@@ -59,18 +59,12 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 	[super viewDidLoad];
     printf("view did load! version: %s", m_metaioSDK->getVersion().c_str());
     
-    ma_log = [[NSMutableArray alloc] init];
-    debugHandler.log = ma_log;
-    cam.ma_log = ma_log; //be careful, you gotta initialize this with every instance!
-    
     // Set the rendering clipping plane
     m_metaioSDK->setRendererClippingPlaneLimits(10, 30000);
     
-    // Initial scaling for the models
-    m_scale = 1;
-    
     // Load content
-    m_obj_t = metaio::Vector3d(0, 100, 0);
+    m_scale = 1; // Initial scaling for the models
+    m_obj_t = metaio::Vector3d(0, 100, 0); //initial offset
     m_obj_r = metaio::Rotation();
     m_obj           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:m_obj_t modelScaling:m_scale modelCos:0];
 //    m_obj1           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:m_obj1_t modelScaling:m_scale modelCos:1];
@@ -79,20 +73,23 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     activeCOS = -1;
     isTracking = false;
     
+    //shared debug log
+    ma_log = [[NSMutableArray alloc] init];
+    cam.ma_log = ma_log; //be careful, you gotta initialize this with every instance!
+    debugHandler.log = ma_log;
+    debugHandler.pose = &cam;
     debugViewIsInit = false; //initialized when web view loads
     
-    //debug view shows on launch
-    showDebugView = true;
+    showDebugView = true; //debug view shows on launch
     debugHandler.print = showDebugView;
-    
-    //should the loop update metaio?
-    updateMetaio = true;
     
     //Web View
     webView.scrollView.scrollEnabled = NO;
     self.webView.delegate = self;
     [self loadDebugView];
     
+    //should the loop update metaio?
+    updateMetaio = true;
 }
 
 -(void)viewDidAppear:(BOOL)animated
@@ -125,7 +122,6 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     }
     
     [self updateTrackingState];
-    debugHandler.update();
     if (activeCOS && updateMetaio)
     {
         
@@ -148,44 +144,28 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         
 
         cam.updateP(tv);
+        
         m_obj_t.x = (debugHandler.t_touch.x * 1000);
         m_obj_t.z = (debugHandler.t_touch.y * 1000);
+        m_obj->setScale(m_scale);
+        m_obj->setRotation(cam.r_last);
+        
+        metaio::Vector3d t;
+        t.x = cam.t_last.x + m_obj_t.x;
+        t.y = cam.t_last.y + m_obj_t.y;
+        t.z = cam.t_last.z + m_obj_t.z;
+        m_obj->setTranslation(t);
 
-        
-        // If the last frame could be tracked successfully
-        if(mapTransitionHelper.lastFrameWasTracked())
-        {
-            metaio::Rotation newRotation = mapTransitionHelper.getRotationCameraFromWorld();//tv.rotation;
-            metaio::Vector3d newTranslation = mapTransitionHelper.getTranslationCameraFromWorld();//tv.translation;
-            //metaio::Vector3d newTranslation_r = metaio::Rotation(0, 0, dToR(180.)).rotatePoint(newTranslation);
-
-            
-            m_obj->setScale(m_scale);
-            m_obj->setRotation(cam.r_last);
-            metaio::Vector3d t;
-            t.x = cam.t_last.x + m_obj_t.x;
-            t.y = cam.t_last.y + m_obj_t.y;
-            t.z = cam.t_last.z + m_obj_t.z;
-            
-            m_obj->setTranslation(t);
-        }
-        
-        
-        
     }
-
-    metaio::Vector3d t_o = mapTransitionHelper.getTranslationCameraFromWorld();
-    metaio::Rotation r_o = mapTransitionHelper.getRotationCameraFromWorld();
-    metaio::Vector3d t_c = mapTransitionHelper.getRotationCameraFromWorld().inverse().rotatePoint(mult(t_o, -1.0));
-    metaio::Rotation r_c = r_o.inverse();
-
-    if (showDebugView)
-    {
-        debugHandler.t0_out = metaio::Vector3d(round(cam.t_p, 100));
-        debugHandler.r0_out = metaio::Rotation(cam.r_p);
-        debugHandler.t1_out = metaio::Vector3d(round(cam.t_last, 100));
-        debugHandler.r1_out = metaio::Rotation(cam.r_last);
-    }
+    debugHandler.update();
+    
+            // If the last frame could be tracked successfully
+//        if(mapTransitionHelper.lastFrameWasTracked())
+//        {
+//            metaio::Rotation newRotation = mapTransitionHelper.getRotationCameraFromWorld();//tv.rotation;
+//            metaio::Vector3d newTranslation = mapTransitionHelper.getTranslationCameraFromWorld();//tv.translation;
+//            //metaio::Vector3d newTranslation_r = metaio::Rotation(0, 0, dToR(180.)).rotatePoint(newTranslation);
+//        }
 }
 
 #pragma mark - CMMotionManager
@@ -375,7 +355,12 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 }
 
 - (IBAction)onPrintDown:(id)sender {
-    debugHandler.reset();
+    logMA(
+    [NSString stringWithFormat:@"last: %s\npose: %s\ninit%s",
+    tRToS(cam.t_last, cam.r_last).c_str(),
+    tRToS(cam.t_p, cam.r_p).c_str(),
+    tRToS(cam.t_offs, cam.r_offs).c_str()],
+    ma_log);
 }
 
 

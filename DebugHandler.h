@@ -15,6 +15,8 @@
 
 class DebugHandler {
 public:
+    const double SIG_FIGS = 100;
+
     const double TOUCH_X_COEFF = 100;
     const double TOUCH_Y_COEFF = -100;
     
@@ -25,10 +27,11 @@ public:
     NSMutableArray * log;
     JSContext * ctx;
     
-    Pose pose; //should be a pointer, should be one for each out. should have separate shit in JS for directional configuration
+    Pose * pose; //should be a pointer, should be one for each out. should have separate shit in JS for directional configuration
     metaio::Vector2d t_touch;
     metaio::Vector3d t0_out, t1_out;
     metaio::Rotation r0_out, r1_out;
+    
     int COS;
     string tracking_state;
     
@@ -43,7 +46,6 @@ public:
     void initJS(JSContext * ctx);
     void getJS();
     void updatePose(NSString * pose_, metaio::Vector3d t_, metaio::Rotation r_);
-    void reset();
 };
 
 
