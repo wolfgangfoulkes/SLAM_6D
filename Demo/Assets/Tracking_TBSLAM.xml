@@ -11,7 +11,7 @@
                 <SensorCosID>map1</SensorCosID>
                 <Parameters>
                     <Initialization Type="map">
-                        <Map>foulkes_vision/chairInBackLeftCorner.slam</Map>
+                        <Map>foulkes_vision/stoolInBackLeftCorner.slam</Map>
                     </Initialization>
                     <Learning Enabled="true">
                         <!-- both near middle, but this one with more "precise"-->

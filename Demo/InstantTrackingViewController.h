@@ -30,6 +30,7 @@
     bool isTracking;
     metaio::TrackingValues COS_offs; //can replace with pose
     
+    bool debugViewIsInit;
     bool showDebugView;
     bool updateMetaio;
     

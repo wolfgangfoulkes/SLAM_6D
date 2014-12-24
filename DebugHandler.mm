@@ -88,9 +88,10 @@ void DebugHandler::update()
         return;
     }
 
-    jsIsReady = ctx[@"isReady"].toBool;
+//    jsIsReady = ctx[@"isReady"].toBool;
     if (!jsIsReady)
     {
+        jsIsReady = ctx[@"isReady"].toBool;
         return;
     }
 

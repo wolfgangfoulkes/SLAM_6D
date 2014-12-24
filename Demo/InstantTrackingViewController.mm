@@ -78,6 +78,8 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     activeCOS = -1;
     isTracking = false;
     
+    debugViewIsInit = false; //initialized when web view loads
+    
     //debug view shows on launch
     showDebugView = true;
     debugHandler.print = showDebugView;
@@ -106,6 +108,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 -(void)webViewDidFinishLoad:(UIWebView *)webView{
     NSLog(@"Web View did load!");
     [self initDebugView];
+    debugViewIsInit = true;
 }
 
 # pragma mark - LOOP
@@ -115,6 +118,11 @@ int printf(const char * __restrict format, ...) //printf don't print to console
  */
 - (void) update
 {
+    if (!debugViewIsInit)
+    {
+        return;
+    }
+    
     [self updateTrackingState];
     debugHandler.update();
     if (activeCOS && updateMetaio)
@@ -161,14 +169,14 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     }
 
     metaio::Vector3d t_o = mapTransitionHelper.getTranslationCameraFromWorld();
-    metaio::Vector3d t_c = mapTransitionHelper.getRotationCameraFromWorld().inverse().rotatePoint(mult(t_o, -1.0));
     metaio::Rotation r_o = mapTransitionHelper.getRotationCameraFromWorld();
+    metaio::Vector3d t_c = mapTransitionHelper.getRotationCameraFromWorld().inverse().rotatePoint(mult(t_o, -1.0));
     metaio::Rotation r_c = r_o.inverse();
 
     if (showDebugView)
     {
-        debugHandler.t0_out = metaio::Vector3d(debugHandler.cam.t_p);
-        debugHandler.r0_out = metaio::Rotation(debugHandler.cam.r_p);
+        debugHandler.t0_out = metaio::Vector3d(t_o);
+        debugHandler.r0_out = metaio::Rotation(r_o);
         debugHandler.t1_out = metaio::Vector3d(debugHandler.cam.t_last);
         debugHandler.r1_out = metaio::Rotation(debugHandler.cam.r_last);
         
