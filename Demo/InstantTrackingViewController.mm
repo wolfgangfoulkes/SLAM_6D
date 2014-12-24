@@ -150,7 +150,6 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         cam.updateP(tv);
         m_obj_t.x = (debugHandler.t_touch.x * 1000);
         m_obj_t.z = (debugHandler.t_touch.y * 1000);
-        m_obj_t.y = (debugHandler.t_touch.z * 1);
 
         
         // If the last frame could be tracked successfully

@@ -10,7 +10,8 @@ DebugHandler::DebugHandler()
     print = false;
     printLog = false;
     
-    t1_out = t0_out = t_touch = metaio::Vector3d(0, 0, 0);
+    t1_out = t0_out = metaio::Vector3d(0, 0, 0);
+    t_touch = metaio::Vector2d(0, 0);
     r0_out.setNoRotation();
     r1_out.setNoRotation();
     COS = -1;
@@ -52,7 +53,6 @@ void DebugHandler::getJS()
     
     t_touch.x = t_x;
     t_touch.y = t_y;
-    t_touch.z = t_z;
     
     _t.x = t_x * TOUCH_X_COEFF;
     _t.y = t_y * TOUCH_Y_COEFF;
@@ -65,7 +65,7 @@ void DebugHandler::getJS()
     
     if (setPInit)
     {
-        this->pose.initP(_t, _r, 1);
+        this->pose.setOffs(_t, _r, 1);
     }
     
     if (setP)
@@ -81,7 +81,7 @@ void DebugHandler::reset()
     metaio::Vector3d _t_db(0.5, 0.5, 0.5);
     
     this->pose = Pose();
-    this->t_touch.setZero();
+    this->t_touch = metaio::Vector2d(0, 0);
     updatePose(@"db", _t_db, _r);
 }
 
@@ -107,8 +107,9 @@ void DebugHandler::update()
     
     if (this->print)
     {
-        updatePose(@"c", t0_out, r0_out);
-        updatePose(@"o", t1_out, r1_out);
+        metaio::Vector3d SCALE(X_COEFF, Y_COEFF, Z_COEFF);
+        updatePose(@"c", scale(t0_out, SCALE) , r0_out);
+        updatePose(@"o", scale(t1_out, SCALE), r1_out);
         ctx[@"COS"][@"idx"] = @(COS);
         ctx[@"COS"][@"state"] = [NSString stringWithFormat:@"%s", tracking_state.c_str()];
 
@@ -132,6 +133,8 @@ void DebugHandler::updatePose(NSString * pose_, metaio::Vector3d t_, metaio::Rot
     ctx[pose_][@"r"][@"y"] = @(r_e_.y);
     ctx[pose_][@"r"][@"z"] = @(r_e_.z);
 }
+
+
 
 //- (void)addPose: (int)name ToDebugContextT: (metaio::Vector4d)obj_t andR:(metaio::Rotation)obj_r
 //{

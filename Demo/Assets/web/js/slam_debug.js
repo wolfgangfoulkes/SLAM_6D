@@ -112,15 +112,15 @@ setXY = function()
 {
     var ct =
     {
-        bottom: ((50. + c.t.z/10).toString() + "%"),
-        left: ((50. + c.t.x/10).toString() + "%"),
+        bottom: ((50. + c.t.z).toString() + "%"),
+        left: ((50. + c.t.x).toString() + "%"),
         transform: "rotateZ(" + c.r.y + "deg)"
     };
     
     var ot =
     {
-        bottom: ((50. + o.t.z/10).toString() + "%"),
-        left: ((50. + o.t.x/10).toString() + "%"),
+        bottom: ((50. + o.t.z).toString() + "%"),
+        left: ((50. + o.t.x).toString() + "%"),
         transform: "rotateZ(" + o.r.y + "deg)"
         
     };
@@ -128,8 +128,8 @@ setXY = function()
     var axes =
     {
         
-        bottom: ((50. + init.t.y/10).toString() + "%"),
-        left: ((50. + init.t.x/10).toString() + "%"),
+        bottom: ((50. + init.t.y).toString() + "%"),
+        left: ((50. + init.t.x).toString() + "%"),
         transform: "rotateZ(" + init.r.z + "deg)"
     };
     

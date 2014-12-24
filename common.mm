@@ -186,6 +186,15 @@ metaio::Vector3d round(metaio::Vector3d v_, float f_)
     return _v;
 }
 
+metaio::Vector3d scale(metaio::Vector3d v_, metaio::Vector3d scale_)
+{
+    metaio::Vector3d _v;
+    _v.x = v_.x * scale_.x;
+    _v.y = v_.y * scale_.y;
+    _v.z = v_.z * scale_.z;
+    return _v;
+}
+
 void logMA(NSString * s_, NSMutableArray * ma_)
 {
     [ma_ addObject: s_];

@@ -16,7 +16,7 @@ Pose::Pose()
     r_world.setNoRotation();
     
     isTracking = false;
-    hasInitPose = false;
+    hasOffs = false;
     COS = 0;
 }
 
@@ -26,7 +26,7 @@ Pose::Pose(metaio::Vector3d t_, metaio::Rotation r_) : Pose()
     r_world = metaio::Rotation(r_);
 }
 
-void Pose::initP(metaio::Vector3d t_, metaio::Rotation r_, int cos_)
+void Pose::setOffs(metaio::Vector3d t_, metaio::Rotation r_, int cos_)
 {
     metaio::Vector3d t_p_ = r_.inverse().rotatePoint(mult(t_, -1.0f));
     r_offs = r_.inverse() * r_last;
@@ -34,16 +34,16 @@ void Pose::initP(metaio::Vector3d t_, metaio::Rotation r_, int cos_)
     
     COS = cos_;
 
-    hasInitPose = true;
+    hasOffs = true;
     isTracking = true;
 }
 
-void Pose::initP(metaio::TrackingValues tv_)
+void Pose::setOffs(metaio::TrackingValues tv_)
 {
     metaio::Vector3d t_ = tv_.translation;
     metaio::Rotation r_ = tv_.rotation;
     int cos_ = tv_.coordinateSystemID;
-    initP(t_, r_, cos_);
+    setOffs(t_, r_, cos_);
 }
 
 void Pose::updateP(metaio::Vector3d t_, metaio::Rotation r_)
@@ -67,14 +67,14 @@ void Pose::updateP(metaio::TrackingValues tv_)
 {
     if (tv_.coordinateSystemID != COS)
     {
-        hasInitPose = false;
+        hasOffs = false;
     }
     
     if (tv_.quality > 0.) //not lost, could be extrapolated
     {
-        if (!hasInitPose)
+        if (!hasOffs)
         {
-            initP(tv_);
+            setOffs(tv_);
         }
         metaio::Vector3d t_ = tv_.translation;
         metaio::Rotation r_ = tv_.rotation;
@@ -83,7 +83,7 @@ void Pose::updateP(metaio::TrackingValues tv_)
     }
     else
     {
-        hasInitPose = false;
+        hasOffs = false;
         isTracking = false;
     }
     

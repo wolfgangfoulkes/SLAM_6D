@@ -43,6 +43,7 @@ void logTR(metaio::Rotation r_ = metaio::Rotation(0, 0, 0), metaio::Vector3d t_ 
 
 metaio::Vector3d mult(metaio::Vector3d v_, float f_);
 metaio::Vector3d round(metaio::Vector3d v_, float f_);
+metaio::Vector3d scale(metaio::Vector3d v_, metaio::Vector3d scale_);
 
 
 #endif /* defined(__Demo__common__) */

@@ -18,12 +18,16 @@ public:
     const double TOUCH_X_COEFF = 1000;
     const double TOUCH_Y_COEFF = -1000;
     const double TOUCH_Z_COEFF = -1000;
+    
+    const double X_COEFF = 0.01; //to scale output, and put into the right COS.
+    const double Y_COEFF = 0.01;
+    const double Z_COEFF = 0.01;
 
     NSMutableArray * log;
     JSContext * ctx;
     
-    Pose pose;
-    metaio::Vector3d t_touch;
+    Pose pose; //should be a pointer, should be one for each out. should have separate shit in JS for directional configuration
+    metaio::Vector2d t_touch;
     metaio::Vector3d t0_out, t1_out;
     metaio::Rotation r0_out, r1_out;
     int COS;
