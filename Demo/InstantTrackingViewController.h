@@ -22,6 +22,8 @@
     
     metaio::IGeometry*  m_obj;            // pointer to the model
     metaio::IGeometry*  m_obj1;           // pointer to the model
+    metaio::Vector3d m_obj_t;
+    metaio::Rotation m_obj_r;
     
     Pose cam;
     

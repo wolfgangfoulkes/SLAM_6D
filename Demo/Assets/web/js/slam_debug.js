@@ -114,14 +114,14 @@ setXY = function()
     {
         bottom: ((50. + c.t.y/10).toString() + "%"),
         left: ((50. + c.t.x/10).toString() + "%"),
-        transform: "rotateZ(" + c.r.z + "deg)"
+        transform: "rotateZ(" + c.r.y + "deg)"
     };
     
     var ot =
     {
         bottom: ((50. + o.t.y/10).toString() + "%"),
         left: ((50. + o.t.x/10).toString() + "%"),
-        transform: "rotateZ(" + o.r.z + "deg)"
+        transform: "rotateZ(" + o.r.y + "deg)"
         
     };
     

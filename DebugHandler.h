@@ -23,6 +23,7 @@ public:
     JSContext * ctx;
     
     Pose pose;
+    metaio::Vector3d t_touch;
     metaio::Vector3d t0_out, t1_out;
     metaio::Rotation r0_out, r1_out;
     int COS;

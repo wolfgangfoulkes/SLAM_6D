@@ -10,7 +10,7 @@ DebugHandler::DebugHandler()
     print = false;
     printLog = false;
     
-    t1_out = t0_out = metaio::Vector3d(0, 0, 0);
+    t1_out = t0_out = t_touch = metaio::Vector3d(0, 0, 0);
     r0_out.setNoRotation();
     r1_out.setNoRotation();
     COS = -1;
@@ -40,8 +40,8 @@ void DebugHandler::getJS()
     bool setPInit = [ctx[@"setPInit"] toBool];
     printLog = [ctx[@"printLog"] toBool];
     
-    metaio::Vector3d t_(0, 0, 0);
-    metaio::Rotation r_; r_.setNoRotation();
+    metaio::Vector3d _t(0, 0, 0);
+    metaio::Rotation _r; _r.setNoRotation();
 
     double t_x = [ctx[@"db"][@"t"][@"x"] toDouble] - 0.5;
     double t_y = [ctx[@"db"][@"t"][@"y"] toDouble] - 0.5;
@@ -50,24 +50,27 @@ void DebugHandler::getJS()
     double r_y = [ctx[@"db"][@"r"][@"y"] toDouble];
     double r_z = [ctx[@"db"][@"r"][@"z"] toDouble];
     
-    t_x *= TOUCH_X_COEFF;
-    t_y *= TOUCH_Y_COEFF;
-    t_z *= TOUCH_Z_COEFF;
+    t_touch.x = t_x;
+    t_touch.y = t_y;
+    t_touch.z = t_z;
     
-    t_ = metaio::Vector3d(t_x, t_y, t_z);
-    r_ = metaio::Rotation(dToR(r_x), dToR(r_y), dToR(r_z));
+    _t.x = t_x * TOUCH_X_COEFF;
+    _t.y = t_y * TOUCH_Y_COEFF;
+    _t.z = t_z * TOUCH_Z_COEFF;
+    
+    _r = metaio::Rotation(dToR(r_x), dToR(r_y), dToR(r_z));
 
     
-    updatePose(@"touch", t_, r_);
+    updatePose(@"touch", _t, _r);
     
     if (setPInit)
     {
-        this->pose.initP(t_, r_, 1);
+        this->pose.initP(_t, _r, 1);
     }
     
     if (setP)
     {
-        this->pose.updateP(t_, r_);
+        this->pose.updateP(_t, _r);
     }
 }
 
@@ -78,6 +81,7 @@ void DebugHandler::reset()
     metaio::Vector3d _t_db(0.5, 0.5, 0.5);
     
     this->pose = Pose();
+    this->t_touch.setZero();
     updatePose(@"db", _t_db, _r);
 }
 

@@ -70,8 +70,9 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     m_scale = 1;
     
     // Load content
-    metaio::Vector3d obj_t_offset(0, 0, 0);
-    m_obj           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:obj_t_offset modelScaling:m_scale modelCos:1];
+    m_obj_t = metaio::Vector3d(0, 100, 0);
+    m_obj_r = metaio::Rotation();
+    m_obj           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:m_obj_t modelScaling:m_scale modelCos:0];
 //    m_obj1           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:m_obj1_t modelScaling:m_scale modelCos:1];
     
     //init tracking vars
@@ -147,6 +148,9 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         
 
         cam.updateP(tv);
+        m_obj_t.x = (debugHandler.t_touch.x * 1000);
+        m_obj_t.z = (debugHandler.t_touch.y * 1000);
+        m_obj_t.y = (debugHandler.t_touch.z * 10);
 
         
         // If the last frame could be tracked successfully
@@ -154,12 +158,15 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         {
             metaio::Rotation newRotation = mapTransitionHelper.getRotationCameraFromWorld();//tv.rotation;
             metaio::Vector3d newTranslation = mapTransitionHelper.getTranslationCameraFromWorld();//tv.translation;
-            metaio::Vector3d newTranslation_r = metaio::Rotation(0, 0, dToR(180.)).rotatePoint(newTranslation);
+            //metaio::Vector3d newTranslation_r = metaio::Rotation(0, 0, dToR(180.)).rotatePoint(newTranslation);
 
             
             m_obj->setScale(m_scale);
-            m_obj->setRotation(newRotation);
-            metaio::Vector3d t = newTranslation;
+            m_obj->setRotation(cam.r_last);
+            metaio::Vector3d t;
+            t.x = cam.t_last.x + m_obj_t.x;
+            t.y = cam.t_last.z + m_obj_t.y;
+            t.z = cam.t_last.y + m_obj_t.z;
             
             m_obj->setTranslation(t);
         }
@@ -175,10 +182,10 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 
     if (showDebugView)
     {
-        debugHandler.t0_out = metaio::Vector3d(round(cam.t_last, 100));
-        debugHandler.r0_out = metaio::Rotation(cam.r_last);
-        debugHandler.t1_out = metaio::Vector3d(round(cam.t_p, 100));
-        debugHandler.r1_out = metaio::Rotation(cam.r_p);
+        debugHandler.t0_out = metaio::Vector3d(round(cam.t_p, 100));
+        debugHandler.r0_out = metaio::Rotation(cam.r_p);
+        debugHandler.t1_out = metaio::Vector3d(round(cam.t_last, 100));
+        debugHandler.r1_out = metaio::Rotation(cam.r_last);
     }
 }
 
@@ -374,8 +381,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 
 
 - (IBAction)poseButtonDown:(id)sender {
-//    if (! cam.hasInitPose ) return;
-//    metaio::Vector3d _t = obj.t_last;
+    if (! debugViewIsInit ) return;
 //    switch ([sender tag]) {
 //        case 1:
 //            _t.x = (int)(_t.x - 40) % 800;
@@ -399,7 +405,6 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 //           NSLog(@"???");
 //            break;
 //        }
-//    obj.t_last = _t;
     
 }
 
