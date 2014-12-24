@@ -15,15 +15,14 @@
 
 class DebugHandler {
 public:
-    const double ROUND = 10;
-    const double X_COEFF = 1000;
-    const double Y_COEFF = -1000;
-    const double Z_COEFF = 1;
+    const double TOUCH_X_COEFF = 1000;
+    const double TOUCH_Y_COEFF = -1000;
+    const double TOUCH_Z_COEFF = 1;
 
     NSMutableArray * log;
     JSContext * ctx;
     
-    Pose cam;
+    Pose pose;
     metaio::Vector3d t0_out, t1_out;
     metaio::Rotation r0_out, r1_out;
     int COS;
@@ -40,7 +39,6 @@ public:
     void initJS(JSContext * ctx);
     void getJS();
     void updatePose(NSString * pose_, metaio::Vector3d t_, metaio::Rotation r_);
-    void updatePose(NSString * pose_, metaio::Vector3d t_, metaio::Rotation r_, float round_);
     void reset();
 };
 

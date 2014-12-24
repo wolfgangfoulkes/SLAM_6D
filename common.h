@@ -39,8 +39,10 @@ void logMA(std::string s_, NSMutableArray * ma_);
 metaio::Vector3d loPassXYZ(metaio::Vector3d v0_, metaio::Vector3d v1_);
 std::string tRToS(metaio::Vector3d t_ = metaio::Vector3d(0, 0, 0), metaio::Rotation r_ = metaio::Rotation(0, 0, 0));
 void logTR(metaio::Vector3d t_ = metaio::Vector3d(0, 0, 0), metaio::Rotation r_ = metaio::Rotation(0, 0, 0));
+void logTR(metaio::Rotation r_ = metaio::Rotation(0, 0, 0), metaio::Vector3d t_ = metaio::Vector3d(0, 0, 0));
 
 metaio::Vector3d mult(metaio::Vector3d v_, float f_);
+metaio::Vector3d round(metaio::Vector3d v_, float f_);
 
 
 #endif /* defined(__Demo__common__) */

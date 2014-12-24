@@ -70,7 +70,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     m_scale = 1;
     
     // Load content
-    metaio::Vector3d obj_t_offset(50, 0, 50);
+    metaio::Vector3d obj_t_offset(0, 0, 0);
     m_obj           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:obj_t_offset modelScaling:m_scale modelCos:1];
 //    m_obj1           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:m_obj1_t modelScaling:m_scale modelCos:1];
     
@@ -175,11 +175,10 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 
     if (showDebugView)
     {
-        debugHandler.t0_out = metaio::Vector3d(t_o);
-        debugHandler.r0_out = metaio::Rotation(r_o);
-        debugHandler.t1_out = metaio::Vector3d(debugHandler.cam.t_last);
-        debugHandler.r1_out = metaio::Rotation(debugHandler.cam.r_last);
-        
+        debugHandler.t0_out = metaio::Vector3d(round(cam.t_last, 100));
+        debugHandler.r0_out = metaio::Rotation(cam.r_last);
+        debugHandler.t1_out = metaio::Vector3d(round(cam.t_p, 100));
+        debugHandler.r1_out = metaio::Rotation(cam.r_p);
     }
 }
 
@@ -335,8 +334,8 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     
     if (_activeCOS != activeCOS)
     {
-        mapTransitionHelper.prepareForTransitionToNewMap();
         lastCOS = activeCOS;
+        logMA("@switching to new COS", ma_log);
     }
     
     activeCOS = _activeCOS;

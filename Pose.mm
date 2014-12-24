@@ -1,10 +1,3 @@
-//
-//  Object.mm
-//  Demo
-//
-//  Created by Wolfgag on 11/19/14.
-//  Copyright (c) 2014 metaio GmbH. All rights reserved.
-//
 
 #import "common.h"
 #import "Pose.h"
@@ -62,7 +55,7 @@ void Pose::updateP(metaio::Vector3d t_, metaio::Rotation r_)
     t_last = _t;
     //t_last =  loPassXYZ(t_last, _t);
     
-    _r = r_offs * r_;
+    _r = r_ * r_offs;
     r_last = _r; //lo-pass this too, this especially
     
     t_p = _r.inverse().rotatePoint(mult(_t, -1.));

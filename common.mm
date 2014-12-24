@@ -176,6 +176,16 @@ metaio::Vector3d mult(metaio::Vector3d v_, float f_)
     return _v;
 }
 
+metaio::Vector3d round(metaio::Vector3d v_, float f_)
+{
+    metaio::Vector3d _v(0);
+    _v.x = ((int)(v_.x * f_))/f_;
+    _v.y = ((int)(v_.y * f_))/f_;
+    _v.z = ((int)(v_.z * f_))/f_;
+    
+    return _v;
+}
+
 void logMA(NSString * s_, NSMutableArray * ma_)
 {
     [ma_ addObject: s_];
@@ -211,11 +221,16 @@ std::string tRToS(metaio::Vector3d t_, metaio::Rotation r_)
     double _r_z = r_.getEulerAngleDegrees().z;
     
     std::stringstream _ss;
-    _ss << "t: (" << _t_x << ", " << _t_y << ", " << ", " << _t_z << "); r: ("<< _r_x << ", " << _r_y << ", " << ", " << _r_z << ");";
+    _ss << "t: (" << _t_x << ", " << _t_y << ", " << _t_z << "); r: ("<< _r_x << ", " << _r_y << ", " << _r_z << ");";
     return _ss.str();
 }
 
 void logTR(metaio::Vector3d t_, metaio::Rotation r_)
+{
+    NSLog([NSString stringWithUTF8String:tRToS(t_, r_).c_str()]);
+}
+
+void logTR(metaio::Rotation r_, metaio::Vector3d t_)
 {
     NSLog([NSString stringWithUTF8String:tRToS(t_, r_).c_str()]);
 }
