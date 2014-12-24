@@ -15,13 +15,12 @@
 
 class DebugHandler {
 public:
-    const double TOUCH_X_COEFF = 1000;
-    const double TOUCH_Y_COEFF = -1000;
-    const double TOUCH_Z_COEFF = -1000;
+    const double TOUCH_X_COEFF = 100;
+    const double TOUCH_Y_COEFF = -100;
     
-    const double X_COEFF = 0.01; //to scale output, and put into the right COS.
-    const double Y_COEFF = 0.01;
-    const double Z_COEFF = 0.01;
+    const double X_COEFF = 0.05; //to scale output, and put into the right COS.
+    const double Y_COEFF = 0.05;
+    const double Z_COEFF = 0.05;
 
     NSMutableArray * log;
     JSContext * ctx;

@@ -38,64 +38,41 @@ update = function()
     setReadout();
 }
 
+printPose = function(name, pose)
+{
+    var tx = name + " .t .x";
+    var ty = name + " .t .y";
+    var tz = name + " .t .z";
+    var rx = name + " .r .x";
+    var ry = name + " .r .y";
+    var rz = name + " .r .z";
+    $(tx).text(pose.t.x.toPrecision(6));
+    $(ty).text(pose.t.y.toPrecision(6));
+    $(tz).text(pose.t.z.toPrecision(6));
+    $(rx).text(pose.r.x.toPrecision(6));
+    $(ry).text(pose.r.y.toPrecision(6));
+    $(rz).text(pose.r.z.toPrecision(6));
+}
+
+setXYItem = function(name, x_, y_, angle_)
+{
+    var _css =
+    {
+        left: ((50. + x_).toString() + "%"),
+        bottom: ((50. + y_).toString() + "%"),
+        transform: "rotateZ(" + angle_ + "deg)"
+    };
+    
+    $(name).css(_css);
+}
+
 setReadout = function()
 {
     if (!printToScreen) {return;}
-    var $ctx = $(".cam .t .x");
-    var $cty = $(".cam .t .y");
-    var $ctz = $(".cam .t .z");
-    var $crx = $(".cam .r .x");
-    var $cry = $(".cam .r .y");
-    var $crz = $(".cam .r .z");
-    
-    var $otx = $(".obj .t .x");
-    var $oty = $(".obj .t .y");
-    var $otz = $(".obj .t .z");
-    var $orx = $(".obj .r .x");
-    var $ory = $(".obj .r .y");
-    var $orz = $(".obj .r .z");
-    
-    var $itx = $(".init .t .x");
-    var $ity = $(".init .t .y");
-    var $itz = $(".init .t .z");
-    var $irx = $(".init .r .x");
-    var $iry = $(".init .r .y");
-    var $irz = $(".init .r .z");
-    
-    var $tchtx = $(".touch .t .x");
-    var $tchty = $(".touch .t .y");
-    var $tchtz = $(".touch .t .z");
-    var $tchrx = $(".touch .r .x");
-    var $tchry = $(".touch .r .y");
-    var $tchrz = $(".touch .r .z");
-    
-    $ctx.text(c.t.x.toPrecision(6));
-    $cty.text(c.t.y.toPrecision(6));
-    $ctz.text(c.t.z.toPrecision(6));
-    $crx.text(c.r.x.toPrecision(6));
-    $cry.text(c.r.y.toPrecision(6));
-    $crz.text(c.r.z.toPrecision(6));
-    
-    $otx.text(o.t.x.toPrecision(6));
-    $oty.text(o.t.y.toPrecision(6));
-    $otz.text(o.t.z.toPrecision(6));
-    $orx.text(o.r.x.toPrecision(6));
-    $ory.text(o.r.y.toPrecision(6));
-    $orz.text(o.r.z.toPrecision(6));
-    
-    $itx.text(init.t.x.toPrecision(6));
-    $ity.text(init.t.y.toPrecision(6));
-    $itz.text(init.t.z.toPrecision(6));
-    $irx.text(init.r.x.toPrecision(6));
-    $iry.text(init.r.y.toPrecision(6));
-    $irz.text(init.r.z.toPrecision(6));
-    
-    $tchtx.text(touch.t.x.toPrecision(6));
-    $tchty.text(touch.t.y.toPrecision(6));
-    $tchtz.text(touch.t.z.toPrecision(6));
-    $tchrx.text(touch.r.x.toPrecision(6));
-    $tchry.text(touch.r.y.toPrecision(6));
-    $tchrz.text(touch.r.z.toPrecision(6));
+    printPose(".cam", c);
+    printPose(".obj", o);
+    printPose(".init", init)
+    printPose(".touch", touch);
     
     var $cos_idx = $(".cos .idx");
     var $cos_state = $(".cos .state");
@@ -110,41 +87,10 @@ setReadout = function()
 
 setXY = function()
 {
-    var ct =
-    {
-        bottom: ((50. + c.t.z).toString() + "%"),
-        left: ((50. + c.t.x).toString() + "%"),
-        transform: "rotateZ(" + c.r.y + "deg)"
-    };
-    
-    var ot =
-    {
-        bottom: ((50. + o.t.z).toString() + "%"),
-        left: ((50. + o.t.x).toString() + "%"),
-        transform: "rotateZ(" + o.r.y + "deg)"
-        
-    };
-    
-    var axes =
-    {
-        
-        bottom: ((50. + init.t.y).toString() + "%"),
-        left: ((50. + init.t.x).toString() + "%"),
-        transform: "rotateZ(" + init.r.z + "deg)"
-    };
-    
-    var tch =
-    {
-        
-        bottom: ((50. + touch.t.y/10).toString() + "%"),
-        left: ((50. + touch.t.x/10).toString() + "%"),
-        transform: "rotateZ(" + touch.r.z + "deg)"
-    };
-
-    $(".axes.init").css(axes);
-    $("#touch").css(tch);
-    $("#camera").css(ct);
-    $("#object").css(ot);
+    setXYItem("#touch", touch.t.x, touch.t.y);
+    setXYItem(".axes.init", init.t.x, init.t.z);
+    setXYItem("#camera", c.t.x, c.t.z);
+    setXYItem("#object", o.t.x, o.t.z);
 };
 
 printLog = function()
