@@ -150,7 +150,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         cam.updateP(tv);
         m_obj_t.x = (debugHandler.t_touch.x * 1000);
         m_obj_t.z = (debugHandler.t_touch.y * 1000);
-        m_obj_t.y = (debugHandler.t_touch.z * 10);
+        m_obj_t.y = (debugHandler.t_touch.z * 1);
 
         
         // If the last frame could be tracked successfully
@@ -165,8 +165,8 @@ int printf(const char * __restrict format, ...) //printf don't print to console
             m_obj->setRotation(cam.r_last);
             metaio::Vector3d t;
             t.x = cam.t_last.x + m_obj_t.x;
-            t.y = cam.t_last.z + m_obj_t.y;
-            t.z = cam.t_last.y + m_obj_t.z;
+            t.y = cam.t_last.y + m_obj_t.y;
+            t.z = cam.t_last.z + m_obj_t.z;
             
             m_obj->setTranslation(t);
         }

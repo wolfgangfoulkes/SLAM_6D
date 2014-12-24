@@ -17,7 +17,7 @@ class DebugHandler {
 public:
     const double TOUCH_X_COEFF = 1000;
     const double TOUCH_Y_COEFF = -1000;
-    const double TOUCH_Z_COEFF = 1;
+    const double TOUCH_Z_COEFF = -1000;
 
     NSMutableArray * log;
     JSContext * ctx;

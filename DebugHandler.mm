@@ -43,7 +43,7 @@ void DebugHandler::getJS()
     metaio::Vector3d _t(0, 0, 0);
     metaio::Rotation _r; _r.setNoRotation();
 
-    double t_x = [ctx[@"db"][@"t"][@"x"] toDouble] - 0.5;
+    double t_x = [ctx[@"db"][@"t"][@"x"] toDouble] - 0.5; //oughta be a 2d vector
     double t_y = [ctx[@"db"][@"t"][@"y"] toDouble] - 0.5;
     double t_z = [ctx[@"db"][@"t"][@"z"] toDouble] - 0.5;
     double r_x = [ctx[@"db"][@"r"][@"x"] toDouble];
