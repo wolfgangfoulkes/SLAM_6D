@@ -124,9 +124,9 @@
                     </connections>
                 </button>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" reversesTitleShadowWhenHighlighted="YES" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" id="cIB-42-NRp">
-                    <rect key="frame" x="27" y="60" width="46" height="30"/>
+                    <rect key="frame" x="26" y="60" width="48" height="30"/>
                     <autoresizingMask key="autoresizingMask"/>
-                    <state key="normal" title="PRINT">
+                    <state key="normal" title="RESET">
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
                     <connections>

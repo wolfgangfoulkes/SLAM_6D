@@ -25,6 +25,7 @@
     
     Pose cam;
     
+    int lastCOS;
     int activeCOS;
     bool isTracking;
     metaio::TrackingValues COS_offs; //can replace with pose

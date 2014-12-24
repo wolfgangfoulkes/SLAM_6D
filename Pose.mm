@@ -12,15 +12,15 @@
 
 Pose::Pose()
 {
-    t_p = metaio::Vector3d(0, 0, 0);
-    t_last = metaio::Vector3d(0, 0, 0);
-    t_offs = metaio::Vector3d(0, 0, 0);
-    t_world = metaio::Vector3d(0, 0, 0);
+    t_p.setZero();
+    t_last.setZero();
+    t_offs.setZero();
+    t_world.setZero();
     
-    r_p = metaio::Rotation(0, 0, 0);
-    r_last = metaio::Rotation(0, 0, 0);
-    r_offs = metaio::Rotation(0, 0, 0);
-    r_world = metaio::Rotation(0, 0, 0);
+    r_p.setNoRotation();
+    r_last.setNoRotation();
+    r_offs.setNoRotation();
+    r_world.setNoRotation();
     
     isTracking = false;
     hasInitPose = false;
@@ -56,7 +56,8 @@ void Pose::initP(metaio::TrackingValues tv_)
 void Pose::updateP(metaio::Vector3d t_, metaio::Rotation r_)
 {
     metaio::Vector3d _t(0, 0, 0);
-    metaio::Rotation _r(0, 0, 0);
+    metaio::Rotation _r; _r.setNoRotation();
+    
     _t = t_ + r_.rotatePoint(t_offs);
     t_last = _t;
     //t_last =  loPassXYZ(t_last, _t);

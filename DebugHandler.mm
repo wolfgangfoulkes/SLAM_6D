@@ -9,8 +9,10 @@ DebugHandler::DebugHandler()
     jsIsReady = false;
     print = false;
     printLog = false;
+    
     t1_out = t0_out = metaio::Vector3d(0, 0, 0);
-    r1_out = r0_out = metaio::Rotation(t0_out);
+    r0_out.setNoRotation();
+    r1_out.setNoRotation();
     COS = -1;
     tracking_state = "unknown";
 }
@@ -38,31 +40,45 @@ void DebugHandler::getJS()
     bool setPInit = [ctx[@"setPInit"] toBool];
     printLog = [ctx[@"printLog"] toBool];
     
+    metaio::Vector3d t_(0, 0, 0);
+    metaio::Rotation r_; r_.setNoRotation();
+
     double t_x = [ctx[@"db"][@"t"][@"x"] toDouble] - 0.5;
     double t_y = [ctx[@"db"][@"t"][@"y"] toDouble] - 0.5;
     double t_z = [ctx[@"db"][@"t"][@"z"] toDouble] - 0.5;
     double r_x = [ctx[@"db"][@"r"][@"x"] toDouble];
     double r_y = [ctx[@"db"][@"r"][@"y"] toDouble];
     double r_z = [ctx[@"db"][@"r"][@"z"] toDouble];
+    
     t_x *= X_COEFF;
     t_y *= Y_COEFF;
     t_z *= Z_COEFF;
     
-    metaio::Vector3d t_ = metaio::Vector3d(t_x, t_y, t_z);
-    metaio::Rotation r_ = metaio::Rotation(dToR(r_x), dToR(r_y), dToR(r_z));
+    t_ = metaio::Vector3d(t_x, t_y, t_z);
+    r_ = metaio::Rotation(dToR(r_x), dToR(r_y), dToR(r_z));
+
     
     updatePose(@"touch", t_, r_);
     
     if (setPInit)
     {
         this->cam.initP(t_, r_, 1);
-        updatePose(@"init", cam.t_offs, cam.r_offs);
     }
     
     if (setP)
     {
         this->cam.updateP(t_, r_);
     }
+}
+
+void DebugHandler::reset()
+{
+    metaio::Vector3d _t(0, 0, 0);
+    metaio::Rotation _r; _r.setNoRotation();
+    metaio::Vector3d _t_db(0.5, 0.5, 0.5);
+    
+    this->cam = Pose();
+    updatePose(@"db", _t_db, _r);
 }
 
 void DebugHandler::update()
@@ -80,6 +96,8 @@ void DebugHandler::update()
 
     getJS();
     
+    updatePose(@"init", cam.t_offs, cam.r_offs);
+    
     ctx[@"printToScreen"] = @(this->print);
     
     if (this->print)
@@ -88,6 +106,7 @@ void DebugHandler::update()
         updatePose(@"o", t1_out, r1_out);
         ctx[@"COS"][@"idx"] = @(COS);
         ctx[@"COS"][@"state"] = [NSString stringWithFormat:@"%s", tracking_state.c_str()];
+
     }
     
     if (printLog)
@@ -96,18 +115,30 @@ void DebugHandler::update()
     }
 }
 
-
 void DebugHandler::updatePose(NSString * pose_, metaio::Vector3d t_, metaio::Rotation r_)
 {
     metaio::Vector3d r_e_ = r_.getEulerAngleDegrees();
 
-    ctx[pose_][@"t"][@"x"] = @(((int) t_.x/ROUND) * ROUND);
-    ctx[pose_][@"t"][@"y"] = @(((int) t_.y/ROUND) * ROUND);
-    ctx[pose_][@"t"][@"z"] = @(((int) t_.z/ROUND) * ROUND);
+    ctx[pose_][@"t"][@"x"] = @(t_.x);
+    ctx[pose_][@"t"][@"y"] = @(t_.y);
+    ctx[pose_][@"t"][@"z"] = @(t_.z);
     
-    ctx[pose_][@"r"][@"x"] = @(((int) r_e_.x/ROUND) * ROUND);
-    ctx[pose_][@"r"][@"y"] = @(((int) r_e_.y/ROUND) * ROUND);
-    ctx[pose_][@"r"][@"z"] = @(((int) r_e_.z/ROUND) * ROUND);
+    ctx[pose_][@"r"][@"x"] = @(r_e_.x);
+    ctx[pose_][@"r"][@"y"] = @(r_e_.y);
+    ctx[pose_][@"r"][@"z"] = @(r_e_.z);
+}
+
+void DebugHandler::updatePose(NSString * pose_, metaio::Vector3d t_, metaio::Rotation r_, float round_)
+{
+    metaio::Vector3d r_e_ = r_.getEulerAngleDegrees();
+
+    ctx[pose_][@"t"][@"x"] = @(((int) t_.x/round_) * round_);
+    ctx[pose_][@"t"][@"y"] = @(((int) t_.y/round_) * round_);
+    ctx[pose_][@"t"][@"z"] = @(((int) t_.z/round_) * round_);
+    
+    ctx[pose_][@"r"][@"x"] = @(((int) r_e_.x/round_) * round_);
+    ctx[pose_][@"r"][@"y"] = @(((int) r_e_.y/round_) * round_);
+    ctx[pose_][@"r"][@"z"] = @(((int) r_e_.z/round_) * round_);
 }
 
 //- (void)addPose: (int)name ToDebugContextT: (metaio::Vector4d)obj_t andR:(metaio::Rotation)obj_r

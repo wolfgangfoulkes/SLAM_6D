@@ -214,3 +214,8 @@ std::string tRToS(metaio::Vector3d t_, metaio::Rotation r_)
     _ss << "t: (" << _t_x << ", " << _t_y << ", " << ", " << _t_z << "); r: ("<< _r_x << ", " << _r_y << ", " << ", " << _r_z << ");";
     return _ss.str();
 }
+
+void logTR(metaio::Vector3d t_, metaio::Rotation r_)
+{
+    NSLog([NSString stringWithUTF8String:tRToS(t_, r_).c_str()]);
+}

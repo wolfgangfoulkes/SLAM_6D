@@ -5,11 +5,16 @@ Pose = function()
     this.t = {x: 0, y:0, z:0};
     this.r = {x: 0, y:0, z:0};
 };
-c = new Pose;
-o = new Pose;
-db = new Pose;
-touch = new Pose;
-init = new Pose;
+
+//set internally
+db = new Pose();
+db.t = {x: 0.5, y: 0.5, z: 0.5};
+
+//set externally
+c = new Pose();
+o = new Pose();
+touch = new Pose();
+init = new Pose();
 
 poses = {};
 
@@ -136,7 +141,6 @@ setXY = function()
         transform: "rotateZ(" + touch.r.z + "deg)"
     };
 
-    if (setPInit) { $(".axes.touch").css(tch); }
     $(".axes.init").css(axes);
     $("#touch").css(tch);
     $("#camera").css(ct);
@@ -168,7 +172,7 @@ getXY = function($node, e)
             db.t.y = normY.toPrecision(6);
         },
         vmouseup : function(e){
-            $(this).off(handlers);   
+            $(this).off(handlers);
         }
     };
     $(document).on(handlers);

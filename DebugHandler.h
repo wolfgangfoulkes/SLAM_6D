@@ -40,6 +40,8 @@ public:
     void initJS(JSContext * ctx);
     void getJS();
     void updatePose(NSString * pose_, metaio::Vector3d t_, metaio::Rotation r_);
+    void updatePose(NSString * pose_, metaio::Vector3d t_, metaio::Rotation r_, float round_);
+    void reset();
 };
 
 

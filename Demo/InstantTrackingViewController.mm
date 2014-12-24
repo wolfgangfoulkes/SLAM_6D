@@ -303,14 +303,15 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 
 - (void) updateTrackingState
 {
+    int _activeCOS = -1;
     int COSs = m_metaioSDK->getNumberOfValidCoordinateSystems();
     string state = "not tracking";
     if (COSs)
     {
         metaio::TrackingValues cos1 = m_metaioSDK->getTrackingValues(1);
         metaio::TrackingValues cos2 = m_metaioSDK->getTrackingValues(2);
-        if (cos1.isTrackingState()) {activeCOS = 1;}
-        else if (cos2.isTrackingState()) {activeCOS = 2;}
+        if (cos1.isTrackingState()) {_activeCOS = 1;}
+        else if (cos2.isTrackingState()) {_activeCOS = 2;}
         else {
             logMA(@"unknownCOS", ma_log);
         }
@@ -321,9 +322,16 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     }
     else {
         mapTransitionHelper.prepareForTransitionToNewMap();
-        activeCOS = -1;
         isTracking = false;
     }
+    
+    if (_activeCOS != activeCOS)
+    {
+        mapTransitionHelper.prepareForTransitionToNewMap();
+        lastCOS = activeCOS;
+    }
+    
+    activeCOS = _activeCOS;
     
     debugHandler.COS = activeCOS;
     debugHandler.tracking_state = state;
@@ -354,6 +362,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 }
 
 - (IBAction)onPrintDown:(id)sender {
+    debugHandler.reset();
 }
 
 
