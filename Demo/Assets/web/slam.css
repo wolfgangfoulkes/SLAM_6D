@@ -16,6 +16,7 @@ html, body {
 
 body.phone {
     font-size: .5em;
+    font-weight: 500;
 }
 
 .hidden {
@@ -36,6 +37,7 @@ body.phone {
 }
 
 body.phone .button {
+    width: 10vw;
     height: 10vh:
 }
 
@@ -63,7 +65,6 @@ body.phone .button {
 }
 
 .controls {
-    display: inline-block;
     width: 100%;
     display: -webkit-flex;
     -webkit-justify-content: flex-end;

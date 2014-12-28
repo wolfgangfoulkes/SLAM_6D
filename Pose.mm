@@ -15,15 +15,22 @@ Pose::Pose()
     r_offs.setNoRotation();
     r_world.setNoRotation();
     
-    isTracking = false;
     hasOffs = false;
-    COS = 0;
+    COS = -1;
 }
 
 Pose::Pose(metaio::Vector3d t_, metaio::Rotation r_) : Pose()
 {
     t_world = metaio::Vector3d(t_);
     r_world = metaio::Rotation(r_);
+}
+
+void Pose::setInitOffs(metaio::Vector3d t_, metaio::Rotation r_, int cos_)
+{
+}
+
+void Pose::setInitOffs(metaio::TrackingValues tv_)
+{
 }
 
 void Pose::setOffs(metaio::Vector3d t_, metaio::Rotation r_, int cos_)
@@ -35,7 +42,6 @@ void Pose::setOffs(metaio::Vector3d t_, metaio::Rotation r_, int cos_)
     COS = cos_;
 
     hasOffs = true;
-    isTracking = true;
 }
 
 void Pose::setOffs(metaio::TrackingValues tv_)
@@ -74,7 +80,15 @@ void Pose::updateP(metaio::TrackingValues tv_)
     {
         if (!hasOffs)
         {
-            setOffs(tv_);
+            if (COS == -1)
+            {
+                COS = tv_.coordinateSystemID;
+                logMA(@"init offs", this->ma_log);
+            }
+            else
+            {
+                setOffs(tv_);
+            }
         }
         metaio::Vector3d t_ = tv_.translation;
         metaio::Rotation r_ = tv_.rotation;
@@ -84,7 +98,6 @@ void Pose::updateP(metaio::TrackingValues tv_)
     else
     {
         hasOffs = false;
-        isTracking = false;
     }
     
 }

@@ -15,6 +15,7 @@
 
 class DebugHandler {
 public:
+    int called;
     const double SIG_FIGS = 100;
 
     const double TOUCH_X_COEFF = 100;
@@ -29,8 +30,11 @@ public:
     
     Pose * pose; //should be a pointer, should be one for each out. should have separate shit in JS for directional configuration
     metaio::Vector2d t_touch;
-    metaio::Vector3d t0_out, t1_out;
-    metaio::Rotation r0_out, r1_out;
+    metaio::Vector3d acc;
+    metaio::Rotation gyr;
+    
+    metaio::Vector3d cf_acc;
+    metaio::Rotation cf_gyr;
     
     int COS;
     string tracking_state;

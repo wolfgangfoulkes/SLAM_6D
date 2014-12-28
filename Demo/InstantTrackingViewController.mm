@@ -2,6 +2,8 @@
 //
 // Copyright 2007-2014 metaio GmbH. All rights reserved.
 //
+
+#import <math.h>
 #import <opencv2/opencv.hpp>
 #import <opencv2/core.hpp>
 #import <opencv2/calib3d.hpp>
@@ -18,7 +20,6 @@
 #import "common.h"
 #import "Pose.h"
 
-
 int printf(const char * __restrict format, ...) //printf don't print to console
 //from http://stackoverflow.com/questions/8924831/iphone-debugging-real-device
 { 
@@ -28,6 +29,12 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     va_end(args);
     return 1;
 }
+
+#define GtoMperSxS(g) (g * 9.81)
+#define MperSxStoG(m) (m * 0.10193679918451)
+
+#define MM_INTERVAL (1.0f/30.0f)
+#define TAU 1.0f //larger: less noise, more drift
 
 @interface InstantTrackingViewController ()
 {
@@ -70,7 +77,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 //    m_obj1           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:m_obj1_t modelScaling:m_scale modelCos:1];
     
     //init tracking vars
-    activeCOS = -1;
+    lastCOS = activeCOS = -1;
     isTracking = false;
     
     //shared debug log
@@ -88,8 +95,20 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     self.webView.delegate = self;
     [self loadDebugView];
     
+    //CMMotionManager
+    if(self.motionManager.isDeviceMotionAvailable)
+    {
+        [self.motionManager startDeviceMotionUpdates];
+        self.motionManager.deviceMotionUpdateInterval = MM_INTERVAL;
+    }
+    
+    comp_filter = CompSixAxis(MM_INTERVAL, TAU);
+    
     //should the loop update metaio?
     updateMetaio = true;
+    
+    //init time
+    elapsed = [[NSDate alloc] init];
 }
 
 -(void)viewDidAppear:(BOOL)animated
@@ -121,28 +140,51 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         return;
     }
     
+    //update device motion
+    NSTimeInterval sinceLastFrame = -[self->elapsed timeIntervalSinceNow]; //in seconds
+    self->elapsed = [NSDate date];
+    NSLog([NSString stringWithFormat:@"interval: %f", sinceLastFrame]);
+    metaio::Vector3d t_s;
+    metaio::Rotation r_s;
+    CMDeviceMotion * motion_ = self.motionManager.deviceMotion;
+    t_s.x = motion_.userAcceleration.x;
+    t_s.y = motion_.userAcceleration.y;
+    t_s.z = motion_.userAcceleration.z;
+    metaio::Vector3d eu_s;
+    eu_s.x = motion_.attitude.pitch;
+    eu_s.y = motion_.attitude.yaw;
+    eu_s.z = motion_.attitude.roll;
+    r_s.setFromEulerAngleRadians(eu_s);
+    debugHandler.acc = t_s;
+    debugHandler.gyr = r_s;
+    
+    metaio::Vector3d r_vel;
+    r_vel.x = motion_.rotationRate.x;
+    r_vel.y = motion_.rotationRate.y;
+    r_vel.z = motion_.rotationRate.z;
+    metaio::Vector3d t_cf = [self compFilterAcc:t_s andRVel:r_vel];
+    t_cf.x = rToD(t_cf.x) - 180;
+    t_cf.y = rToD(t_cf.y) - 180;
+    debugHandler.cf_acc = t_cf;
+    
+    
     [self updateTrackingState];
     if (activeCOS && updateMetaio)
     {
-        
-        
         metaio::TrackingValues tv = m_metaioSDK->getTrackingValues(activeCOS);
-        
+        //matrix maps object onto tracked object.
+        //cv::Mat tv_mat = cv::Mat::Mat(4, 4, CV_32F, tvm);
+        //metaio::stlcompat::String points = m_metaioSDK->sensorCommand((metaio::stlcompat::String)"getNewMapFeatures");
         
         //float tvm[16];
         //m_metaioSDK->getTrackingValues(activeCOS, tvm, true); //false if you want only modelMatrix. additional true to get a right-handed system
         //http://www.evl.uic.edu/ralph/508S98/coordinates.html
         //right-handed right:x+, up:y+, screen:z-, rotation is counterclockwise around axis
         //left-handed right:x+, up:y+, screen:z+, rotation is clockwise around axis
-        
-        //matrix maps object onto tracked object.
-        //cv::Mat tv_mat = cv::Mat::Mat(4, 4, CV_32F, tvm);
-        //metaio::stlcompat::String points = m_metaioSDK->sensorCommand((metaio::stlcompat::String)"getNewMapFeatures");
 
         // Update the internal state with the lastest tracking values from the SDK.
         mapTransitionHelper.update(m_metaioSDK->getTrackingValues(activeCOS), m_metaioSDK->getRegisteredSensorsComponent()->getLastSensorValues());
         
-
         cam.updateP(tv);
         
         m_obj_t.x = (debugHandler.t_touch.x * 1000);
@@ -155,11 +197,10 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         t.y = cam.t_last.y + m_obj_t.y;
         t.z = cam.t_last.z + m_obj_t.z;
         m_obj->setTranslation(t);
-
     }
     debugHandler.update();
     
-            // If the last frame could be tracked successfully
+//        // If the last frame could be tracked successfully
 //        if(mapTransitionHelper.lastFrameWasTracked())
 //        {
 //            metaio::Rotation newRotation = mapTransitionHelper.getRotationCameraFromWorld();//tv.rotation;
@@ -181,6 +222,20 @@ int printf(const char * __restrict format, ...) //printf don't print to console
    return motionManager;
 }
 
+- (metaio::Vector3d) compFilterAcc: (metaio::Vector3d)acc_ andRVel: (metaio::Vector3d)r_vel_
+{
+    metaio::Vector3d _cf;
+    float cf_x = 0.0f;
+    float cf_y = 0.0f;
+    self->comp_filter.CompAccelUpdate(GtoMperSxS(acc_.x), GtoMperSxS(acc_.y), GtoMperSxS(acc_.z));
+    self->comp_filter.CompGyroUpdate(r_vel_.x, r_vel_.y, r_vel_.z);
+    //self->comp_filter.CompStart();
+    self->comp_filter.CompUpdate();
+    self->comp_filter.CompAnglesGet(&cf_x, &cf_y);
+    _cf.x = cf_x;
+    _cf.y = cf_y;
+    return _cf;
+}
 
 
 #pragma mark - metaio SDK
@@ -194,7 +249,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     }
     
     string _state = poses[0].trackingStateToString(poses[0].state);
-    logMA([NSString stringWithUTF8String: _state.c_str()], ma_log);
+    logMA([NSString stringWithFormat:@"tracking event: %s", _state.c_str()], ma_log);
     [self updateTrackingState];
     
     if (poses[0].state == metaio::ETS_LOST)
@@ -296,21 +351,21 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 
 - (void) updateTrackingState
 {
-    int _activeCOS = -1;
+    int activeCOS_ = -1;
     int COSs = m_metaioSDK->getNumberOfValidCoordinateSystems();
+    int allCOSs = m_metaioSDK->getNumberOfDefinedCoordinateSystems();
     string state = "not tracking";
     if (COSs)
     {
         metaio::TrackingValues cos1 = m_metaioSDK->getTrackingValues(1);
         metaio::TrackingValues cos2 = m_metaioSDK->getTrackingValues(2);
-        if (cos1.isTrackingState()) {_activeCOS = 1;}
-        else if (cos2.isTrackingState()) {_activeCOS = 2;}
+        if (cos1.isTrackingState()) {activeCOS_ = 1;}
+        else if (cos2.isTrackingState()) {activeCOS_ = 2;}
         else {
             logMA(@"unknownCOS", ma_log);
         }
         metaio::TrackingValues tv = m_metaioSDK->getTrackingValues(activeCOS);
         state = tv.trackingStateToString(tv.state);
-        
         isTracking = true;
     }
     else {
@@ -318,13 +373,15 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         isTracking = false;
     }
     
-    if (_activeCOS != activeCOS)
+    if (activeCOS_ != activeCOS)
     {
-        lastCOS = activeCOS;
-        logMA("@switching to new COS", ma_log);
+        NSString * _fmt = @"changing COS: %d=>%d";
+        NSString * _s = [NSString stringWithFormat:_fmt, activeCOS, activeCOS_];
+        logMA(_s, ma_log);
     }
     
-    activeCOS = _activeCOS;
+    lastCOS = activeCOS;
+    activeCOS = activeCOS_;
     
     debugHandler.COS = activeCOS;
     debugHandler.tracking_state = state;
@@ -341,7 +398,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 - (BOOL) shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation
 {
 	// allow rotation in all directions
-	return YES;
+	return NO;
 }
 
 

@@ -9,6 +9,7 @@
 #import "MetaioSDKViewController.h"
 
 #import "DebugHandler.h"
+#import "CompSixAxis.h"
 
 @interface InstantTrackingViewController : MetaioSDKViewController <UIWebViewDelegate>
 {
@@ -19,6 +20,9 @@
 
     int                 m_frames;
     NSInteger           m_scale;             // model scale
+    NSDate              *elapsed;
+    
+    CompSixAxis comp_filter;
     
     metaio::IGeometry*  m_obj;            // pointer to the model
     metaio::IGeometry*  m_obj1;           // pointer to the model
@@ -27,11 +31,12 @@
     
     Pose cam;
     
-    int lastCOS;
-    int activeCOS;
-    bool isTracking;
     metaio::TrackingValues COS_offs; //can replace with pose
     
+    int lastCOS;
+    int activeCOS;
+    
+    bool isTracking;
     bool debugViewIsInit;
     bool showDebugView;
     bool updateMetaio;
@@ -68,11 +73,16 @@
 - (IBAction)poseButtonDown:(id)sender;
 /*****/
 
+- (CMMotionManager *)motionManager;
+
 - (void) updateTrackingState;
-- (void) updateObjectsWithCameraT: (metaio::Vector3d)t AndR:(metaio::Rotation)r; 
+- (void) updateObjectsWithCameraT: (metaio::Vector3d)t AndR:(metaio::Rotation)r;
 
 - (void) loadDebugView;
 - (void) initDebugView;
+
+- (metaio::Vector3d) compFilterAcc: (metaio::Vector3d)acc_ andRVel: (metaio::Vector3d)r_vel_;
+
 
 //- (void)addPose: (int)name ToDebugContextT: (metaio::Vector4d)obj_t andR:(metaio::Rotation)obj_r;
 

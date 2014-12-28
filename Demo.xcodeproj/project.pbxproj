@@ -32,6 +32,7 @@
 		98BD77291A1139B400CC9EAD /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98BD77281A1139B400CC9EAD /* WebKit.framework */; };
 		98BD772B1A113A3600CC9EAD /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98BD772A1A113A3600CC9EAD /* JavaScriptCore.framework */; };
 		98D533D51A07B3CA00E7089D /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = B9BC117115D8FD9B00713ED3 /* libxml2.dylib */; };
+		98DCAC381A4FEA7D00915477 /* CompSixAxis.mm in Sources */ = {isa = PBXBuildFile; fileRef = 98DCAC361A4FEA7D00915477 /* CompSixAxis.mm */; };
 		9E384CF2190ABA230037E16E /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E384CF1190ABA230037E16E /* CoreImage.framework */; };
 		9E55C9F416F740430068ACC8 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E55C9F316F740430068ACC8 /* CFNetwork.framework */; };
 		9E62CF7F1732B30300E238F5 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E62CF7E1732B30300E238F5 /* Security.framework */; };
@@ -97,6 +98,8 @@
 		98BD77241A112C2F00CC9EAD /* slam.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; name = slam.css; path = Demo/Assets/web/slam.css; sourceTree = "<group>"; };
 		98BD77281A1139B400CC9EAD /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		98BD772A1A113A3600CC9EAD /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		98DCAC361A4FEA7D00915477 /* CompSixAxis.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CompSixAxis.mm; sourceTree = "<group>"; };
+		98DCAC371A4FEA7D00915477 /* CompSixAxis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CompSixAxis.h; sourceTree = "<group>"; };
 		9E384CF1190ABA230037E16E /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
 		9E55C9F316F740430068ACC8 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		9E62CF7E1732B30300E238F5 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
@@ -187,6 +190,8 @@
 				986B18751A2BEF8700CD7C5A /* js.h */,
 				989977A51A1DFB31000AB036 /* common.mm */,
 				989977A11A1DC7C3000AB036 /* common.h */,
+				98DCAC361A4FEA7D00915477 /* CompSixAxis.mm */,
+				98DCAC371A4FEA7D00915477 /* CompSixAxis.h */,
 				9899779B1A1D9B11000AB036 /* Pose.h */,
 				9899779C1A1D9B11000AB036 /* Pose.mm */,
 				98A012401A1450BC005993B4 /* js */,
@@ -383,6 +388,7 @@
 				989977A81A1DFE26000AB036 /* main.mm in Sources */,
 				986B18791A30FE2900CD7C5A /* Kalman.mm in Sources */,
 				986B18761A2BEF8700CD7C5A /* js.mm in Sources */,
+				98DCAC381A4FEA7D00915477 /* CompSixAxis.mm in Sources */,
 				B9BC116015D8FA7C00713ED3 /* AppDelegate.mm in Sources */,
 				B9BC118B15D900D900713ED3 /* EAGLView.mm in Sources */,
 				B9BC118C15D900D900713ED3 /* MetaioSDKViewController.mm in Sources */,

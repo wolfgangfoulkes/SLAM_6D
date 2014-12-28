@@ -15,6 +15,8 @@ c = new Pose();
 o = new Pose();
 touch = new Pose();
 init = new Pose();
+sensors = new Pose();
+filter = new Pose();
 
 poses = {};
 
@@ -29,6 +31,7 @@ print_log = false;
 
 isReady = false;
 
+panel = 0;
 setP = false;
 setPInit = false;
 
@@ -48,12 +51,12 @@ printPose = function(name, pose)
     var rx = name + " .r .x";
     var ry = name + " .r .y";
     var rz = name + " .r .z";
-    $(tx).text(pose.t.x.toPrecision(6));
-    $(ty).text(pose.t.y.toPrecision(6));
-    $(tz).text(pose.t.z.toPrecision(6));
-    $(rx).text(pose.r.x.toPrecision(6));
-    $(ry).text(pose.r.y.toPrecision(6));
-    $(rz).text(pose.r.z.toPrecision(6));
+    $(tx).text(pose.t.x.toPrecision(5));
+    $(ty).text(pose.t.y.toPrecision(5));
+    $(tz).text(pose.t.z.toPrecision(5));
+    $(rx).text(pose.r.x.toPrecision(5));
+    $(ry).text(pose.r.y.toPrecision(5));
+    $(rz).text(pose.r.z.toPrecision(5));
 }
 
 setXYItem = function(name, x_, y_, angle_)
@@ -75,6 +78,8 @@ setReadout = function()
     printPose(".obj", o);
     printPose(".init", init)
     printPose(".touch", touch);
+    printPose(".sensors", sensors);
+    printPose(".filter", filter);
     
     var $cos_idx = $(".cos .idx");
     var $cos_state = $(".cos .state");
@@ -135,6 +140,21 @@ whichDevice = function()
         return _which;
 }
 
+switchPanels = function()
+{
+    var p_i = panel * 4;
+    var $poses = $(".pose");
+    var $poses_show = $poses.slice(p_i, p_i+4);
+    $poses_show.show();
+    $poses.not($poses_show).hide();
+    
+    var p_b = panel * 3;
+    var $buttons = $(".button").not(".panel");
+    var $buttons_show = $buttons.slice(p_b, p_b + 3);
+    $buttons_show.show();
+    $buttons.not($buttons_show).hide();
+}
+
 
 jQuery(document).ready(function(){
 //    $("#xy-outer").css("background-color", "blue");
@@ -145,6 +165,13 @@ jQuery(document).ready(function(){
 
     var device = whichDevice();
     $("body").addClass(device);
+    
+    $(".panel").click(function(){
+        panel = (panel + 1) % 2;
+        switchPanels();
+        
+        $(this).toggleClass("active", panel);
+    });
 
     $(".printLog").click(function(){
         print_log = !print_log;
@@ -187,6 +214,8 @@ jQuery(document).ready(function(){
         {
             getXY($(this), e);
         }
-    }
-    );
+    });
+    
+    /*****RUNTIME*****/
+    switchPanels();
 });

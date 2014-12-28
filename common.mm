@@ -9,12 +9,17 @@
 #import <stdio.h>
 #import <iostream>
 #import <sstream>
+#import <math.h>
 #import <opencv2/core.hpp>
 #import <opencv2/core/core.hpp>
 #import <opencv2/calib3d.hpp>
 #import "common.h"
 
 using namespace std;
+
+#define PI                              3.1415926f
+#define HALF_PI                         1.5707963f
+#define TWO_PI                          6.2831853f
 
 void matToArray(cv::Mat m_, float * _m) //works with vectors too, if you pass in &vec[0]
 {
@@ -195,14 +200,54 @@ metaio::Vector3d scale(metaio::Vector3d v_, metaio::Vector3d scale_)
     return _v;
 }
 
+metaio::Vector3d calcCOSTOffset(metaio::Vector3d t_, metaio::Vector3d t_last_, metaio::Rotation r_)
+{
+    metaio::Vector3d _t;
+    metaio::Vector3d t_p_ = r_.inverse().rotatePoint(mult(t_, -1.0f));
+    _t = r_.inverse().rotatePoint(t_last_) + t_p_;
+    return _t;
+}
+
+metaio::Rotation calcCOSROffset(metaio::Rotation r_, metaio::Rotation r_last_)
+{
+    metaio::Rotation _r;
+    _r = r_.inverse() * r_last_;
+    return _r;
+}
+
+void calcCOSOffset(metaio::Vector3d t_, metaio::Rotation r_, metaio::Vector3d t_last_, metaio::Rotation r_last_, metaio::Vector3d& _t, metaio::Rotation& _r)
+{
+    _t = calcCOSTOffset(t_, t_last_, r_);
+    _r = calcCOSROffset(r_, r_last_);
+}
+
 void logMA(NSString * s_, NSMutableArray * ma_)
 {
+    if (ma_.count >= 200)
+    {
+        [ma_ removeObjectAtIndex:0];
+        //[ma_ removeObjectsInRange:{0, 10}]; //put this in debugHandler
+    }
     [ma_ addObject: s_];
 }
 
 void logMA(std::string s_, NSMutableArray * ma_)
 {
+    if (ma_.count >= 200)
+    {
+        [ma_ removeObjectAtIndex:0];
+        //[ma_ removeObjectsInRange:{0, 10}]; //put this in debugHandler
+    }
     [ma_ addObject: [NSString stringWithUTF8String:s_.c_str()]];
+}
+
+void logMA(NSMutableArray * ma_, NSString* fmt_, ...)
+{
+//    va_list args;
+//    va_start(args, fmt_);
+//    NSString * _s = [NSString stringWithFormat:fmt_, args];
+//    [ma_ addObject:_s];
+//    va_end(args);
 }
 
 metaio::Vector3d loPassXYZ(metaio::Vector3d v0_, metaio::Vector3d v1_)

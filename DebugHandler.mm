@@ -11,12 +11,10 @@ DebugHandler::DebugHandler()
     printLog = false;
     
     pose = nil;
-    t1_out = t0_out = metaio::Vector3d(0, 0, 0);
     t_touch = metaio::Vector2d(0, 0);
-    r0_out.setNoRotation();
-    r1_out.setNoRotation();
     COS = -1;
     tracking_state = "unknown";
+    called = 0;
 }
 
 void DebugHandler::initJS(JSContext * ctx_)
@@ -85,16 +83,20 @@ void DebugHandler::update()
     metaio::Vector3d _cam = metaio::Vector3d(this->pose->t_p);      _cam = round(_cam, SIG_FIGS);    _cam = scale(_cam, SCALE);
     metaio::Vector3d _obj = metaio::Vector3d(this->pose->t_last);   _obj = round(_obj, SIG_FIGS);    _obj = scale(_obj, SCALE);
     
+    metaio::Vector3d _cf_acc = metaio::Vector3d(this->cf_acc);   _cf_acc = round(_cf_acc, SIG_FIGS);
+    
     updatePose(@"init", _offs, this->pose->r_offs);
     updatePose(@"c", _cam , this->pose->r_p);
     updatePose(@"o", _obj , this->pose->r_last);
+    updatePose(@"sensors", this->acc, this->gyr);
+    updatePose(@"filter", this->cf_acc, this->cf_gyr);
     
     ctx[@"COS"][@"idx"] = @(COS); //@(this->pose->COS);
     ctx[@"COS"][@"state"] = [NSString stringWithFormat:@"%s", tracking_state.c_str()];
     
     if (printLog)
     {
-        ctx[@"log"] = this->log;
+        ctx[@"log"] = this->log;      
     }
 }
 

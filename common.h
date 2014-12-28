@@ -10,8 +10,9 @@
 #ifndef __Demo__common__
 #define __Demo__common__
 
-#import  <opencv2/opencv.hpp>
+#import <opencv2/opencv.hpp>
 #import <metaioSDK/IMetaioSDKIOS.h>
+
 
 /*untested unless mentioned*/
 void matToArray(cv::Mat m_, float * _m);
@@ -36,6 +37,7 @@ metaio::TrackingValues toTrackingValues(cv::Mat r_, cv::Mat t_);
 
 void logMA(NSString * s_, NSMutableArray * ma_);
 void logMA(std::string s_, NSMutableArray * ma_);
+void logMA(NSMutableArray * ma_, NSString* fmt_, ...);
 metaio::Vector3d loPassXYZ(metaio::Vector3d v0_, metaio::Vector3d v1_);
 std::string tRToS(metaio::Vector3d t_ = metaio::Vector3d(0, 0, 0), metaio::Rotation r_ = metaio::Rotation(0, 0, 0));
 void logTR(metaio::Vector3d t_ = metaio::Vector3d(0, 0, 0), metaio::Rotation r_ = metaio::Rotation(0, 0, 0));
@@ -44,6 +46,10 @@ void logTR(metaio::Rotation r_ = metaio::Rotation(0, 0, 0), metaio::Vector3d t_ 
 metaio::Vector3d mult(metaio::Vector3d v_, float f_);
 metaio::Vector3d round(metaio::Vector3d v_, float f_);
 metaio::Vector3d scale(metaio::Vector3d v_, metaio::Vector3d scale_);
+
+metaio::Vector3d calcCOSTOffset(metaio::Vector3d t_, metaio::Vector3d t_last_, metaio::Rotation r_);
+metaio::Rotation calcCOSROffset(metaio::Rotation r_, metaio::Rotation r_last_);
+void calcCOSOffset(metaio::Vector3d t_, metaio::Rotation r_, metaio::Vector3d t_last_, metaio::Rotation r_last_, metaio::Vector3d& _t, metaio::Rotation& _r);
 
 
 #endif /* defined(__Demo__common__) */
