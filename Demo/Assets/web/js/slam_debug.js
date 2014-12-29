@@ -13,6 +13,7 @@ db.t = {x: 0.5, y: 0.5, z: 0.5};
 //set externally
 c = new Pose();
 o = new Pose();
+o1 = new Pose();
 touch = new Pose();
 init = new Pose();
 sensors = new Pose();
@@ -94,10 +95,11 @@ setReadout = function()
 
 setXY = function()
 {
-    setXYItem("#touch", touch.t.x, touch.t.y, touch.r.z);
+    setXYItem("#touch", touch.t.x, touch.t.y, touch.r.y);
     setXYItem(".axes.init", init.t.x, init.t.z, init.r.y);
     setXYItem("#camera",    c.t.x, c.t.z, c.r.y);
     setXYItem("#object",    o.t.x, o.t.z, o.r.y);
+    setXYItem("#object1",   o1.t.x, o1.t.z, o1.r.y);
 };
 
 printLog = function()
@@ -196,7 +198,7 @@ jQuery(document).ready(function(){
     {
         if (setP || setPInit)
         {
-            db.r.z = db.r.z - 10;
+            db.r.y = db.r.y - 10;
         }
     });
     
@@ -204,7 +206,7 @@ jQuery(document).ready(function(){
     {
         if (setP || setPInit)
         {
-            db.r.z = db.r.z + 10;
+            db.r.y = db.r.y + 10;
         }
     });
 

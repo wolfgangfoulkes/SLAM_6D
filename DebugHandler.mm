@@ -43,7 +43,7 @@ void DebugHandler::getJS()
 
     double t_x = [ctx[@"db"][@"t"][@"x"] toDouble];
     double t_y = [ctx[@"db"][@"t"][@"y"] toDouble];
-    double r_z = [ctx[@"db"][@"r"][@"z"] toDouble];
+    double r_y = [ctx[@"db"][@"r"][@"y"] toDouble];
     
     t_touch.x = t_x;
     t_touch.y = t_y;
@@ -51,7 +51,9 @@ void DebugHandler::getJS()
     _t.x = t_x * TOUCH_X_COEFF;
     _t.y = t_y * TOUCH_Y_COEFF;
     
-    _r = metaio::Rotation(dToR(0), dToR(0), dToR(r_z));
+    _r = metaio::Rotation(dToR(0), dToR(r_y), dToR(0));
+    
+    r_touch = _r;
 
     updatePose(@"touch", _t, _r);
 }
@@ -82,12 +84,14 @@ void DebugHandler::update()
     metaio::Vector3d _offs = metaio::Vector3d(this->pose->t_offs); _offs = round(_offs, SIG_FIGS);  _offs = scale(_offs, SCALE);
     metaio::Vector3d _cam = metaio::Vector3d(this->pose->t_p);      _cam = round(_cam, SIG_FIGS);    _cam = scale(_cam, SCALE);
     metaio::Vector3d _obj = metaio::Vector3d(this->pose->t_last);   _obj = round(_obj, SIG_FIGS);    _obj = scale(_obj, SCALE);
+    metaio::Vector3d _obj1 = metaio::Vector3d(this->o_t);          _obj1 = round(_obj1, SIG_FIGS);  _obj1 = scale(_obj1, SCALE);
     
     metaio::Vector3d _cf_acc = metaio::Vector3d(this->cf_acc);   _cf_acc = round(_cf_acc, SIG_FIGS);
     
     updatePose(@"init", _offs, this->pose->r_offs);
     updatePose(@"c", _cam , this->pose->r_p);
     updatePose(@"o", _obj , this->pose->r_last);
+    updatePose(@"o1", _obj1 , this->o_r);
     updatePose(@"sensors", this->acc, this->gyr);
     updatePose(@"filter", this->cf_acc, this->cf_gyr);
     

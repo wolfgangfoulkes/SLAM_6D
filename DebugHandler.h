@@ -30,8 +30,12 @@ public:
     
     Pose * pose; //should be a pointer, should be one for each out. should have separate shit in JS for directional configuration
     metaio::Vector2d t_touch;
+    metaio::Rotation r_touch;
     metaio::Vector3d acc;
     metaio::Rotation gyr;
+    
+    metaio::Vector3d o_t;
+    metaio::Rotation o_r;
     
     metaio::Vector3d cf_acc;
     metaio::Rotation cf_gyr;
