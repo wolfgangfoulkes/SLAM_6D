@@ -5,24 +5,25 @@
 
 Pose::Pose()
 {
-    t_p.setZero();
-    t_last.setZero();
-    t_offs.setZero();
-    t_world.setZero();
+    this->t_p.setZero();
+    this->t_last.setZero();
+    this->t_offs.setZero();
+    this->t_world.setZero();
     
-    r_p.setNoRotation();
-    r_last.setNoRotation();
-    r_offs.setNoRotation();
-    r_world.setNoRotation();
+    this->r_p.setNoRotation();
+    this->r_last.setNoRotation();
+    this->r_offs.setNoRotation();
+    this->r_world.setNoRotation();
     
-    hasOffs = false;
-    COS = -1;
+    this->hasTracking = false;
+    this->hasOffs = false;
+    this->COS = 0;
 }
 
 Pose::Pose(metaio::Vector3d t_, metaio::Rotation r_) : Pose()
 {
-    t_world = metaio::Vector3d(t_);
-    r_world = metaio::Rotation(r_);
+    this->t_world = metaio::Vector3d(t_);
+    this->r_world = metaio::Rotation(r_);
 }
 
 void Pose::setInitOffs(metaio::Vector3d t_, metaio::Rotation r_, int cos_)
@@ -33,71 +34,42 @@ void Pose::setInitOffs(metaio::TrackingValues tv_)
 {
 }
 
-void Pose::setOffs(metaio::Vector3d t_, metaio::Rotation r_, int cos_)
+void Pose::setOffs(metaio::Vector3d t_, metaio::Rotation r_)
 {
     metaio::Vector3d t_p_ = r_.inverse().rotatePoint(mult(t_, -1.0f));
-    r_offs = r_.inverse() * r_last;
-    t_offs = r_.inverse().rotatePoint(t_last) + t_p_;
-    
-    COS = cos_;
+    this->r_offs = r_.inverse() * this->r_last;
+    this->t_offs = r_.inverse().rotatePoint(this->t_last) + t_p_;
 
-    hasOffs = true;
+    this->hasOffs = true;
 }
 
 void Pose::setOffs(metaio::TrackingValues tv_)
 {
     metaio::Vector3d t_ = tv_.translation;
     metaio::Rotation r_ = tv_.rotation;
-    int cos_ = tv_.coordinateSystemID;
-    setOffs(t_, r_, cos_);
+    this->setOffs(t_, r_);
 }
 
-void Pose::updateP(metaio::Vector3d t_, metaio::Rotation r_)
+void Pose::updateP(metaio::Vector3d t_, metaio::Rotation r_, int cos_)
 {
+    if (!this->hasTracking) {this->hasTracking = true;}
     metaio::Vector3d _t(0, 0, 0);
     metaio::Rotation _r; _r.setNoRotation();
     
-    _t = t_ + r_.rotatePoint(t_offs);
-    t_last = _t;
-    //t_last =  loPassXYZ(t_last, _t);
+    _t = t_ + r_.rotatePoint(this->t_offs);
+    this->t_last = _t; //this->t_last =  loPassXYZ(this->t_last, _t);
     
-    _r = r_ * r_offs;
-    r_last = _r; //lo-pass this too, this especially
+    _r = r_ * this->r_offs;
+    this->r_last = _r; //lo-pass this too, this especially
     
-    t_p = _r.inverse().rotatePoint(mult(_t, -1.));
-    r_p = _r.inverse();
+    this->t_p = _r.inverse().rotatePoint(mult(this->t_last, -1.0f));
+    this->r_p = _r.inverse();
+    
+    this->COS = cos_;
 }
 
 
 void Pose::updateP(metaio::TrackingValues tv_)
 {
-    if (tv_.coordinateSystemID != COS)
-    {
-        hasOffs = false;
-    }
-    
-    if (tv_.quality > 0.) //not lost, could be extrapolated
-    {
-        if (!hasOffs)
-        {
-            if (COS == -1)
-            {
-                COS = tv_.coordinateSystemID;
-                logMA(@"init offs", this->ma_log);
-            }
-            else
-            {
-                setOffs(tv_);
-            }
-        }
-        metaio::Vector3d t_ = tv_.translation;
-        metaio::Rotation r_ = tv_.rotation;
-
-        updateP(t_, r_);
-    }
-    else
-    {
-        hasOffs = false;
-    }
-    
+    this->updateP(tv_.translation, tv_.rotation, tv_.coordinateSystemID);
 }

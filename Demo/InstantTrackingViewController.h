@@ -36,6 +36,7 @@
     int lastCOS;
     int activeCOS;
     
+    bool hasTracking;
     bool isTracking;
     bool debugViewIsInit;
     bool showDebugView;

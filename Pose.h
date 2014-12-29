@@ -52,6 +52,7 @@ class Pose
     metaio::Vector3d t_p, t_last, t_offs, t_world;
     metaio::Rotation r_p, r_last, r_offs, r_world;
     
+    bool hasTracking;
     bool hasOffs;
     int COS;
     
@@ -60,9 +61,9 @@ class Pose
     
     void setInitOffs(metaio::Vector3d t_, metaio::Rotation r_, int cos_);
     void setInitOffs(metaio::TrackingValues tv_);
-    void setOffs(metaio::Vector3d t_, metaio::Rotation r_, int cos_);
+    void setOffs(metaio::Vector3d t_, metaio::Rotation r_);
     void setOffs(metaio::TrackingValues tv_);
-    void updateP(metaio::Vector3d t_, metaio::Rotation r_);
+    void updateP(metaio::Vector3d t_, metaio::Rotation r_, int cos_=0);
     void updateP(metaio::TrackingValues tv_);
     //void updateP(metaio::TrackingValues tv_, metaio::SensorValues sv_);
 };

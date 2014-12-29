@@ -250,6 +250,16 @@ void logMA(NSMutableArray * ma_, NSString* fmt_, ...)
 //    va_end(args);
 }
 
+void logTR(metaio::Vector3d t_, metaio::Rotation r_)
+{
+    NSLog([NSString stringWithUTF8String:tRToS(t_, r_).c_str()]);
+}
+
+void logTR(metaio::Rotation r_, metaio::Vector3d t_)
+{
+    NSLog([NSString stringWithUTF8String:tRToS(t_, r_).c_str()]);
+}
+
 metaio::Vector3d loPassXYZ(metaio::Vector3d v0_, metaio::Vector3d v1_)
 {
     //original time constant was 0.3, original dt was 1/20. did 0.3 / (1/20), got 6. multiplied by 1/30 to get 0.199...
@@ -279,12 +289,4 @@ std::string tRToS(metaio::Vector3d t_, metaio::Rotation r_)
     return _ss.str();
 }
 
-void logTR(metaio::Vector3d t_, metaio::Rotation r_)
-{
-    NSLog([NSString stringWithUTF8String:tRToS(t_, r_).c_str()]);
-}
 
-void logTR(metaio::Rotation r_, metaio::Vector3d t_)
-{
-    NSLog([NSString stringWithUTF8String:tRToS(t_, r_).c_str()]);
-}

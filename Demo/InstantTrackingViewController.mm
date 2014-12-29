@@ -58,81 +58,8 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 @synthesize ZppButton;
 @synthesize ZmmButton;
 
-#pragma mark - UIView(s)Controller lifecycle
-
-/***** INITIALIZE VARIABLES, LOAD MODEL *****/
-- (void) viewDidLoad
-{
-	[super viewDidLoad];
-    printf("view did load! version: %s", m_metaioSDK->getVersion().c_str());
-    
-    // Set the rendering clipping plane
-    m_metaioSDK->setRendererClippingPlaneLimits(10, 30000);
-    
-    // Load content
-    m_scale = 1; // Initial scaling for the models
-    m_obj_t = metaio::Vector3d(0, 100, 0); //initial offset
-    m_obj_r = metaio::Rotation();
-    m_obj           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:m_obj_t modelScaling:m_scale modelCos:0];
-//    m_obj1           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:m_obj1_t modelScaling:m_scale modelCos:1];
-    
-    //init tracking vars
-    lastCOS = activeCOS = -1;
-    isTracking = false;
-    
-    //shared debug log
-    ma_log = [[NSMutableArray alloc] init];
-    cam.ma_log = ma_log; //be careful, you gotta initialize this with every instance!
-    debugHandler.log = ma_log;
-    debugHandler.pose = &cam;
-    debugViewIsInit = false; //initialized when web view loads
-    
-    showDebugView = true; //debug view shows on launch
-    debugHandler.print = showDebugView;
-    
-    //Web View
-    webView.scrollView.scrollEnabled = NO;
-    self.webView.delegate = self;
-    [self loadDebugView];
-    
-    //CMMotionManager
-    if(self.motionManager.isDeviceMotionAvailable)
-    {
-        [self.motionManager startDeviceMotionUpdates];
-        self.motionManager.deviceMotionUpdateInterval = MM_INTERVAL;
-    }
-    
-    comp_filter = CompSixAxis(MM_INTERVAL, TAU);
-    
-    //should the loop update metaio?
-    updateMetaio = true;
-    
-    //init time
-    elapsed = [[NSDate alloc] init];
-}
-
--(void)viewDidAppear:(BOOL)animated
-{
-    [self setTrackingConfiguration];
-}
-
-
-- (void)viewDidUnload
-{
-	[super viewDidUnload];
-}
-
--(void)webViewDidFinishLoad:(UIWebView *)webView{
-    NSLog(@"Web View did load!");
-    [self initDebugView];
-    debugViewIsInit = true;
-}
-
 # pragma mark - LOOP
 
-/**
- * Update the scale, rotation and translation of the models
- */
 - (void) update
 {
     if (!debugViewIsInit)
@@ -140,10 +67,9 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         return;
     }
     
-    //update device motion
+    /***** update device motion *****/
     NSTimeInterval sinceLastFrame = -[self->elapsed timeIntervalSinceNow]; //in seconds
     self->elapsed = [NSDate date];
-    NSLog([NSString stringWithFormat:@"interval: %f", sinceLastFrame]);
     metaio::Vector3d t_s;
     metaio::Rotation r_s;
     CMDeviceMotion * motion_ = self.motionManager.deviceMotion;
@@ -166,24 +92,23 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     t_cf.x = rToD(t_cf.x) - 180;
     t_cf.y = rToD(t_cf.y) - 180;
     debugHandler.cf_acc = t_cf;
+    /*****/
     
     
     [self updateTrackingState];
-    if (activeCOS && updateMetaio)
+    if (updateMetaio && activeCOS)
     {
         metaio::TrackingValues tv = m_metaioSDK->getTrackingValues(activeCOS);
-        //matrix maps object onto tracked object.
-        //cv::Mat tv_mat = cv::Mat::Mat(4, 4, CV_32F, tvm);
-        //metaio::stlcompat::String points = m_metaioSDK->sensorCommand((metaio::stlcompat::String)"getNewMapFeatures");
-        
-        //float tvm[16];
-        //m_metaioSDK->getTrackingValues(activeCOS, tvm, true); //false if you want only modelMatrix. additional true to get a right-handed system
+
         //http://www.evl.uic.edu/ralph/508S98/coordinates.html
         //right-handed right:x+, up:y+, screen:z-, rotation is counterclockwise around axis
         //left-handed right:x+, up:y+, screen:z+, rotation is clockwise around axis
-
-        // Update the internal state with the lastest tracking values from the SDK.
-        mapTransitionHelper.update(m_metaioSDK->getTrackingValues(activeCOS), m_metaioSDK->getRegisteredSensorsComponent()->getLastSensorValues());
+        
+        if (cam.COS && (activeCOS != cam.COS)) //if the pose has tracked a COS, and the COS has changed
+        {
+            cam.setOffs(tv);
+            logMA([NSString stringWithFormat:@"lastCOS: %d, activeCOS: %d, cam.COS: %d", lastCOS, activeCOS, cam.COS], ma_log);
+        }
         
         cam.updateP(tv);
         
@@ -197,16 +122,121 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         t.y = cam.t_last.y + m_obj_t.y;
         t.z = cam.t_last.z + m_obj_t.z;
         m_obj->setTranslation(t);
+        
+        if (!hasTracking)
+        {
+            hasTracking = true;
+        }
     }
     debugHandler.update();
+}
+
+- (void) updateTrackingState
+{
+    int activeCOS_ = 0;
+    int COSs = m_metaioSDK->getNumberOfValidCoordinateSystems();
+    int allCOSs = m_metaioSDK->getNumberOfDefinedCoordinateSystems();
+    string state = "not tracking";
+    if (COSs)
+    {
+        metaio::TrackingValues cos1 = m_metaioSDK->getTrackingValues(1);
+        metaio::TrackingValues cos2 = m_metaioSDK->getTrackingValues(2);
+        if (cos1.isTrackingState()) {activeCOS_ = 1;}
+        else if (cos2.isTrackingState()) {activeCOS_ = 2;}
+        else {
+            //logMA(@"unknownCOS", ma_log);
+        }
+        metaio::TrackingValues tv = m_metaioSDK->getTrackingValues(activeCOS);
+        state = tv.trackingStateToString(tv.state);
+        isTracking = true;
+    }
+    else {
+        mapTransitionHelper.prepareForTransitionToNewMap();
+        isTracking = false;
+    }
     
-//        // If the last frame could be tracked successfully
-//        if(mapTransitionHelper.lastFrameWasTracked())
-//        {
-//            metaio::Rotation newRotation = mapTransitionHelper.getRotationCameraFromWorld();//tv.rotation;
-//            metaio::Vector3d newTranslation = mapTransitionHelper.getTranslationCameraFromWorld();//tv.translation;
-//            //metaio::Vector3d newTranslation_r = metaio::Rotation(0, 0, dToR(180.)).rotatePoint(newTranslation);
-//        }
+    if (activeCOS_ != activeCOS)
+    {
+        NSString * _fmt = @"changing COS: %d=>%d";
+        NSString * _s = [NSString stringWithFormat:_fmt, activeCOS, activeCOS_];
+        logMA(_s, ma_log);
+    }
+    
+    lastCOS = activeCOS;
+    activeCOS = activeCOS_;
+    
+    debugHandler.COS = activeCOS;
+    debugHandler.tracking_state = state;
+}
+
+#pragma mark - UIView(s)Controller lifecycle
+
+/***** INITIALIZE VARIABLES, LOAD MODEL *****/
+- (void) viewDidLoad
+{
+	[super viewDidLoad];
+    printf("view did load! version: %s", m_metaioSDK->getVersion().c_str());
+    
+    // Set the rendering clipping plane
+    m_metaioSDK->setRendererClippingPlaneLimits(10, 30000);
+    
+    // Load content
+    m_scale = 1; // Initial scaling for the models
+    m_obj_t = metaio::Vector3d(0, 100, 0); //initial offset
+    m_obj_r = metaio::Rotation();
+    m_obj           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:m_obj_t modelScaling:m_scale modelCos:0];
+//    m_obj1           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:m_obj1_t modelScaling:m_scale modelCos:1];
+    
+    //init tracking vars
+    lastCOS = activeCOS = 0;
+    isTracking = hasTracking = false;
+    
+    //shared debug log
+    ma_log = [[NSMutableArray alloc] init];
+    cam.ma_log = ma_log; //be careful, you gotta initialize this with every instance!
+    debugHandler.log = ma_log;
+    debugHandler.pose = &cam;
+    debugViewIsInit = false; //initialized when web view loads
+    
+    showDebugView = true; //debug view shows on launch
+    debugHandler.print = showDebugView;
+    
+    //should the loop update metaio?
+    updateMetaio = true;
+    
+    //Web View
+    webView.scrollView.scrollEnabled = NO;
+    self.webView.delegate = self;
+    [self loadDebugView];
+    
+    //CMMotionManager
+    if(self.motionManager.isDeviceMotionAvailable)
+    {
+        [self.motionManager startDeviceMotionUpdates];
+        self.motionManager.deviceMotionUpdateInterval = MM_INTERVAL;
+    }
+    
+    comp_filter = CompSixAxis(MM_INTERVAL, TAU);
+    
+    //init time
+    elapsed = [[NSDate alloc] init];
+}
+
+-(void)viewDidAppear:(BOOL)animated
+{
+    [self setTrackingConfiguration];
+}
+
+
+- (void)viewDidUnload
+{
+	[super viewDidUnload];
+}
+
+-(void)webViewDidFinishLoad:(UIWebView *)webView{
+    NSLog(@"Web View did load!");
+    [self initDebugView];
+    debugViewIsInit = true;
 }
 
 #pragma mark - CMMotionManager
@@ -349,43 +379,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     return geometry;
 }
 
-- (void) updateTrackingState
-{
-    int activeCOS_ = -1;
-    int COSs = m_metaioSDK->getNumberOfValidCoordinateSystems();
-    int allCOSs = m_metaioSDK->getNumberOfDefinedCoordinateSystems();
-    string state = "not tracking";
-    if (COSs)
-    {
-        metaio::TrackingValues cos1 = m_metaioSDK->getTrackingValues(1);
-        metaio::TrackingValues cos2 = m_metaioSDK->getTrackingValues(2);
-        if (cos1.isTrackingState()) {activeCOS_ = 1;}
-        else if (cos2.isTrackingState()) {activeCOS_ = 2;}
-        else {
-            logMA(@"unknownCOS", ma_log);
-        }
-        metaio::TrackingValues tv = m_metaioSDK->getTrackingValues(activeCOS);
-        state = tv.trackingStateToString(tv.state);
-        isTracking = true;
-    }
-    else {
-        mapTransitionHelper.prepareForTransitionToNewMap();
-        isTracking = false;
-    }
-    
-    if (activeCOS_ != activeCOS)
-    {
-        NSString * _fmt = @"changing COS: %d=>%d";
-        NSString * _s = [NSString stringWithFormat:_fmt, activeCOS, activeCOS_];
-        logMA(_s, ma_log);
-    }
-    
-    lastCOS = activeCOS;
-    activeCOS = activeCOS_;
-    
-    debugHandler.COS = activeCOS;
-    debugHandler.tracking_state = state;
-}
+
 
 
 - (void) updateObjectsWithCameraT: (metaio::Vector3d)t AndR:(metaio::Rotation)r

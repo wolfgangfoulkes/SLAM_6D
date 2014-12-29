@@ -96,7 +96,7 @@ setXY = function()
 {
     setXYItem("#touch", touch.t.x, touch.t.y, touch.r.z);
     setXYItem(".axes.init", init.t.x, init.t.z, init.r.y);
-    setXYItem("#camera",    c.t.x, c.t.z, c.r.y);
+    setXYItem("#camera",    c.t.x, c.t.y, c.r.z);
     setXYItem("#object",    o.t.x, o.t.z, o.r.y);
 };
 
