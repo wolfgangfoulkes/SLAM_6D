@@ -113,6 +113,24 @@ void DebugHandler::updatePose(NSString * pose_, metaio::Vector3d t_, metaio::Rot
     ctx[pose_][@"r"][@"z"] = @(r_e_.z);
 }
 
+void DebugHandler::setPose()
+{
+    metaio::Vector3d _t;
+    metaio::Rotation _r;
+    double r_y = ctx[@"db"][@"r"][@"z"].toDouble;
+    _r.setFromEulerAngleDegrees(metaio::Vector3d(0, r_y, 0));
+    
+    _t.x = t_touch.x * TOUCH_X_COEFF * (1/X_COEFF);
+    _t.z = t_touch.y * TOUCH_Y_COEFF * (1/Y_COEFF);
+    if (ctx[@"setPInit"].toBool)
+    {
+        pose->setOffs(_t, _r);
+    }
+    if (ctx[@"setP"].toBool)
+    {
+        pose->updateP(_t, _r, 0);
+    }
+}
 
 
 //- (void)addPose: (int)name ToDebugContextT: (metaio::Vector4d)obj_t andR:(metaio::Rotation)obj_r
