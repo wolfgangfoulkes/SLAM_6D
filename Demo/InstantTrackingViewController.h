@@ -19,7 +19,8 @@
     JSContext * ctx;
 
     int                 m_frames;
-    NSInteger           m_scale;             // model scale
+    NSInteger           m_scale;
+    NSInteger           m_scale1;
     NSDate              *elapsed;
     
     CompSixAxis comp_filter;
@@ -27,7 +28,9 @@
     metaio::IGeometry*  m_obj;            // pointer to the model
     metaio::IGeometry*  m_obj1;           // pointer to the model
     metaio::Vector3d m_obj_t;
+    metaio::Vector3d m_obj1_t;
     metaio::Rotation m_obj_r;
+    metaio::Rotation m_obj1_r;
     
     Pose cam;
     

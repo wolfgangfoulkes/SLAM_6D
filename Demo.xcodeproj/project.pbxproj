@@ -33,6 +33,8 @@
 		98BD772B1A113A3600CC9EAD /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98BD772A1A113A3600CC9EAD /* JavaScriptCore.framework */; };
 		98D533D51A07B3CA00E7089D /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = B9BC117115D8FD9B00713ED3 /* libxml2.dylib */; };
 		98DCAC381A4FEA7D00915477 /* CompSixAxis.mm in Sources */ = {isa = PBXBuildFile; fileRef = 98DCAC361A4FEA7D00915477 /* CompSixAxis.mm */; };
+		98E56D401A51E7B300E46F50 /* Thing.mm in Sources */ = {isa = PBXBuildFile; fileRef = 98E56D3E1A51E7B300E46F50 /* Thing.mm */; };
+		98E56D431A51EC6500E46F50 /* Things.mm in Sources */ = {isa = PBXBuildFile; fileRef = 98E56D411A51EC6500E46F50 /* Things.mm */; };
 		9E384CF2190ABA230037E16E /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E384CF1190ABA230037E16E /* CoreImage.framework */; };
 		9E55C9F416F740430068ACC8 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E55C9F316F740430068ACC8 /* CFNetwork.framework */; };
 		9E62CF7F1732B30300E238F5 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E62CF7E1732B30300E238F5 /* Security.framework */; };
@@ -100,6 +102,10 @@
 		98BD772A1A113A3600CC9EAD /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		98DCAC361A4FEA7D00915477 /* CompSixAxis.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CompSixAxis.mm; sourceTree = "<group>"; };
 		98DCAC371A4FEA7D00915477 /* CompSixAxis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CompSixAxis.h; sourceTree = "<group>"; };
+		98E56D3E1A51E7B300E46F50 /* Thing.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Thing.mm; sourceTree = "<group>"; };
+		98E56D3F1A51E7B300E46F50 /* Thing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Thing.h; sourceTree = "<group>"; };
+		98E56D411A51EC6500E46F50 /* Things.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Things.mm; sourceTree = "<group>"; };
+		98E56D421A51EC6500E46F50 /* Things.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Things.h; sourceTree = "<group>"; };
 		9E384CF1190ABA230037E16E /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
 		9E55C9F316F740430068ACC8 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		9E62CF7E1732B30300E238F5 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
@@ -182,6 +188,10 @@
 		B9BC114015D8FA7B00713ED3 = {
 			isa = PBXGroup;
 			children = (
+				98E56D411A51EC6500E46F50 /* Things.mm */,
+				98E56D421A51EC6500E46F50 /* Things.h */,
+				98E56D3E1A51E7B300E46F50 /* Thing.mm */,
+				98E56D3F1A51E7B300E46F50 /* Thing.h */,
 				984660A21A48D36E002818C5 /* DebugHandler.mm */,
 				984660A31A48D36E002818C5 /* DebugHandler.h */,
 				986B18771A30FE2900CD7C5A /* Kalman.mm */,
@@ -381,6 +391,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				98E56D401A51E7B300E46F50 /* Thing.mm in Sources */,
+				98E56D431A51EC6500E46F50 /* Things.mm in Sources */,
 				984660A41A48D36E002818C5 /* DebugHandler.mm in Sources */,
 				7CCB429D19582BAE007355FA /* InstantTrackingViewController.mm in Sources */,
 				989977A61A1DFB31000AB036 /* common.mm in Sources */,

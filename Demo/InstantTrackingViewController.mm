@@ -201,7 +201,11 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     m_obj_t = metaio::Vector3d(0, 100, 0); //initial offset
     m_obj_r = metaio::Rotation();
     m_obj           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:m_obj_t modelScaling:m_scale modelCos:0];
-//    m_obj1           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:m_obj1_t modelScaling:m_scale modelCos:1];
+    
+    m_scale1 = 1; // Initial scaling for the models
+    m_obj1_t = metaio::Vector3d(0, 100, 0); //initial offset
+    m_obj1_r = metaio::Rotation();
+    m_obj1           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:1  modelTranslation:m_obj1_t modelScaling:m_scale modelCos:0];
     
     //init tracking vars
     lastCOS = activeCOS = 0;

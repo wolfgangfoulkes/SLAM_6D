@@ -11,7 +11,7 @@
                 <SensorCosID>map1</SensorCosID>
                 <Parameters>
                     <Initialization Type="map">
-                        <Map>foulkes_vision/stoolInBackLeftCorner.slam</Map>
+                        <Map>foulkes_vision/pelicanInBackCorner.slam</Map>
                     </Initialization>
                     <Learning Enabled="true">
                         <!-- both near middle, but this one with more "precise"-->
@@ -51,6 +51,7 @@
                     <GammaTranslation>1.0</GammaTranslation>
                     <KeepPoseForNumberOfFrames>24</KeepPoseForNumberOfFrames>
                     <ContinueLostTrackingWithOrientationSensor>true</ContinueLostTrackingWithOrientationSensor>
+<!--                watch out for this guy changing your COS-->
                     <GravityAssistance>replaceZAxis</GravityAssistance>
                 </Parameters>
             </Fuser>
@@ -96,6 +97,7 @@
                     <GammaTranslation>1.0</GammaTranslation>
                     <KeepPoseForNumberOfFrames>24</KeepPoseForNumberOfFrames>
                     <ContinueLostTrackingWithOrientationSensor>true</ContinueLostTrackingWithOrientationSensor>
+<!--                watch out for this guy changing your COS-->
                     <GravityAssistance>replaceZAxis</GravityAssistance>
                 </Parameters>
             </Fuser>
@@ -131,48 +133,5 @@
                 </COSOffset>
             </SensorSource>
         </COS>
-<!--        <COS>-->
-<!--            <Name>map-mlab-back</Name>-->
-<!--            <Fuser Type="SmoothingFuser">-->
-<!--                <Parameters>-->
-<!--                    <AlphaRotation>0.8</AlphaRotation>-->
-<!--                    <AlphaTranslation>1.0</AlphaTranslation>-->
-<!--                    <GammaRotation>0.8</GammaRotation>-->
-<!--                    <GammaTranslation>1.0</GammaTranslation>-->
-<!--                    <KeepPoseForNumberOfFrames>24</KeepPoseForNumberOfFrames>-->
-<!--                    <ContinueLostTrackingWithOrientationSensor>true</ContinueLostTrackingWithOrientationSensor>-->
-<!--                </Parameters>-->
-<!--            </Fuser>-->
-<!--            <SensorSource>-->
-<!--                <SensorID>SLAM</SensorID>-->
-<!--                <SensorCosID>mlab_back</SensorCosID>-->
-<!--                <HandEyeCalibration>-->
-<!--                    <TranslationOffset>-->
-<!--                        <x>0.0</x>-->
-<!--                        <y>0.0</y>-->
-<!--                        <z>0.0</z>-->
-<!--                    </TranslationOffset>-->
-<!--                    <RotationOffset>-->
-<!--                        <x>0.0</x>-->
-<!--                        <y>0.0</y>-->
-<!--                        <z>0.0</z>-->
-<!--                        <w>1.0</w>-->
-<!--                    </RotationOffset>-->
-<!--                </HandEyeCalibration>-->
-<!--                <COSOffset>-->
-<!--                    <TranslationOffset>-->
-<!--                        <x>0.0</x>-->
-<!--                        <y>0.0</y>-->
-<!--                        <z>0.0</z>-->
-<!--                    </TranslationOffset>-->
-<!--                    <RotationOffset>-->
-<!--                        <x>0.0</x>-->
-<!--                        <y>0.0</y>-->
-<!--                        <z>0.0</z>-->
-<!--                        <w>1.0</w>-->
-<!--                    </RotationOffset>-->
-<!--                </COSOffset>-->
-<!--            </SensorSource>-->
-<!--        </COS>-->
     </Connections>
 </TrackingData>
