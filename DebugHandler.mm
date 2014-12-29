@@ -100,7 +100,7 @@ void DebugHandler::update()
     
     if (printLog)
     {
-        ctx[@"log"] = this->log;      
+        ctx[@"log"] = this->log;
     }
 }
 
