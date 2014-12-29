@@ -53,13 +53,14 @@ class Pose
     metaio::Rotation r_p, r_last, r_offs, r_world;
     
     bool hasTracking;
+    bool hasInitOffs;
     bool hasOffs;
     int COS;
     
     Pose();
     Pose(metaio::Vector3d t_, metaio::Rotation r_);
     
-    void setInitOffs(metaio::Vector3d t_, metaio::Rotation r_, int cos_);
+    void setInitOffs(metaio::Vector3d t_, metaio::Rotation r_, int cos_=0);
     void setInitOffs(metaio::TrackingValues tv_);
     void setOffs(metaio::Vector3d t_, metaio::Rotation r_);
     void setOffs(metaio::TrackingValues tv_);

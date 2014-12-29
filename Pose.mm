@@ -15,8 +15,7 @@ Pose::Pose()
     this->r_offs.setNoRotation();
     this->r_world.setNoRotation();
     
-    this->hasTracking = false;
-    this->hasOffs = false;
+    this->hasTracking = this->hasOffs = this->hasInitOffs = false;
     this->COS = 0;
 }
 
@@ -28,10 +27,17 @@ Pose::Pose(metaio::Vector3d t_, metaio::Rotation r_) : Pose()
 
 void Pose::setInitOffs(metaio::Vector3d t_, metaio::Rotation r_, int cos_)
 {
+//    metaio::Vector3d r_eu;
+//    r_eu.z = r_.inverse().getEulerAngleDegrees().z;
+//    
+//    this->r_offs.setFromEulerAngleDegrees(r_eu);
+//    this->t_offs = r_offs.rotatePoint(t_);
+    this->hasInitOffs = true;
 }
 
 void Pose::setInitOffs(metaio::TrackingValues tv_)
 {
+    this->setInitOffs(tv_.translation, tv_.rotation);
 }
 
 void Pose::setOffs(metaio::Vector3d t_, metaio::Rotation r_)
@@ -62,8 +68,8 @@ void Pose::updateP(metaio::Vector3d t_, metaio::Rotation r_, int cos_)
     _r = r_ * this->r_offs;
     this->r_last = _r; //lo-pass this too, this especially
     
-    this->t_p = _r.inverse().rotatePoint(mult(this->t_last, -1.0f));
-    this->r_p = _r.inverse();
+    this->t_p = r_last.inverse().rotatePoint(mult(this->t_last, -1.0f));
+    this->r_p = r_last.inverse();
     
     this->COS = cos_;
 }

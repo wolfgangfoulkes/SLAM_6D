@@ -51,12 +51,6 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 
 /*****UNUSED*****/
 @synthesize debugPrintButton;
-@synthesize XppButton;
-@synthesize XmmButton;
-@synthesize YppButton;
-@synthesize YmmButton;
-@synthesize ZppButton;
-@synthesize ZmmButton;
 
 # pragma mark - LOOP
 
@@ -99,10 +93,16 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     if (updateMetaio && activeCOS)
     {
         metaio::TrackingValues tv = m_metaioSDK->getTrackingValues(activeCOS);
+        [self offsetTrackingValues:tv];
 
         //http://www.evl.uic.edu/ralph/508S98/coordinates.html
         //right-handed right:x+, up:y+, screen:z-, rotation is counterclockwise around axis
         //left-handed right:x+, up:y+, screen:z+, rotation is clockwise around axis
+        
+        if (!cam.hasInitOffs)
+        {
+            cam.setInitOffs(tv);
+        }
         
         if (cam.COS && (activeCOS != cam.COS)) //if the pose has tracked a COS, and the COS has changed
         {
@@ -169,6 +169,22 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     debugHandler.tracking_state = state;
 }
 
+- (void) offsetTrackingValues: (metaio::TrackingValues&)tv_
+{
+    metaio::Vector3d offs_t;
+    metaio::Rotation offs_r;
+    metaio::Vector3d offs_eu;
+    offs_t.x = 0;
+    offs_t.y = 0;
+    offs_t.z = 0;
+    offs_eu.x = 90; //metaio's object COS faces up.
+    offs_eu.y = 0;
+    offs_eu.z = 0;
+    offs_r.setFromEulerAngleDegrees(offs_eu);
+    tv_.translation = tv_.translation + offs_t;
+    tv_.rotation = tv_.rotation * offs_r;
+}
+
 #pragma mark - UIView(s)Controller lifecycle
 
 /***** INITIALIZE VARIABLES, LOAD MODEL *****/
@@ -220,6 +236,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     
     //init time
     elapsed = [[NSDate alloc] init];
+    
 }
 
 -(void)viewDidAppear:(BOOL)animated
@@ -325,19 +342,29 @@ int printf(const char * __restrict format, ...) //printf don't print to console
  * Set the tracking configuration file
  */
 - (void) setTrackingConfiguration {
-    NSString* config = [NSString stringWithFormat:@"Tracking_TBSLAM"];
+    NSString* config = [NSString stringWithFormat:@"Tracking_SLAM"];
 	NSString* dir = [NSString stringWithFormat:@"Assets"];
     NSString* ext = [NSString stringWithFormat:@"xml"];
 	NSString* tr = [[NSBundle mainBundle] pathForResource:config ofType:ext inDirectory:dir];
 	
     bool success = m_metaioSDK->setTrackingConfiguration([tr UTF8String]);
-    if(!success)
+    if(success)
     {
-        NSLog(@"No success loading the tracking configuration");
+        //offset metaio's COS's
+//        int COSs = m_metaioSDK->getNumberOfDefinedCoordinateSystems();
+//        metaio::TrackingValues offs;
+//        metaio::Vector3d offs_euler(90.0, 0.0, 0.0);
+//        offs.rotation.setFromEulerAngleDegrees(offs_euler);
+//        logMA([NSString stringWithFormat:@"defined: %d", COSs], ma_log);
+//        for (int i = 0; i < COSs; i++)
+//        {
+//            m_metaioSDK->setCosOffset(i+1, offs);
+//        }
     }
     else
     {
-        //NSLog(@"Success loading the tracking configuration");
+        NSLog(@"No success loading the tracking configuration");
+        logMA(@"No success loading the tracking configuration", ma_log);
     }
     
 }
@@ -412,35 +439,6 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     tRToS(cam.t_p, cam.r_p).c_str(),
     tRToS(cam.t_offs, cam.r_offs).c_str()],
     ma_log);
-}
-
-
-- (IBAction)poseButtonDown:(id)sender {
-    if (! debugViewIsInit ) return;
-//    switch ([sender tag]) {
-//        case 1:
-//            _t.x = (int)(_t.x - 40) % 800;
-//            break;
-//        case 2:
-//            _t.x = (int)(_t.x + 40) % 800;
-//            break;
-//        case 3:
-//            _t.y = (int)(_t.y - 40) % 800;
-//            break;
-//        case 4:
-//            _t.y = (int)(_t.y + 40) % 800;
-//            break;
-//        case 5:
-//            _t.z = (int)(_t.z - 40) % 800;
-//            break;
-//        case 6:
-//            _t.z = (int)(_t.z + 40) % 800;
-//            break;
-//       default:
-//           NSLog(@"???");
-//            break;
-//        }
-    
 }
 
 # pragma mark - JS Debug
