@@ -163,7 +163,6 @@ jQuery(document).ready(function(){
     isReady = true;
     setInterval(update, rate);
     $.vmouse.moveDistanceThreshold = 1000000;
-    console.log("javascript is ready!");
 
     var device = whichDevice();
     $("body").addClass(device);
