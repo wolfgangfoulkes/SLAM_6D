@@ -83,6 +83,87 @@ display = new function()
         model.pose = pose_;
         display.models[display.models.length] = model;
     }
+    
+//    this.addOBJ = function(path_, x_, y_, z_, rx_, ry_, rz_, rw_, scale, color_)
+//    {
+//        x_ = defaultOr(x_, 0);
+//        y_ = defaultOr(y_, 0);
+//        z_ = defaultOr(z_, 0);
+//        rx_ = defaultOr(rx_, 0);
+//        ry_ = defaultOr(ry_, 0);
+//        rz_ = defaultOr(rz_, 0);
+//        rw_ = defaultOr(rw_, 0);
+//        color_ = defaultOr(color_, 0);
+//        
+//        var pose_ = new Pose();
+//        pose_.t.x = x_;
+//        pose_.t.y = y_;
+//        pose_.t.z = z_;
+//        pose_.r.x = rx_;
+//        pose_.r.y = ry_;
+//        pose_.r.z = rz_;
+//        pose_.r.w = rw_;
+//        
+//        color_ = parseInt(color_.toString(16), 16);
+//        
+//        display.loadOBJ(path_,
+//            function(object)
+//            {
+//                object.position.x = x_;
+//                object.position.y = y_;
+//                object.position.z = z_;
+//                
+//                object.quaternion.x = x_;
+//                object.quaternion.y = y_;
+//                object.quaternion.z = z_;
+//                object.quaternion.w = w_;
+//                
+//                object.traverse(function (child) {
+//                        if ( child instanceof THREE.Mesh )
+//                        {
+//                            child.material.color = color_;
+//                            //child.material.map = texture;
+//                        }
+//                    }
+//                );
+//                
+//                object.scale.x = scale_;
+//                object.scale.y = scale_;
+//                object.scale.z = scale_;
+//                
+//                display.scene.add(object);
+//                
+//                var model = new Model();
+//                model.model = object;
+//                model.pose = pose_;
+//            }
+//        );
+//    };
+//    
+//    this.loadOBJ = function(path_, callback_)
+//    {
+//        var manager = new THREE.LoadingManager();
+//        manager.onProgress = function (item, loaded, total)
+//        {
+//            console.log( item, loaded, total );
+//        };
+//        
+//        var onProgress = function ( xhr )
+//        {
+//            if ( xhr.lengthComputable )
+//            {
+//                var percentComplete = xhr.loaded / xhr.total * 100;
+//                console.log( Math.round(percentComplete, 2) + "% downloaded" );
+//            }
+//        };
+//
+//        var onError = function ( xhr )
+//        {
+//        };
+//    
+//        var loader = new THREE.OBJLoader( manager );
+//        loader.load( path_, callback_, onProgress, onError );
+//    };
 };
 
 jQuery(document).ready(function(){
