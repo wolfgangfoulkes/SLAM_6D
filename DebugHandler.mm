@@ -30,6 +30,10 @@ void DebugHandler::initJS(JSContext * ctx_)
         NSLog(@"JavaScript %@ log message: %@", [JSContext currentContext], msg);
     }; //works for all console.log messages
     
+    this->addModel();
+    this->addModel(8947712, metaio::Vector3d(-200, 0, -200)); //yellowy-brown
+    this->addModel(559232, metaio::Vector3d(-500, -100, 0)); //aqua
+    
     jsIsInit = true;
 }
 
@@ -98,6 +102,8 @@ void DebugHandler::update()
     ctx[@"COS"][@"idx"] = @(COS); //@(this->pose->COS);
     ctx[@"COS"][@"state"] = [NSString stringWithFormat:@"%s", tracking_state.c_str()];
     
+    this->updateCamera(this->pose->t_p, this->pose->r_p);
+    
     if (printLog)
     {
         ctx[@"log"] = this->log;
@@ -134,6 +140,32 @@ void DebugHandler::setPose()
     {
         pose->updateP(_t, _r, 0);
     }
+}
+
+void DebugHandler::addModel(metaio::Vector3d t_, metaio::Rotation r_)
+{
+    metaio::Vector3d eu_ = r_.getEulerAngleDegrees();
+    JSValue * addBox = ctx[@"display"][@"addBox"];
+    [addBox callWithArguments:@[@(t_.x), @(t_.y), @(t_.z), @(eu_.x), @(eu_.y), @(eu_.z)]];
+}
+
+void DebugHandler::addModel(int color_, metaio::Vector3d t_, metaio::Rotation r_)
+{
+    metaio::Vector3d eu_ = r_.getEulerAngleDegrees();
+    JSValue * addBox = ctx[@"display"][@"addBox"];
+    [addBox callWithArguments:@[@(t_.x), @(t_.y), @(t_.z), @(eu_.x), @(eu_.y), @(eu_.z), @(color_)]];
+}
+
+void DebugHandler::updateCamera(metaio::Vector3d t_, metaio::Rotation r_)
+{
+    metaio::Vector4d qu_ = r_.getQuaternion();
+    ctx[@"display"][@"cam"][@"t"][@"x"] = @(t_.x);
+    ctx[@"display"][@"cam"][@"t"][@"y"] = @(t_.y);
+    ctx[@"display"][@"cam"][@"t"][@"z"] = @(t_.z);
+    ctx[@"display"][@"cam"][@"r"][@"x"] = @(qu_.x);
+    ctx[@"display"][@"cam"][@"r"][@"y"] = @(qu_.y);
+    ctx[@"display"][@"cam"][@"r"][@"z"] = @(qu_.z);
+    ctx[@"display"][@"cam"][@"r"][@"w"] = @(qu_.w);
 }
 
 
