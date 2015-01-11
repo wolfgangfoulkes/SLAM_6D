@@ -272,7 +272,6 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     
     //init time
     elapsed = [[NSDate alloc] init];
-    
 }
 
 -(void)viewDidAppear:(BOOL)animated
