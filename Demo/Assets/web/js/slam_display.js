@@ -6,6 +6,7 @@ defaultOr = function(arg_, default_)
 Pose = function(){
     this.t = {x: 0, y:0, z:0};
     this.r = {x: 0, y:0, z:0, w:0};
+    this.scale = {x: 0, y:0, z:0};
 };
 
 Model = function(){
@@ -56,7 +57,6 @@ display = new function()
         rx_ = defaultOr(rx_, 0);
         ry_ = defaultOr(ry_, 0);
         rz_ = defaultOr(rz_, 0);
-        rw_ = defaultOr(rw_, 0);
         color_ = defaultOr(color_, 0);
         
         var pose_ = new Pose();
@@ -66,7 +66,6 @@ display = new function()
         pose_.r.x = rx_;
         pose_.r.y = ry_;
         pose_.r.z = rz_;
-        pose_.r.w = rw_;
         
         color_ = parseInt(color_.toString(16), 16);
         

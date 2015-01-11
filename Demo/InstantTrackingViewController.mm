@@ -272,15 +272,6 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     
     //init time
     elapsed = [[NSDate alloc] init];
-    
-    metaio::Vector3d t(100, 0, 100);
-    metaio::Rotation r(dToR(10), dToR(20), dToR(30));
-    metaio::Vector3d scale(10, 100, 1000);
-    NSMutableDictionary * dict = toDict(t, r, scale);
-    NSLog([NSString stringWithFormat:@"(%@, %@, %@), (%@, %@, %@, %@), (%@, %@, %@)",
-    dict[@"t"][@"x"], dict[@"t"][@"y"], dict[@"t"][@"z"],
-    dict[@"r"][@"x"], dict[@"r"][@"x"], dict[@"r"][@"z"], dict[@"r"][@"w"],
-    dict[@"scale"][@"x"], dict[@"scale"][@"y"], dict[@"scale"][@"z"]]);
 }
 
 -(void)viewDidAppear:(BOOL)animated

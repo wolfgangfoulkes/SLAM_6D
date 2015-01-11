@@ -169,14 +169,14 @@ void DebugHandler::addBox(int color_, metaio::Vector3d t_, metaio::Rotation r_)
 void DebugHandler::updateCamera(metaio::Vector3d t_, metaio::Rotation r_)
 {
     metaio::Vector4d qu_ = r_.getQuaternion();
-    ctx[@"display"][@"cam"][@"t"][@"x"] = @(t_.x);
-    ctx[@"display"][@"cam"][@"t"][@"y"] = @(t_.y);
-    ctx[@"display"][@"cam"][@"t"][@"z"] = @(t_.z);
-    ctx[@"display"][@"cam"][@"r"][@"x"] = @(qu_.x);
-    ctx[@"display"][@"cam"][@"r"][@"y"] = @(qu_.y);
-    ctx[@"display"][@"cam"][@"r"][@"z"] = @(qu_.z);
-    ctx[@"display"][@"cam"][@"r"][@"w"] = @(qu_.w);
-    //ctx[@"display"][@"cam"] = toDict(t_, qu_);
+//    ctx[@"display"][@"cam"][@"t"][@"x"] = @(t_.x);
+//    ctx[@"display"][@"cam"][@"t"][@"y"] = @(t_.y);
+//    ctx[@"display"][@"cam"][@"t"][@"z"] = @(t_.z);
+//    ctx[@"display"][@"cam"][@"r"][@"x"] = @(qu_.x);
+//    ctx[@"display"][@"cam"][@"r"][@"y"] = @(qu_.y);
+//    ctx[@"display"][@"cam"][@"r"][@"z"] = @(qu_.z);
+//    ctx[@"display"][@"cam"][@"r"][@"w"] = @(qu_.w);
+    ctx[@"display"][@"cam"] = toDict(t_, qu_);
 }
 
 
