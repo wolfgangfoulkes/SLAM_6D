@@ -1,32 +1,11 @@
 defaultOr = function(arg_, default_)
 {
-    return (typeof arg_ !== 'undefined') ? arg_ : default_;
+    return (typeof arg_ !== "undefined") ? arg_ : default_;
 }
 
 Pose = function(){
     this.t = {x: 0, y:0, z:0};
     this.r = {x: 0, y:0, z:0, w:0};
-    
-//    this.set = function(three_v_, three_r_)
-//    {
-//        three_v_ = defaultOr(three_v_, new THREE.Vector3(0, 0, 0));
-//        three_r_ = defaultOr(three_r_, new THREE.Euler(0, 0, 0));
-//        this.t.x = three_v_.x;
-//        this.t.y = three_v_.y;
-//        this.t.z = three_v_.z;
-//        this.r.x = three_r_.x;
-//        this.r.y = three_r_.y;
-//        this.r.z = three_r_.z;
-//    }
-//    this.getVec3 = function()
-//    {
-//        return new THREE.Vector3(this.t.x, this.t.y, this.t.z);
-//    }
-//    
-//    this.getEuler = function()
-//    {
-//        return new THREE.Euler(this.r.x, this.r.y, this.r.z);
-//    }
 };
 
 Model = function(){
@@ -39,7 +18,7 @@ display = new function()
 {
     
     this.animate = false;
-    this.models = [];
+    this.models = []; //replace with object, so you can access by name
     this.cam = new Pose();
     
     this.init = function()
@@ -74,9 +53,10 @@ display = new function()
         x_ = defaultOr(x_, 0);
         y_ = defaultOr(y_, 0);
         z_ = defaultOr(z_, 0);
-        rx_ = defaultOr(x_, 0);
-        ry_ = defaultOr(y_, 0);
-        rz_ = defaultOr(z_, 0);
+        rx_ = defaultOr(rx_, 0);
+        ry_ = defaultOr(ry_, 0);
+        rz_ = defaultOr(rz_, 0);
+        rw_ = defaultOr(rw_, 0);
         color_ = defaultOr(color_, 0);
         
         var pose_ = new Pose();
@@ -86,6 +66,7 @@ display = new function()
         pose_.r.x = rx_;
         pose_.r.y = ry_;
         pose_.r.z = rz_;
+        pose_.r.w = rw_;
         
         color_ = parseInt(color_.toString(16), 16);
         

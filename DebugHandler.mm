@@ -30,11 +30,69 @@ void DebugHandler::initJS(JSContext * ctx_)
         NSLog(@"JavaScript %@ log message: %@", [JSContext currentContext], msg);
     }; //works for all console.log messages
     
-    this->addModel();
-    this->addModel(8947712, metaio::Vector3d(-200, 0, -200)); //yellowy-brown
-    this->addModel(559232, metaio::Vector3d(-500, -100, 0)); //aqua
+    this->initGL();
     
     jsIsInit = true;
+}
+
+void DebugHandler::update()
+{
+    if (!jsIsInit)
+    {
+        return;
+    }
+
+    if (!jsIsReady)
+    {
+        jsIsReady = ctx[@"isReady"].toBool;
+        return;
+    }
+    
+    if (!pose || !this->print)
+    {
+        return;
+    }
+    
+    ctx[@"printToScreen"] = @(this->print);
+    
+    this->getJS();
+    
+    metaio::Vector3d SCALE(X_COEFF, Y_COEFF, Z_COEFF);
+    metaio::Vector3d _offs = metaio::Vector3d(this->pose->t_offs); _offs = round(_offs, SIG_FIGS);  _offs = scale(_offs, SCALE);
+    metaio::Vector3d _cam = metaio::Vector3d(this->pose->t_p);      _cam = round(_cam, SIG_FIGS);    _cam = scale(_cam, SCALE);
+    metaio::Vector3d _obj = metaio::Vector3d(this->pose->t_last);   _obj = round(_obj, SIG_FIGS);    _obj = scale(_obj, SCALE);
+    metaio::Vector3d _obj1 = metaio::Vector3d(this->o_t);          _obj1 = round(_obj1, SIG_FIGS);  _obj1 = scale(_obj1, SCALE);
+    
+    metaio::Vector3d _cf_acc = metaio::Vector3d(this->cf_acc);   _cf_acc = round(_cf_acc, SIG_FIGS);
+    
+    updatePose(@"init", _offs, this->pose->r_offs);
+    updatePose(@"c", _cam , this->pose->r_p);
+    updatePose(@"o", _obj , this->pose->r_last);
+    updatePose(@"o1", _obj1 , this->o_r);
+    updatePose(@"sensors", this->acc, this->gyr);
+    updatePose(@"filter", this->cf_acc, this->cf_gyr);
+    
+    ctx[@"COS"][@"idx"] = @(COS); //@(this->pose->COS);
+    ctx[@"COS"][@"state"] = [NSString stringWithFormat:@"%s", tracking_state.c_str()];
+    
+    this->updateGL();
+    
+    if (printLog)
+    {
+        ctx[@"log"] = this->log;
+    }
+}
+
+void DebugHandler::initGL()
+{
+    this->addBox();
+    this->addBox(8947712, metaio::Vector3d(-200, 0, -200)); //yellowy-brown
+    this->addBox(559232, metaio::Vector3d(-500, -100, 0)); //aqua
+}
+
+void DebugHandler::updateGL()
+{
+    this->updateCamera(this->pose->t_p, this->pose->r_p);
 }
 
 void DebugHandler::getJS()
@@ -60,54 +118,6 @@ void DebugHandler::getJS()
     r_touch = _r;
 
     updatePose(@"touch", _t, _r);
-}
-
-void DebugHandler::update()
-{
-    if (!jsIsInit)
-    {
-        return;
-    }
-
-    if (!jsIsReady)
-    {
-        jsIsReady = ctx[@"isReady"].toBool;
-        return;
-    }
-    
-    if (!pose || !this->print)
-    {
-        return;
-    }
-    
-    ctx[@"printToScreen"] = @(this->print);
-    
-    getJS();
-    
-    metaio::Vector3d SCALE(X_COEFF, Y_COEFF, Z_COEFF);
-    metaio::Vector3d _offs = metaio::Vector3d(this->pose->t_offs); _offs = round(_offs, SIG_FIGS);  _offs = scale(_offs, SCALE);
-    metaio::Vector3d _cam = metaio::Vector3d(this->pose->t_p);      _cam = round(_cam, SIG_FIGS);    _cam = scale(_cam, SCALE);
-    metaio::Vector3d _obj = metaio::Vector3d(this->pose->t_last);   _obj = round(_obj, SIG_FIGS);    _obj = scale(_obj, SCALE);
-    metaio::Vector3d _obj1 = metaio::Vector3d(this->o_t);          _obj1 = round(_obj1, SIG_FIGS);  _obj1 = scale(_obj1, SCALE);
-    
-    metaio::Vector3d _cf_acc = metaio::Vector3d(this->cf_acc);   _cf_acc = round(_cf_acc, SIG_FIGS);
-    
-    updatePose(@"init", _offs, this->pose->r_offs);
-    updatePose(@"c", _cam , this->pose->r_p);
-    updatePose(@"o", _obj , this->pose->r_last);
-    updatePose(@"o1", _obj1 , this->o_r);
-    updatePose(@"sensors", this->acc, this->gyr);
-    updatePose(@"filter", this->cf_acc, this->cf_gyr);
-    
-    ctx[@"COS"][@"idx"] = @(COS); //@(this->pose->COS);
-    ctx[@"COS"][@"state"] = [NSString stringWithFormat:@"%s", tracking_state.c_str()];
-    
-    this->updateCamera(this->pose->t_p, this->pose->r_p);
-    
-    if (printLog)
-    {
-        ctx[@"log"] = this->log;
-    }
 }
 
 void DebugHandler::updatePose(NSString * pose_, metaio::Vector3d t_, metaio::Rotation r_)
@@ -142,18 +152,18 @@ void DebugHandler::setPose()
     }
 }
 
-void DebugHandler::addModel(metaio::Vector3d t_, metaio::Rotation r_)
+void DebugHandler::addBox(metaio::Vector3d t_, metaio::Rotation r_)
 {
     metaio::Vector3d eu_ = r_.getEulerAngleDegrees();
-    JSValue * addBox = ctx[@"display"][@"addBox"];
-    [addBox callWithArguments:@[@(t_.x), @(t_.y), @(t_.z), @(eu_.x), @(eu_.y), @(eu_.z)]];
+    JSValue * addBoxJS = ctx[@"display"][@"addBox"];
+    [addBoxJS callWithArguments:@[@(t_.x), @(t_.y), @(t_.z), @(eu_.x), @(eu_.y), @(eu_.z)]];
 }
 
-void DebugHandler::addModel(int color_, metaio::Vector3d t_, metaio::Rotation r_)
+void DebugHandler::addBox(int color_, metaio::Vector3d t_, metaio::Rotation r_)
 {
     metaio::Vector3d eu_ = r_.getEulerAngleDegrees();
-    JSValue * addBox = ctx[@"display"][@"addBox"];
-    [addBox callWithArguments:@[@(t_.x), @(t_.y), @(t_.z), @(eu_.x), @(eu_.y), @(eu_.z), @(color_)]];
+    JSValue * addBoxJS = ctx[@"display"][@"addBox"];
+    [addBoxJS callWithArguments:@[@(t_.x), @(t_.y), @(t_.z), @(eu_.x), @(eu_.y), @(eu_.z), @(color_)]];
 }
 
 void DebugHandler::updateCamera(metaio::Vector3d t_, metaio::Rotation r_)
@@ -166,6 +176,7 @@ void DebugHandler::updateCamera(metaio::Vector3d t_, metaio::Rotation r_)
     ctx[@"display"][@"cam"][@"r"][@"y"] = @(qu_.y);
     ctx[@"display"][@"cam"][@"r"][@"z"] = @(qu_.z);
     ctx[@"display"][@"cam"][@"r"][@"w"] = @(qu_.w);
+    //ctx[@"display"][@"cam"] = toDict(t_, qu_);
 }
 
 
