@@ -34,7 +34,7 @@ display = new function()
         display.camera = new THREE.PerspectiveCamera(750, $container.innerWidth() / $container.innerHeight(), 0.1, 100000);
         display.camera.useQuaternion = true;
         
-        var ambient = new THREE.AmbientLight( 0x101030 );
+        var ambient = new THREE.AmbientLight( 0xffffff );
 		display.scene.add( ambient );
         display.renderer = new THREE.WebGLRenderer();
         display.renderer.setSize( $container.innerWidth(), $container.innerHeight() );
@@ -57,7 +57,7 @@ display = new function()
     };
     
     
-    this.addOBJ = function(path_, x_, y_, z_, rx_, ry_, rz_, rw_, scale_, color_)
+    this.addOBJ = function(obj_path_, x_, y_, z_, rx_, ry_, rz_, rw_, scale_)
     {
         console.log("addOBJ");
         x_ = defaultOr(x_, 0);
@@ -67,8 +67,7 @@ display = new function()
         ry_ = defaultOr(ry_, 0);
         rz_ = defaultOr(rz_, 0);
         rw_ = defaultOr(rw_, 0);
-        scale_ = defaultOr(scale_, 1.);
-        color_ = defaultOr(color_, 0);
+        scale_ = defaultOr(scale_, 1.0);
 
         var pose_ = new Pose();
         pose_.t.x = x_;
@@ -81,53 +80,13 @@ display = new function()
         pose_.scale.x = scale_;
         pose_.scale.y = scale_;
         pose_.scale.z = scale_;
-        
-        color_ = parseInt(color_.toString(16), 16);
-        
-        display.loadOBJ(path_,
-            function(object)
-            {
-                object.position.x = x_;
-                object.position.y = y_;
-                object.position.z = z_;
-                console.log(object.position.z);
-                
-                object.quaternion.x = rx_;
-                object.quaternion.y = ry_;
-                object.quaternion.z = rz_;
-                object.quaternion.w = rw_;
-                
-                object.traverse(function (child) {
-                        if ( child instanceof THREE.Mesh )
-                        {
-                            child.material.color = color_;
-                            //child.material.map = texture;
-                        }
-                    }
-                );
-                
-                object.scale.x = scale_;
-                object.scale.y = scale_;
-                object.scale.z = scale_;
-                
-                display.scene.add(object);
-                
-                var model = new Model();
-                model.model = object;
-                model.pose = pose_;
-            }
-        );
-    };
-    
-    this.loadOBJ = function(path_, callback_)
-    {
-        console.log("loadOBJ");
+
+        /***** shared *****/
         var manager = new THREE.LoadingManager();
         manager.onProgress = function (item, loaded, total)
         {
             console.log( item, loaded, total );
         };
-        
         var onProgress = function ( xhr )
         {
             if ( xhr.lengthComputable )
@@ -136,14 +95,142 @@ display = new function()
                 console.log( Math.round(percentComplete, 2) + "% downloaded" );
             }
         };
-
         var onError = function ( xhr )
         {
             console.log("error loading object!");
         };
+
+        /***** load OBJ *****/
+        var loaderOBJ = new THREE.OBJLoader( manager );
+        var callbackOBJ = function (object)
+        {
+        	object.position.x = x_;
+            object.position.y = y_;
+            object.position.z = z_;
+            //object.position.set(x_, y_, z_);
+
+            object.useQuaternion = true;
+            
+            object.quaternion.x = rx_;
+            object.quaternion.y = ry_;
+            object.quaternion.z = rz_;
+            object.quaternion.w = rw_;
+            //object.quaternion.set(rx_, ry_, rz_, rw_);
+            
+           object.scale.x = scale_;
+           object.scale.y = scale_;
+           object.scale.z = scale_;
+           //object.scale.set(scale_, scale_, scale_);
+
+           object.traverse(function (child) {
+				if ( child instanceof THREE.Mesh ) 
+				{
+					child.material.wireframe = true;
+				}
+			});
+
+           	display.scene.add(object);
+			
+		/*** create new Model for OBJ ***/
+			display.models[0] = new Model();
+        	display.models[0].model = object;
+       		display.models[0].pose = pose_;
+        }
+        loaderOBJ.load(obj_path_, callbackOBJ, onProgress, onError);
+    };
     
-        var loader = new THREE.OBJLoader( manager );
-        loader.load( path_, callback_, onProgress, onError );
+    //can replace this with 2 functions, one that takes an object, and traverses and maps tex to obj
+    this.addTexturedOBJ = function(obj_path_, image_path_, x_, y_, z_, rx_, ry_, rz_, rw_, scale_)
+    {
+        console.log("addOBJ");
+        x_ = defaultOr(x_, 0);
+        y_ = defaultOr(y_, 0);
+        z_ = defaultOr(z_, 0);
+        rx_ = defaultOr(rx_, 0);
+        ry_ = defaultOr(ry_, 0);
+        rz_ = defaultOr(rz_, 0);
+        rw_ = defaultOr(rw_, 0);
+        scale_ = defaultOr(scale_, 1.0);
+
+        var pose_ = new Pose();
+        pose_.t.x = x_;
+        pose_.t.y = y_;
+        pose_.t.z = z_;
+        pose_.r.x = rx_;
+        pose_.r.y = ry_;
+        pose_.r.z = rz_;
+        pose_.r.w = rw_;
+        pose_.scale.x = scale_;
+        pose_.scale.y = scale_;
+        pose_.scale.z = scale_;
+
+        /***** shared *****/
+        var manager = new THREE.LoadingManager();
+        manager.onProgress = function (item, loaded, total)
+        {
+            console.log( item, loaded, total );
+        };
+        var onProgress = function ( xhr )
+        {
+            if ( xhr.lengthComputable )
+            {
+                var percentComplete = xhr.loaded / xhr.total * 100;
+                console.log( Math.round(percentComplete, 2) + "% downloaded" );
+            }
+        };
+        var onError = function ( xhr )
+        {
+            console.log("error loading object!");
+        };
+
+        /***** create texture to map onto object *****/
+        var texture = new THREE.Texture(); 
+
+        /***** load OBJ *****/
+        var loaderOBJ = new THREE.OBJLoader( manager );
+        var callbackOBJ = function (object)
+        {
+            object.position.x = x_;
+            object.position.y = y_;
+            object.position.z = z_;
+            //object.position.set(x_, y_, z_);
+
+            object.useQuaternion = true;
+            
+            object.quaternion.x = rx_;
+            object.quaternion.y = ry_;
+            object.quaternion.z = rz_;
+            object.quaternion.w = rw_;
+            //object.quaternion.set(rx_, ry_, rz_, rw_);
+            
+           object.scale.x = scale_;
+           object.scale.y = scale_;
+           object.scale.z = scale_;
+           //object.scale.set(scale_, scale_, scale_);
+
+           object.traverse(function (child) {
+                if ( child instanceof THREE.Mesh ) 
+                {
+                    child.material.map = texture;
+                }
+            });
+
+            display.scene.add(object);
+			
+		/*** create new Model for OBJ ***/
+			display.models[0] = new Model();
+        	display.models[0].model = object;
+       		display.models[0].pose = pose_;
+        }
+        loaderOBJ.load(obj_path_, callbackOBJ, onProgress, onError);
+
+       	var loaderImage = new THREE.ImageLoader(manager);
+       	var callbackImage = function (image) 
+       	{
+       		texture.image = image;
+	        texture.needsUpdate = true;
+       	}
+       	loaderImage.load(image_path_, callbackImage, onProgress, onError);
     };
 };
 

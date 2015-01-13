@@ -87,9 +87,9 @@ void DebugHandler::initGL()
 {
     JSValue * display_init = ctx[@"display"][@"init"];
     [display_init callWithArguments:@[]];
-    this->addOBJ();
-    this->addOBJ(8947712, metaio::Vector3d(-200, 0, -200)); //yellowy-brown
-    this->addOBJ(559232, metaio::Vector3d(-500, -100, 0)); //aqua
+    this->addOBJ(@"../../Assets/obj/head.obj", @"../../Assets/images/head.png", metaio::Vector3d(0, 0, 0), metaio::Rotation(0, 0, 0), 100.0);
+    this->addOBJ(@"../../Assets/obj/head.obj", metaio::Vector3d(-200, 0, -200), metaio::Rotation(0, 0, 0), 100.0);
+    this->addOBJ(@"../../Assets/obj/head.obj", metaio::Vector3d(-500, -100, 0), metaio::Rotation(0, 0, 0), 100.0);
 }
 
 void DebugHandler::updateGL()
@@ -154,25 +154,18 @@ void DebugHandler::setPose()
     }
 }
 
-void DebugHandler::addOBJ(metaio::Vector3d t_, metaio::Rotation r_)
+void DebugHandler::addOBJ(NSString * obj_path_, metaio::Vector3d t_, metaio::Rotation r_, float scale_)
 {
     metaio::Vector4d qu_ = r_.getQuaternion();
     JSValue * addOBJJS = ctx[@"display"][@"addOBJ"];
-    [addOBJJS callWithArguments:@[@"../../Assets/obj/head.obj", @(t_.x), @(t_.y), @(t_.z), @(qu_.x), @(qu_.y), @(qu_.z), @(qu_.w), @(1.0)]];
+    [addOBJJS callWithArguments:@[[NSString stringWithString: obj_path_], @(t_.x), @(t_.y), @(t_.z), @(qu_.x), @(qu_.y), @(qu_.z), @(qu_.w), @(scale_)]];
 }
 
-void DebugHandler::addOBJ(int color_, metaio::Vector3d t_, metaio::Rotation r_)
+void DebugHandler::addOBJ(NSString * obj_path_, NSString * tex_path_, metaio::Vector3d t_, metaio::Rotation r_, float scale_)
 {
     metaio::Vector4d qu_ = r_.getQuaternion();
-    JSValue * addOBJJS = ctx[@"display"][@"addOBJ"];
-    [addOBJJS callWithArguments:@[@"../../Assets/obj/head.obj", @(t_.x), @(t_.y), @(t_.z), @(qu_.x), @(qu_.y), @(qu_.z), @(qu_.w), @(1.0), @(color_)]];
-}
-
-void DebugHandler::addOBJ(int color_, float scale_, metaio::Vector3d t_, metaio::Rotation r_)
-{
-    metaio::Vector4d qu_ = r_.getQuaternion();
-    JSValue * addOBJJS = ctx[@"display"][@"addOBJ"];
-    [addOBJJS callWithArguments:@[@"../../Assets/obj/head.obj", @(t_.x), @(t_.y), @(t_.z), @(qu_.x), @(qu_.y), @(qu_.z), @(qu_.w), @(scale_), @(color_)]];
+    JSValue * addOBJJS = ctx[@"display"][@"addTexturedOBJ"];
+    [addOBJJS callWithArguments:@[[NSString stringWithString: obj_path_], [NSString stringWithString: tex_path_], @(t_.x), @(t_.y), @(t_.z), @(qu_.x), @(qu_.y), @(qu_.z), @(qu_.w), @(scale_)]];
 }
 
 void DebugHandler::updateCamera(metaio::Vector3d t_, metaio::Rotation r_)
