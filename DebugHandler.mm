@@ -89,12 +89,12 @@ void DebugHandler::initGL()
     [display_init callWithArguments:@[]];
     this->addOBJ();
     this->addOBJ(8947712, metaio::Vector3d(-200, 0, -200)); //yellowy-brown
-    this->addBox(559232, metaio::Vector3d(-500, -100, 0)); //aqua
+    this->addOBJ(559232, metaio::Vector3d(-500, -100, 0)); //aqua
 }
 
 void DebugHandler::updateGL()
 {
-    //this->updateCamera(this->pose->t_p, this->pose->r_p);
+    this->updateCamera(this->pose->t_p, this->pose->r_p);
 }
 
 void DebugHandler::getJS()
@@ -152,20 +152,6 @@ void DebugHandler::setPose()
     {
         pose->updateP(_t, _r, 0);
     }
-}
-
-void DebugHandler::addBox(metaio::Vector3d t_, metaio::Rotation r_)
-{
-    metaio::Vector3d eu_ = r_.getEulerAngleDegrees();
-    JSValue * addBoxJS = ctx[@"display"][@"addBox"];
-    [addBoxJS callWithArguments:@[@(t_.x), @(t_.y), @(t_.z), @(eu_.x), @(eu_.y), @(eu_.z)]];
-}
-
-void DebugHandler::addBox(int color_, metaio::Vector3d t_, metaio::Rotation r_)
-{
-    metaio::Vector3d eu_ = r_.getEulerAngleDegrees();
-    JSValue * addBoxJS = ctx[@"display"][@"addBox"];
-    [addBoxJS callWithArguments:@[@(t_.x), @(t_.y), @(t_.z), @(eu_.x), @(eu_.y), @(eu_.z), @(color_)]];
 }
 
 void DebugHandler::addOBJ(metaio::Vector3d t_, metaio::Rotation r_)
