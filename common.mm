@@ -254,7 +254,7 @@ void calcCOSOffset(metaio::Vector3d t_, metaio::Rotation r_, metaio::Vector3d t_
 
 void logMA(NSString * s_, NSMutableArray * ma_)
 {
-    if (ma_.count >= 200)
+    if (ma_.count >= 50)
     {
         [ma_ removeObjectAtIndex:0];
         //[ma_ removeObjectsInRange:{0, 10}]; //put this in debugHandler
@@ -264,7 +264,7 @@ void logMA(NSString * s_, NSMutableArray * ma_)
 
 void logMA(std::string s_, NSMutableArray * ma_)
 {
-    if (ma_.count >= 200)
+    if (ma_.count >= 50)
     {
         [ma_ removeObjectAtIndex:0];
         //[ma_ removeObjectsInRange:{0, 10}]; //put this in debugHandler
