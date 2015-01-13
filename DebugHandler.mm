@@ -85,14 +85,16 @@ void DebugHandler::update()
 
 void DebugHandler::initGL()
 {
-    this->addBox();
-    this->addBox(8947712, metaio::Vector3d(-200, 0, -200)); //yellowy-brown
+    JSValue * display_init = ctx[@"display"][@"init"];
+    [display_init callWithArguments:@[]];
+    this->addOBJ();
+    this->addOBJ(8947712, metaio::Vector3d(-200, 0, -200)); //yellowy-brown
     this->addBox(559232, metaio::Vector3d(-500, -100, 0)); //aqua
 }
 
 void DebugHandler::updateGL()
 {
-    this->updateCamera(this->pose->t_p, this->pose->r_p);
+    //this->updateCamera(this->pose->t_p, this->pose->r_p);
 }
 
 void DebugHandler::getJS()
@@ -164,6 +166,27 @@ void DebugHandler::addBox(int color_, metaio::Vector3d t_, metaio::Rotation r_)
     metaio::Vector3d eu_ = r_.getEulerAngleDegrees();
     JSValue * addBoxJS = ctx[@"display"][@"addBox"];
     [addBoxJS callWithArguments:@[@(t_.x), @(t_.y), @(t_.z), @(eu_.x), @(eu_.y), @(eu_.z), @(color_)]];
+}
+
+void DebugHandler::addOBJ(metaio::Vector3d t_, metaio::Rotation r_)
+{
+    metaio::Vector4d qu_ = r_.getQuaternion();
+    JSValue * addOBJJS = ctx[@"display"][@"addOBJ"];
+    [addOBJJS callWithArguments:@[@"../../Assets/obj/head.obj", @(t_.x), @(t_.y), @(t_.z), @(qu_.x), @(qu_.y), @(qu_.z), @(qu_.w), @(1.0)]];
+}
+
+void DebugHandler::addOBJ(int color_, metaio::Vector3d t_, metaio::Rotation r_)
+{
+    metaio::Vector4d qu_ = r_.getQuaternion();
+    JSValue * addOBJJS = ctx[@"display"][@"addOBJ"];
+    [addOBJJS callWithArguments:@[@"../../Assets/obj/head.obj", @(t_.x), @(t_.y), @(t_.z), @(qu_.x), @(qu_.y), @(qu_.z), @(qu_.w), @(1.0), @(color_)]];
+}
+
+void DebugHandler::addOBJ(int color_, float scale_, metaio::Vector3d t_, metaio::Rotation r_)
+{
+    metaio::Vector4d qu_ = r_.getQuaternion();
+    JSValue * addOBJJS = ctx[@"display"][@"addOBJ"];
+    [addOBJJS callWithArguments:@[@"../../Assets/obj/head.obj", @(t_.x), @(t_.y), @(t_.z), @(qu_.x), @(qu_.y), @(qu_.z), @(qu_.w), @(scale_), @(color_)]];
 }
 
 void DebugHandler::updateCamera(metaio::Vector3d t_, metaio::Rotation r_)
