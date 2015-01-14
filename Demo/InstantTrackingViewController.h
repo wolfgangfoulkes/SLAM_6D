@@ -21,7 +21,6 @@
     int                 m_frames;
     NSDate              *elapsed;
     
-    CompSixAxis comp_filter;
 //    
 //    metaio::IGeometry*  m_obj;            // pointer to the model
 //    metaio::IGeometry*  m_obj1;           // pointer to the model
@@ -70,9 +69,6 @@
 
 - (void) loadDebugView;
 - (void) initDebugView;
-
-- (metaio::Vector3d) compFilterAcc: (metaio::Vector3d)acc_ andRVel: (metaio::Vector3d)r_vel_;
-
 
 //- (void)addPose: (int)name ToDebugContextT: (metaio::Vector4d)obj_t andR:(metaio::Rotation)obj_r;
 

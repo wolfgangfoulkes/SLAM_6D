@@ -29,11 +29,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     return 1;
 }
 
-#define GtoMperSxS(g) (g * 9.81)
-#define MperSxStoG(m) (m * 0.10193679918451)
-
 #define MM_INTERVAL (1.0f/30.0f)
-#define TAU 1.0f //larger: less noise, more drift
 
 @interface InstantTrackingViewController ()
 {
@@ -57,34 +53,6 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     {
         return;
     }
-    
-    /***** update device motion *****/
-    NSTimeInterval sinceLastFrame = -[self->elapsed timeIntervalSinceNow]; //in seconds
-    self->elapsed = [NSDate date];
-    metaio::Vector3d t_s;
-    metaio::Rotation r_s;
-    CMDeviceMotion * motion_ = self.motionManager.deviceMotion;
-    t_s.x = motion_.userAcceleration.x;
-    t_s.y = motion_.userAcceleration.y;
-    t_s.z = motion_.userAcceleration.z;
-    metaio::Vector3d eu_s;
-    eu_s.x = motion_.attitude.pitch;
-    eu_s.y = motion_.attitude.yaw;
-    eu_s.z = motion_.attitude.roll;
-    r_s.setFromEulerAngleRadians(eu_s);
-    debugHandler.acc = t_s;
-    debugHandler.gyr = r_s;
-    
-    metaio::Vector3d r_vel;
-    r_vel.x = motion_.rotationRate.x;
-    r_vel.y = motion_.rotationRate.y;
-    r_vel.z = motion_.rotationRate.z;
-    metaio::Vector3d t_cf = [self compFilterAcc:t_s andRVel:r_vel];
-    t_cf.x = rToD(t_cf.x) - 180;
-    t_cf.y = rToD(t_cf.y) - 180;
-    debugHandler.cf_acc = t_cf;
-    /*****/
-    
     
     [self updateTrackingState];
     if (updateMetaio && activeCOS)
@@ -260,11 +228,9 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     //CMMotionManager
     if(self.motionManager.isDeviceMotionAvailable)
     {
-        [self.motionManager startDeviceMotionUpdates];
-        self.motionManager.deviceMotionUpdateInterval = MM_INTERVAL;
+//        [self.motionManager startDeviceMotionUpdates];
+//        self.motionManager.deviceMotionUpdateInterval = MM_INTERVAL;
     }
-    
-    comp_filter = CompSixAxis(MM_INTERVAL, TAU);
     
     //init time
     elapsed = [[NSDate alloc] init];
@@ -298,21 +264,6 @@ int printf(const char * __restrict format, ...) //printf don't print to console
      motionManager = [appDelegate motionManager];
    }
    return motionManager;
-}
-
-- (metaio::Vector3d) compFilterAcc: (metaio::Vector3d)acc_ andRVel: (metaio::Vector3d)r_vel_
-{
-    metaio::Vector3d _cf;
-    float cf_x = 0.0f;
-    float cf_y = 0.0f;
-    self->comp_filter.CompAccelUpdate(GtoMperSxS(acc_.x), GtoMperSxS(acc_.y), GtoMperSxS(acc_.z));
-    self->comp_filter.CompGyroUpdate(r_vel_.x, r_vel_.y, r_vel_.z);
-    //self->comp_filter.CompStart();
-    self->comp_filter.CompUpdate();
-    self->comp_filter.CompAnglesGet(&cf_x, &cf_y);
-    _cf.x = cf_x;
-    _cf.y = cf_y;
-    return _cf;
 }
 
 
