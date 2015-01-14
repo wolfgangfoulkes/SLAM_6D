@@ -26,6 +26,7 @@ public:
     const double Z_COEFF = 0.05;
     
     //to scale coordinates for display
+    //eventually, we'll need to scale Z more or less, bc Z is the hardest for the camera to figure
     double SCALE_COEFF = 0.05;
 
     NSMutableArray * log;

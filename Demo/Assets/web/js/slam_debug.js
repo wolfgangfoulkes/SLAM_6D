@@ -10,6 +10,8 @@ Pose = function()
 db = new Pose();
 db.t = {x: 0.5, y: 0.5, z: 0.5};
 
+SCALE_COEFF = 0.0;
+
 //set externally
 c = new Pose();
 o = new Pose();
@@ -86,6 +88,8 @@ setReadout = function()
     var $cos_state = $(".cos .state");
     $cos_idx.text(COS.idx);
     $cos_state.text(COS.state);
+    
+    $(".scale .coordinates").text(SCALE_COEFF.toPrecision(5));
     
     if (print_log)
     {
@@ -198,6 +202,7 @@ jQuery(document).ready(function(){
     {
         if (setP || setPInit)
         {
+            SCALE_COEFF = SCALE_COEFF * (1/1.1);
         }
     });
     
@@ -205,6 +210,7 @@ jQuery(document).ready(function(){
     {
         if (setP || setPInit)
         {
+            SCALE_COEFF = SCALE_COEFF * 1.1;
         }
     });
 

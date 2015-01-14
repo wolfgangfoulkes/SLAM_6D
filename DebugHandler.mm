@@ -32,6 +32,8 @@ void DebugHandler::initJS(JSContext * ctx_)
     
     this->initGL();
     
+    ctx[@"SCALE_COEFF"] = @(SCALE_COEFF);
+    
     jsIsInit = true;
 }
 
@@ -135,6 +137,8 @@ void DebugHandler::getJS()
     r_touch = _r;
 
     updatePose(@"touch", _t, _r);
+    
+    SCALE_COEFF = [ctx[@"SCALE_COEFF"] toDouble];
 }
 
 void DebugHandler::updatePose(NSString * pose_, metaio::Vector3d t_, metaio::Rotation r_)
