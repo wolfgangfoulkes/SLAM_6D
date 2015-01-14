@@ -87,18 +87,17 @@ void DebugHandler::initGL()
 {
     JSValue * display_init = ctx[@"display"][@"init"];
     [display_init callWithArguments:@[]];
-    double _scale_coeff = SCALE_COEFF;
     this->addOBJ(@"../../Assets/obj/head.obj",
         @"../../Assets/images/head.png",
         metaio::Vector3d(0, 0, 0),
         metaio::Rotation(0, 0, 0),
-        1.0);
+        3.0);
     this->addOBJ(@"../../Assets/obj/head.obj",
-        metaio::Vector3d(-200 * SCALE_COEFF, 0, -200 * SCALE_COEFF),
+        metaio::Vector3d(-100 * SCALE_COEFF, 0, -50 * SCALE_COEFF),
         metaio::Rotation(0, 0, 0),
-        1.0);
+        2.0);
     this->addOBJ(@"../../Assets/obj/head.obj",
-        metaio::Vector3d(-500 * SCALE_COEFF, -100 * SCALE_COEFF, 0),
+        metaio::Vector3d(-200 * SCALE_COEFF, -80 * SCALE_COEFF, 0),
         metaio::Rotation(0, 0, 0),
         1.0);
 }

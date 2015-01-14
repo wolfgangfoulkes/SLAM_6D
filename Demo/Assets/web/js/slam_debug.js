@@ -198,7 +198,6 @@ jQuery(document).ready(function(){
     {
         if (setP || setPInit)
         {
-            db.r.y = db.r.y - 10;
         }
     });
     
@@ -206,7 +205,6 @@ jQuery(document).ready(function(){
     {
         if (setP || setPInit)
         {
-            db.r.y = db.r.y + 10;
         }
     });
 
