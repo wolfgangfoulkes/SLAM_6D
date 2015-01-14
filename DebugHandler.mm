@@ -87,14 +87,30 @@ void DebugHandler::initGL()
 {
     JSValue * display_init = ctx[@"display"][@"init"];
     [display_init callWithArguments:@[]];
-    this->addOBJ(@"../../Assets/obj/head.obj", @"../../Assets/images/head.png", metaio::Vector3d(0, 0, 0), metaio::Rotation(0, 0, 0), 100.0);
-    this->addOBJ(@"../../Assets/obj/head.obj", metaio::Vector3d(-200, 0, -200), metaio::Rotation(0, 0, 0), 100.0);
-    this->addOBJ(@"../../Assets/obj/head.obj", metaio::Vector3d(-500, -100, 0), metaio::Rotation(0, 0, 0), 100.0);
+    double _scale_coeff = SCALE_COEFF;
+    this->addOBJ(@"../../Assets/obj/head.obj",
+        @"../../Assets/images/head.png",
+        metaio::Vector3d(0, 0, 0),
+        metaio::Rotation(0, 0, 0),
+        1.0);
+    this->addOBJ(@"../../Assets/obj/head.obj",
+        metaio::Vector3d(-200 * SCALE_COEFF, 0, -200 * SCALE_COEFF),
+        metaio::Rotation(0, 0, 0),
+        1.0);
+    this->addOBJ(@"../../Assets/obj/head.obj",
+        metaio::Vector3d(-500 * SCALE_COEFF, -100 * SCALE_COEFF, 0),
+        metaio::Rotation(0, 0, 0),
+        1.0);
 }
 
 void DebugHandler::updateGL()
 {
-    this->updateCamera(this->pose->t_p, this->pose->r_p);
+    //scale rotation?
+    metaio::Vector3d _scaled = metaio::Vector3d(this->pose->t_p);
+    _scaled.x *= SCALE_COEFF;
+    _scaled.y *= SCALE_COEFF;
+    _scaled.z *= SCALE_COEFF;
+    this->updateCamera(_scaled, this->pose->r_p);
 }
 
 void DebugHandler::getJS()

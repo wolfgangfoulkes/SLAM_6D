@@ -24,6 +24,9 @@ public:
     const double X_COEFF = 0.05; //to scale output, and put into the right COS.
     const double Y_COEFF = 0.05;
     const double Z_COEFF = 0.05;
+    
+    //to scale coordinates for display
+    double SCALE_COEFF = 0.05;
 
     NSMutableArray * log;
     JSContext * ctx;
