@@ -191,7 +191,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     // Set the rendering clipping plane
     m_metaioSDK->setRendererClippingPlaneLimits(10, 30000);
     
-//    /***** Load content *****/
+    /***** Load content *****/
 //    m_scale = 1; // Initial scaling for the models
 //    m_obj_t = metaio::Vector3d(0, 0, 0);
 //    m_obj_r = metaio::Rotation();
@@ -201,7 +201,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 //    m_obj1_t = metaio::Vector3d(50, 0, -50);
 //    m_obj1_r = metaio::Rotation();
 //    m_obj1           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:1  modelTranslation:m_obj1_t modelScaling:m_scale modelCos:0];
-//    /*****/
+    /*****/
     
     //init tracking vars
     lastCOS = activeCOS = 0;
@@ -402,8 +402,6 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 	// allow rotation in all directions
 	return NO;
 }
-
-
 
 #pragma mark - Button handlers
 
