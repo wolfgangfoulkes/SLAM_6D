@@ -15,7 +15,6 @@
 
 #import "InstantTrackingViewController.h"
 #import "EAGLView.h"
-#import "MapTransitionHelper.h"
 
 #import "common.h"
 #import "Pose.h"
@@ -38,8 +37,6 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 
 @interface InstantTrackingViewController ()
 {
-    // Instance of a class that helps moving from one map to the next one, without the user noticing it
-    metaio::MapTransitionHelper mapTransitionHelper;
 }
 @end
 
@@ -182,7 +179,6 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         isTracking = true;
     }
     else {
-        mapTransitionHelper.prepareForTransitionToNewMap();
         isTracking = false;
     }
     
@@ -336,7 +332,6 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     
     if (poses[0].state == metaio::ETS_LOST)
     {
-        mapTransitionHelper.prepareForTransitionToNewMap();
     }
 }
 
