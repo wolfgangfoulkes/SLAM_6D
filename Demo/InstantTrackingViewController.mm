@@ -440,26 +440,4 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 }
 
 
-- (void)printDebugToConsole
-{
-//        //prints defined vs. valid (active) COS's
-//        printf("/nCOS's: %i of %i", m_metaioSDK->getNumberOfValidCoordinateSystems(), m_metaioSDK->getNumberOfDefinedCoordinateSystems());
-//        metaio::TrackingValues cos0 = m_metaioSDK->getTrackingValues(0);
-//        metaio::TrackingValues cos1 = m_metaioSDK->getTrackingValues(1);
-//        metaio::TrackingValues cos2 = m_metaioSDK->getTrackingValues(2);
-//        if (cos0.isTrackingState()) {printf("COS0: is tracking!");}
-//        else {printf("COS0: is not tracking!");}
-//        if (cos1.isTrackingState()) {printf("COS1: is tracking!");}
-//        else {printf("COS1: is not tracking!");}
-//        if (cos2.isTrackingState()) {printf("COS2: is tracking!");}
-//        else {printf("COS2: is not tracking!");}
-//
-//        //prints COS's IDs from name
-//        int right = m_metaioSDK->getCoordinateSystemID("map-mlab-front-right");
-//        int left = m_metaioSDK->getCoordinateSystemID("map-mlab-front-left");
-//        printf("\nmap-mlab-front-right: %d\n", right); //1
-//        printf("\nmap-mlab-front-left: %d\n", left); //2
-}
-
-
 @end
