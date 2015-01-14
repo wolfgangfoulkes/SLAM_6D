@@ -11,7 +11,7 @@
                 <SensorCosID>map1</SensorCosID>
                 <Parameters>
                     <Initialization Type="map">
-                        <Map>mlab/mlab_front_left.slam</Map>
+                        <Map>b304/board.slam</Map>
                     </Initialization>
                     <Learning Enabled="true">
                         <!-- both near middle, but this one with more "precise"-->
@@ -27,7 +27,7 @@
                 <SensorCosID>map2</SensorCosID>
                 <Parameters>
                     <Initialization Type="map">
-                        <Map>mlab/mlab_front_right.slam</Map>
+                        <Map>b304/keyboard_and_tower.slam</Map>
                     </Initialization>
                     <Learning Enabled="true">
                         <MinNumberOfObservations>4</MinNumberOfObservations>
@@ -57,7 +57,7 @@
     </Sensors>
     <Connections>
         <COS>
-            <Name>SLAN1</Name>
+            <Name>SLAM1</Name>
             <Fuser Type="SmoothingFuser">
                 <Parameters>
                     <AlphaRotation>0.8</AlphaRotation>

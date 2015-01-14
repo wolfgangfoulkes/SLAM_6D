@@ -118,41 +118,41 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         metaio::Rotation r;
         
         
-        //object 1
-        m_obj->setScale(m_scale);
-        
-        m_obj_t.x = (debugHandler.t_touch.x * 1000);
-        m_obj_t.z = (debugHandler.t_touch.y * 1000);
-        
-        t.x = cam.t_last.x + m_obj_t.x;
-        t.y = cam.t_last.y + m_obj_t.y;
-        t.z = cam.t_last.z + m_obj_t.z;
-        m_obj->setTranslation(t);
-        
-        //eu.y = debugHandler.r_touch.getEulerAngleDegrees().y; //removed rotation control for debug
-        //m_obj_r.setFromEulerAngleDegrees(eu);
-        r = cam.r_last * m_obj_r;
-        m_obj->setRotation(r); //I don't know what order this should be in, but this looked better
-        
-        
-        debugHandler.o_t = t;
-        debugHandler.o_r = r;
-        
-        eu.setZero();
-        t.setZero();
-        r.setNoRotation();
-        
-        //object 2
-        m_obj1->setScale(m_scale1);
-        
-        t.x = cam.t_last.x + m_obj1_t.x;
-        t.y = cam.t_last.y + m_obj1_t.y;
-        t.z = cam.t_last.z + m_obj1_t.z;
-        m_obj1->setTranslation(t);
-        
-        r = cam.r_last * m_obj1_r;
-        m_obj1->setRotation(r);
-        
+//        //object 1
+//        m_obj->setScale(m_scale);
+//        
+//        m_obj_t.x = (debugHandler.t_touch.x * 1000);
+//        m_obj_t.z = (debugHandler.t_touch.y * 1000);
+//        
+//        t.x = cam.t_last.x + m_obj_t.x;
+//        t.y = cam.t_last.y + m_obj_t.y;
+//        t.z = cam.t_last.z + m_obj_t.z;
+//        m_obj->setTranslation(t);
+//        
+//        //eu.y = debugHandler.r_touch.getEulerAngleDegrees().y; //removed rotation control for debug
+//        //m_obj_r.setFromEulerAngleDegrees(eu);
+//        r = cam.r_last * m_obj_r;
+//        m_obj->setRotation(r); //I don't know what order this should be in, but this looked better
+//        
+//        
+//        debugHandler.o_t = t;
+//        debugHandler.o_r = r;
+//        
+//        eu.setZero();
+//        t.setZero();
+//        r.setNoRotation();
+//        
+//        //object 2
+//        m_obj1->setScale(m_scale1);
+//        
+//        t.x = cam.t_last.x + m_obj1_t.x;
+//        t.y = cam.t_last.y + m_obj1_t.y;
+//        t.z = cam.t_last.z + m_obj1_t.z;
+//        m_obj1->setTranslation(t);
+//        
+//        r = cam.r_last * m_obj1_r;
+//        m_obj1->setRotation(r);
+//        
         
         if (!hasTracking)
         {
@@ -227,17 +227,17 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     // Set the rendering clipping plane
     m_metaioSDK->setRendererClippingPlaneLimits(10, 30000);
     
-    /***** Load content *****/
-    m_scale = 1; // Initial scaling for the models
-    m_obj_t = metaio::Vector3d(0, 0, 0);
-    m_obj_r = metaio::Rotation();
-    m_obj           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:m_obj_t modelScaling:m_scale modelCos:0];
-    
-    m_scale1 = 1; // Initial scaling for the models
-    m_obj1_t = metaio::Vector3d(50, 0, -50);
-    m_obj1_r = metaio::Rotation();
-    m_obj1           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:1  modelTranslation:m_obj1_t modelScaling:m_scale modelCos:0];
-    /*****/
+//    /***** Load content *****/
+//    m_scale = 1; // Initial scaling for the models
+//    m_obj_t = metaio::Vector3d(0, 0, 0);
+//    m_obj_r = metaio::Rotation();
+//    m_obj           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:0  modelTranslation:m_obj_t modelScaling:m_scale modelCos:0];
+//    
+//    m_scale1 = 1; // Initial scaling for the models
+//    m_obj1_t = metaio::Vector3d(50, 0, -50);
+//    m_obj1_r = metaio::Rotation();
+//    m_obj1           = [self createModel:@"head" ofType:@"obj" inDirectory:@"Assets/obj" renderOrder:1  modelTranslation:m_obj1_t modelScaling:m_scale modelCos:0];
+//    /*****/
     
     //init tracking vars
     lastCOS = activeCOS = 0;
