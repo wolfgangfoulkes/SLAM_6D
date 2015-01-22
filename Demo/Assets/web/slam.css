@@ -64,6 +64,7 @@ body.phone .button {
     top: 0;
     width: 50vw;
     visibility: transparent;
+    background: none;
 }
 
 .log {

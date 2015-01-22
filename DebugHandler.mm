@@ -89,16 +89,22 @@ void DebugHandler::initGL()
 {
     JSValue * display_init = ctx[@"display"][@"init"];
     [display_init callWithArguments:@[]];
-    this->addOBJ(@"../../Assets/obj/head.obj",
+    this->addOBJ(
+        @"head1",
+        @"../../Assets/obj/head.obj",
         @"../../Assets/images/head.png",
         metaio::Vector3d(0, 0, 0),
         metaio::Rotation(0, 0, 0),
         3.0);
-    this->addOBJ(@"../../Assets/obj/head.obj",
+    this->addOBJ(
+        @"head2",
+        @"../../Assets/obj/head.obj",
         metaio::Vector3d(-100 * SCALE_COEFF, 0, -50 * SCALE_COEFF),
         metaio::Rotation(0, 0, 0),
         2.0);
-    this->addOBJ(@"../../Assets/obj/head.obj",
+    this->addOBJ(
+        @"head3",
+        @"../../Assets/obj/head.obj",
         metaio::Vector3d(-200 * SCALE_COEFF, -80 * SCALE_COEFF, 0),
         metaio::Rotation(0, 0, 0),
         1.0);
@@ -173,18 +179,39 @@ void DebugHandler::setPose()
     }
 }
 
-void DebugHandler::addOBJ(NSString * obj_path_, metaio::Vector3d t_, metaio::Rotation r_, float scale_)
+void DebugHandler::addOBJ(NSString * name_, NSString * obj_path_, metaio::Vector3d t_, metaio::Rotation r_, float scale_)
 {
     metaio::Vector4d qu_ = r_.getQuaternion();
     JSValue * addOBJJS = ctx[@"display"][@"addOBJ"];
-    [addOBJJS callWithArguments:@[[NSString stringWithString: obj_path_], @(t_.x), @(t_.y), @(t_.z), @(qu_.x), @(qu_.y), @(qu_.z), @(qu_.w), @(scale_)]];
+    [addOBJJS callWithArguments:@[
+        [NSString stringWithString: name_],
+        [NSString stringWithString: obj_path_],
+        @(t_.x), @(t_.y), @(t_.z), @(qu_.x), @(qu_.y), @(qu_.z), @(qu_.w), @(scale_)]];
 }
 
-void DebugHandler::addOBJ(NSString * obj_path_, NSString * tex_path_, metaio::Vector3d t_, metaio::Rotation r_, float scale_)
+void DebugHandler::addOBJ(NSString * name_, NSString * obj_path_, NSString * tex_path_, metaio::Vector3d t_, metaio::Rotation r_, float scale_)
 {
     metaio::Vector4d qu_ = r_.getQuaternion();
     JSValue * addOBJJS = ctx[@"display"][@"addTexturedOBJ"];
-    [addOBJJS callWithArguments:@[[NSString stringWithString: obj_path_], [NSString stringWithString: tex_path_], @(t_.x), @(t_.y), @(t_.z), @(qu_.x), @(qu_.y), @(qu_.z), @(qu_.w), @(scale_)]];
+    [addOBJJS callWithArguments:@[
+        [NSString stringWithString: name_],
+        [NSString stringWithString: obj_path_],
+        [NSString stringWithString: tex_path_],
+        @(t_.x), @(t_.y), @(t_.z), @(qu_.x), @(qu_.y), @(qu_.z), @(qu_.w), @(scale_)]];
+}
+
+void DebugHandler::setOBJVisibility(NSString * name_, bool visibility_)
+{
+    JSValue * model = ctx[@"display"][@"models"][name_][@"model"];
+    model[@"visible"] = @(visibility_);
+    if ([model[@"visible"] toBool])
+    {
+        printf("%s %s", [name_ UTF8String], "is visible!");
+    }
+    else
+    {
+        printf("%s %s", [name_ UTF8String], "is not visible!");
+    }
 }
 
 void DebugHandler::updateCamera(metaio::Vector3d t_, metaio::Rotation r_)

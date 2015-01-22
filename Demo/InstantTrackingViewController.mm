@@ -54,6 +54,11 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         return;
     }
     
+    if (!debugHandler.jsIsInit)
+    {
+        return;
+    }
+    
     [self updateTrackingState];
     if (updateMetaio && activeCOS)
     {
@@ -283,6 +288,10 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     
     if (poses[0].state == metaio::ETS_LOST)
     {
+//        if (useInstantTracking)
+//        {
+//            cam.COS = 0;
+//        }
     }
 }
 
@@ -296,7 +305,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     }
 	else
 	{
-		//NSLog(@"SLAM has timed out!");
+		NSLog(@"SLAM has timed out!");
 	}
     logMA(@"\ninstant tracking!1!?\n", ma_log);
 	

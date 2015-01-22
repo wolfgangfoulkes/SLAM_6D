@@ -20,7 +20,7 @@ display = new function()
 {
     
     this.animate = false;
-    this.models = []; //replace with object, so you can access by name
+    this.models = {}; //replace with object, so you can access by name
     this.cam = new Pose();
     this.scene = null;
     this.camera = null;
@@ -57,7 +57,7 @@ display = new function()
     };
     
     
-    this.addOBJ = function(obj_path_, x_, y_, z_, rx_, ry_, rz_, rw_, scale_)
+    this.addOBJ = function(name, obj_path_, x_, y_, z_, rx_, ry_, rz_, rw_, scale_)
     {
         console.log("addOBJ");
         x_ = defaultOr(x_, 0);
@@ -132,15 +132,15 @@ display = new function()
            	display.scene.add(object);
 			
 		/*** create new Model for OBJ ***/
-			display.models[0] = new Model();
-        	display.models[0].model = object;
-       		display.models[0].pose = pose_;
+			display.models[name] = new Model();
+        	display.models[name].model = object;
+       		display.models[name].pose = pose_;
         }
         loaderOBJ.load(obj_path_, callbackOBJ, onProgress, onError);
     };
     
     //can replace this with 2 functions, one that takes an object, and traverses and maps tex to obj
-    this.addTexturedOBJ = function(obj_path_, image_path_, x_, y_, z_, rx_, ry_, rz_, rw_, scale_)
+    this.addTexturedOBJ = function(name, obj_path_, image_path_, x_, y_, z_, rx_, ry_, rz_, rw_, scale_)
     {
         console.log("addOBJ");
         x_ = defaultOr(x_, 0);
@@ -218,9 +218,9 @@ display = new function()
             display.scene.add(object);
 			
 		/*** create new Model for OBJ ***/
-			display.models[0] = new Model();
-        	display.models[0].model = object;
-       		display.models[0].pose = pose_;
+			display.models[name] = new Model();
+        	display.models[name].model = object;
+       		display.models[name].pose = pose_;
         }
         loaderOBJ.load(obj_path_, callbackOBJ, onProgress, onError);
 
