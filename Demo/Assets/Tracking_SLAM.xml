@@ -11,7 +11,7 @@
                 <SensorCosID>map1</SensorCosID>
                 <Parameters>
                     <Initialization Type="map">
-                        <Map>b304/board.slam</Map>
+                        <Map>b305/modular_left.slam</Map>
                     </Initialization>
                     <Learning Enabled="true">
                         <!-- both near middle, but this one with more "precise"-->
@@ -27,7 +27,7 @@
                 <SensorCosID>map2</SensorCosID>
                 <Parameters>
                     <Initialization Type="map">
-                        <Map>b304/keyboard_and_tower.slam</Map>
+                        <Map>b305/modular_right.slam</Map>
                     </Initialization>
                     <Learning Enabled="true">
                         <MinNumberOfObservations>4</MinNumberOfObservations>
