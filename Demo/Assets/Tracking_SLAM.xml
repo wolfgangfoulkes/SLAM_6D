@@ -13,8 +13,7 @@
                     <Initialization Type="map">
                         <Map>b305/modular_left.slam</Map>
                     </Initialization>
-                    <Learning Enabled="true">
-                        <!-- both near middle, but this one with more "precise"-->
+                    <Learning Enabled="true"> 
                         <MinNumberOfObservations>4</MinNumberOfObservations>
                         <MinTriangulationAngle>5.0</MinTriangulationAngle>
                     </Learning>
