@@ -181,6 +181,10 @@ void DebugHandler::setPose()
 
 void DebugHandler::addOBJ(NSString * name_, NSString * obj_path_, metaio::Vector3d t_, metaio::Rotation r_, float scale_)
 {
+    Object3D * obj = new Object3D();
+    obj->init(name_.UTF8String, obj_path_.UTF8String, t_, r_, scale_);
+    this->things.push_back(obj);
+    
     metaio::Vector4d qu_ = r_.getQuaternion();
     JSValue * addOBJJS = ctx[@"display"][@"addOBJ"];
     [addOBJJS callWithArguments:@[
@@ -191,6 +195,10 @@ void DebugHandler::addOBJ(NSString * name_, NSString * obj_path_, metaio::Vector
 
 void DebugHandler::addOBJ(NSString * name_, NSString * obj_path_, NSString * tex_path_, metaio::Vector3d t_, metaio::Rotation r_, float scale_)
 {
+    Object3D * obj = new Object3D();
+    obj->init(name_.UTF8String, obj_path_.UTF8String, t_, r_, scale_);
+    this->things.push_back(obj);
+    
     metaio::Vector4d qu_ = r_.getQuaternion();
     JSValue * addOBJJS = ctx[@"display"][@"addTexturedOBJ"];
     [addOBJJS callWithArguments:@[
@@ -200,8 +208,48 @@ void DebugHandler::addOBJ(NSString * name_, NSString * obj_path_, NSString * tex
         @(t_.x), @(t_.y), @(t_.z), @(qu_.x), @(qu_.y), @(qu_.z), @(qu_.w), @(scale_)]];
 }
 
+Thing * DebugHandler::getThing(std::string name_)
+{
+    for (int i = 0; i < things.size(); i++)
+    {
+        Thing * _thing = things[i];
+        if (_thing->name == name_)
+        {
+            return _thing;
+        }
+    }
+    return NULL;
+}
+
+Thing * DebugHandler::getThing(NSString * name_)
+{
+    return this->getThing(name_.UTF8String);
+}
+
+Object3D * DebugHandler::getOBJ(std::string name_)
+{
+    for (int i = 0; i < things.size(); i++)
+    {
+        Thing * _thing = things[i];
+        if ((_thing->type == "Object3D") && (_thing->name == name_))
+        {
+            return dynamic_cast<Object3D *>(_thing);
+        }
+    }
+    return NULL;
+}
+
+Object3D * DebugHandler::getOBJ(NSString * name_)
+{
+    return this->getOBJ(name_.UTF8String);
+}
+
 void DebugHandler::setOBJVisibility(NSString * name_, bool visibility_)
 {
+    Object3D * obj = this->getOBJ(name_);
+    if (!obj) { return; }
+    
+    obj->is_visible = visibility_;
     JSValue * model = ctx[@"display"][@"models"][name_][@"model"];
     model[@"visible"] = @(visibility_);
     if ([model[@"visible"] toBool])

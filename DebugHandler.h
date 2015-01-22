@@ -10,6 +10,7 @@
 #define __Demo__DebugHandler__
 #import "common.h"
 #import "Pose.h"
+#import "Things.h"
 #import <JavaScriptCore/JavaScriptCore.h>
 #import <metaioSDK/IMetaioSDKIOS.h>
 
@@ -44,6 +45,8 @@ public:
     metaio::Vector3d cf_acc;
     metaio::Rotation cf_gyr;
     
+    std::vector<Thing *> things;
+    
     int COS;
     string tracking_state;
     
@@ -65,6 +68,10 @@ public:
     void updateGL();
     void addOBJ(NSString * name_, NSString * obj_path_, metaio::Vector3d t_ = metaio::Vector3d(0, 0, 0), metaio::Rotation r_ = metaio::Rotation(0, 0, 0), float scale_ = 1.0);
     void addOBJ(NSString * name_, NSString * obj_path_, NSString * tex_path_, metaio::Vector3d t_ = metaio::Vector3d(0, 0, 0), metaio::Rotation r_ = metaio::Rotation(0, 0, 0), float scale_ = 1.0);
+    Thing * getThing(std::string name_);
+    Thing * getThing(NSString * name_);
+    Object3D * getOBJ(std::string name_);
+    Object3D * getOBJ(NSString * name_);
     void setOBJVisibility(NSString * name_, bool visibility_);
     void updateCamera(metaio::Vector3d t_ = metaio::Vector3d(0, 0, 0), metaio::Rotation r_ = metaio::Rotation(0, 0, 0));
 };

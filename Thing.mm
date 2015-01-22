@@ -10,17 +10,19 @@
 
 Thing::Thing()
 {
-    is_init = false;
-}
-
-Thing::Thing(metaio::Vector3d t_, metaio::Rotation r_) : t(t_), r(r_)
-{
-    is_init = false;
+    this->type = "Thing";
+    this->name = "undefined";
+    this->is_loaded = false;
+    this->is_init = false;
 }
 
 void Thing::init()
 {
     //you don't want to initialize is_init for inheriting classes
+}
+
+void Thing::load()
+{
 }
 
 void Thing::update()
@@ -30,3 +32,9 @@ void Thing::update()
 void Thing::render()
 {
 }
+
+bool operator== (const Thing& left_, const Thing& right_)
+{
+    return ((left_.type == right_.type) && (left_.name == right_.name));
+}
+

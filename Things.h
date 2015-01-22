@@ -13,17 +13,14 @@
 class Object3D : public Thing
 {
     public:
-    metaio::IMetaioSDKIOS*	sdk;
-    metaio::IGeometry * object;
-    NSString * path;
-    int render_order;
+    std::string path;
     float scale;
+    bool is_visible;
     
     Object3D();
-    Object3D(metaio::Vector3d t_, metaio::Rotation r_); //because base class has this, prolly need to do more stuff
-    
-    void init();
-    void init(metaio::IMetaioSDKIOS* sdk_, NSString * path_, int render_order_, float scale_, metaio::Vector3d t_ = metaio::Vector3d(0, 0, 0), metaio::Rotation r_ = metaio::Rotation(0, 0, 0));
+    Object3D(std::string name_); //probably ought remove this.
+    void init(std::string name_, std::string path_ = "undefined", metaio::Vector3d t_ = metaio::Vector3d(0, 0, 0), metaio::Rotation r_ = metaio::Rotation(0, 0, 0), float scale_ = 1.0);
+    void load();
     void update();
     void render();
 };

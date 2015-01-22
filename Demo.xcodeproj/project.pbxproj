@@ -27,7 +27,6 @@
 		989977AA1A1E0325000AB036 /* libSystem.B.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 989977A91A1E0325000AB036 /* libSystem.B.dylib */; };
 		989977AC1A1E07D9000AB036 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 989977AB1A1E07D9000AB036 /* AssetsLibrary.framework */; };
 		98A012411A1450BC005993B4 /* js in Resources */ = {isa = PBXBuildFile; fileRef = 98A012401A1450BC005993B4 /* js */; };
-		98BBD6B51A70AE620050913D /* Model.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 98BBD6B31A70AE620050913D /* Model.cpp */; };
 		98BD77211A112B6C00CC9EAD /* slam.html in Resources */ = {isa = PBXBuildFile; fileRef = 98BD77201A112B6C00CC9EAD /* slam.html */; };
 		98BD77251A112C2F00CC9EAD /* slam.css in Resources */ = {isa = PBXBuildFile; fileRef = 98BD77241A112C2F00CC9EAD /* slam.css */; };
 		98BD77291A1139B400CC9EAD /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98BD77281A1139B400CC9EAD /* WebKit.framework */; };
@@ -97,8 +96,6 @@
 		989977A91A1E0325000AB036 /* libSystem.B.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libSystem.B.dylib; path = usr/lib/libSystem.B.dylib; sourceTree = SDKROOT; };
 		989977AB1A1E07D9000AB036 /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
 		98A012401A1450BC005993B4 /* js */ = {isa = PBXFileReference; lastKnownFileType = folder; name = js; path = Demo/Assets/web/js; sourceTree = "<group>"; };
-		98BBD6B31A70AE620050913D /* Model.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Model.cpp; path = Demo/Model.cpp; sourceTree = "<group>"; };
-		98BBD6B41A70AE620050913D /* Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Model.h; path = Demo/Model.h; sourceTree = "<group>"; };
 		98BD77201A112B6C00CC9EAD /* slam.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = slam.html; path = Demo/Assets/web/slam.html; sourceTree = "<group>"; };
 		98BD77241A112C2F00CC9EAD /* slam.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; name = slam.css; path = Demo/Assets/web/slam.css; sourceTree = "<group>"; };
 		98BD77281A1139B400CC9EAD /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
@@ -191,8 +188,6 @@
 		B9BC114015D8FA7B00713ED3 = {
 			isa = PBXGroup;
 			children = (
-				98BBD6B31A70AE620050913D /* Model.cpp */,
-				98BBD6B41A70AE620050913D /* Model.h */,
 				98E56D411A51EC6500E46F50 /* Things.mm */,
 				98E56D421A51EC6500E46F50 /* Things.h */,
 				98E56D3E1A51E7B300E46F50 /* Thing.mm */,
@@ -407,7 +402,6 @@
 				986B18761A2BEF8700CD7C5A /* js.mm in Sources */,
 				98DCAC381A4FEA7D00915477 /* CompSixAxis.mm in Sources */,
 				B9BC116015D8FA7C00713ED3 /* AppDelegate.mm in Sources */,
-				98BBD6B51A70AE620050913D /* Model.cpp in Sources */,
 				B9BC118B15D900D900713ED3 /* EAGLView.mm in Sources */,
 				B9BC118C15D900D900713ED3 /* MetaioSDKViewController.mm in Sources */,
 			);

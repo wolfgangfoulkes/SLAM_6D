@@ -10,48 +10,31 @@
 
 Object3D::Object3D() : Thing() //this happens by default anyway, just ta let ya nough
 {
-    object = nullptr;
-    path = nullptr;
-    render_order = 0;
-    scale = 0.0;
+    this->type = "Object3D";
+    this->path = "undefined";
+    this->scale = 1.0;
+    this->is_visible = true; //false l8er
 }
 
-Object3D::Object3D(metaio::Vector3d t_, metaio::Rotation r_) : Object3D()
+Object3D::Object3D(std::string name_) : Object3D()
 {
-    this->t = t_;
-    this->r = r_;
+    this->name = name_;
 }
 
-void Object3D::init(metaio::IMetaioSDKIOS* sdk_, NSString * path_, int render_order_, float scale_, metaio::Vector3d t_, metaio::Rotation r_)
+void Object3D::init(std::string name_, std::string path_, metaio::Vector3d t_, metaio::Rotation r_, float scale_)
 {
-    this->t = t_;
-    this->r = r_;
-    
-    this->sdk = sdk_;
-    
+    this->name = name_;
     this->path = path_;
-    this->render_order = render_order_;
+    
+    this->t = t_;
+    this->r = r_;
     this->scale = scale_;
     
-    if (this->path)
-	{
-		// if this call was successful, theLoadedModel will contain a pointer to the 3D model
-		this->object =  this->sdk->createGeometry([this->path UTF8String]);
-		if (this->object)
-		{
-            metaio::Vector3d obj_t_init(0, 0, 0);
-            metaio::Rotation obj_r_init(0, 0, 0);
-            this->object->setScale(scale);
-            this->object->setRenderOrder(this->render_order);
-            this->object->setTranslation(obj_t_init);
-            this->object->setRotation(obj_r_init);
-            this->object->setCoordinateSystemID(0);
-		}
-		else
-		{
-			NSLog(@"error, could not load %@", this->path);
-		}
-	}
+    this->is_init = true;
+}
+
+void Object3D::load()
+{
 }
 
 void Object3D::update()
