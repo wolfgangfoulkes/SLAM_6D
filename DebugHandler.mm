@@ -112,7 +112,7 @@ void DebugHandler::initGL()
 
 void DebugHandler::updateGL()
 {
-    //scale rotation?
+    //scale rotation? looks OK now. it's very possible that rotation is scale-independent (for the camera)
     metaio::Vector3d _scaled = metaio::Vector3d(this->pose->t_p);
     _scaled.x *= SCALE_COEFF;
     _scaled.y *= SCALE_COEFF;
@@ -236,6 +236,7 @@ Object3D * DebugHandler::getOBJ(std::string name_)
             return dynamic_cast<Object3D *>(_thing);
         }
     }
+    
     return NULL;
 }
 
@@ -252,14 +253,14 @@ void DebugHandler::setOBJVisibility(NSString * name_, bool visibility_)
     obj->is_visible = visibility_;
     JSValue * model = ctx[@"display"][@"models"][name_][@"model"];
     model[@"visible"] = @(visibility_);
-    if ([model[@"visible"] toBool])
-    {
-        printf("%s %s", [name_ UTF8String], "is visible!");
-    }
-    else
-    {
-        printf("%s %s", [name_ UTF8String], "is not visible!");
-    }
+//    if ([model[@"visible"] toBool])
+//    {
+//        printf("%s %s", [name_ UTF8String], "is visible!");
+//    }
+//    else
+//    {
+//        printf("%s %s", [name_ UTF8String], "is not visible!");
+//    }
 }
 
 void DebugHandler::updateCamera(metaio::Vector3d t_, metaio::Rotation r_)

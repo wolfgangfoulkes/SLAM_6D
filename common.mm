@@ -21,6 +21,8 @@ using namespace std;
 #define HALF_PI                         1.5707963f
 #define TWO_PI                          6.2831853f
 
+/***** OPENCV *****/
+
 void matToArray(cv::Mat m_, float * _m) //works with vectors too, if you pass in &vec[0]
 {
     cv::Mat m(m_.rows, m_.cols, CV_32F, _m);
@@ -157,6 +159,8 @@ void matToP(cv::Mat mat_, metaio::Vector3d& _p)
     _p.z = mat_.at<float>(2, 0);
 }
 
+/***** C++ -> JS *****/
+
 NSMutableDictionary * toDict(metaio::Vector3d t_, metaio::Rotation r_, metaio::Vector3d scale_)
 {
     metaio::Vector4d qu_ = r_.getQuaternion();
@@ -188,6 +192,8 @@ NSMutableDictionary * toDict(metaio::Vector3d t_, metaio::Vector3d eu_, metaio::
         return _dict;
 }
 
+/********/
+
 metaio::TrackingValues toTrackingValues(metaio::Rotation r_, metaio::Vector3d t_)
 {
     metaio::TrackingValues _tv;
@@ -205,6 +211,8 @@ metaio::TrackingValues toTrackingValues(cv::Mat r_, cv::Mat t_)
     metaio::TrackingValues _tv = metaio::TrackingValues(toTrackingValues(r, t));
     return _tv;
 }
+
+/***** MATH ******/
 
 metaio::Vector3d mult(metaio::Vector3d v_, float f_)
 {
@@ -246,11 +254,20 @@ metaio::Rotation calcCOSROffset(metaio::Rotation r_, metaio::Rotation r_last_)
     return _r;
 }
 
+float distance(metaio::Vector3d v_)
+{
+    return sqrt(v_.x * v_.x +
+                v_.y * v_.y +
+                v_.z * v_.z);
+}
+
 void calcCOSOffset(metaio::Vector3d t_, metaio::Rotation r_, metaio::Vector3d t_last_, metaio::Rotation r_last_, metaio::Vector3d& _t, metaio::Rotation& _r)
 {
     _t = calcCOSTOffset(t_, t_last_, r_);
     _r = calcCOSROffset(r_, r_last_);
 }
+
+/***** DEBUG *****/
 
 void logMA(NSString * s_, NSMutableArray * ma_)
 {
@@ -290,6 +307,8 @@ void logTR(metaio::Rotation r_, metaio::Vector3d t_)
 {
     NSLog([NSString stringWithUTF8String:tRToS(t_, r_).c_str()]);
 }
+
+/***** MISC *****/
 
 metaio::Vector3d loPassXYZ(metaio::Vector3d v0_, metaio::Vector3d v1_)
 {
