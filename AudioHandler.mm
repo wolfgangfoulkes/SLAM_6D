@@ -6,4 +6,3 @@
 //  Copyright (c) 2015 metaio GmbH. All rights reserved.
 //
 
-#import "AudioHandler.h"

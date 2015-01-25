@@ -339,4 +339,11 @@ std::string tRToS(metaio::Vector3d t_, metaio::Rotation r_)
     return _ss.str();
 }
 
+void calcPanPosition(metaio::Vector3d t_, metaio::Rotation r_, double& _azimuth, double& _elevation, double& _distance)
+{
+    _azimuth = r_.getEulerAngleDegrees().y;
+    _elevation = r_.getEulerAngleDegrees().x;
+    _distance = distance(t_);
+}
+
 

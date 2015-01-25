@@ -8,11 +8,13 @@
 #import "AppDelegate.h"
 
 #import "InstantTrackingViewController.h"
+#import "TheAmazingAudioEngine.h"
 
 @implementation AppDelegate
 @synthesize window;
 @synthesize viewController;
 @synthesize motionManager;
+@synthesize audioController = _audioController;
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -23,6 +25,12 @@
     self.viewController = [[InstantTrackingViewController alloc] initWithNibName:@"InstantTracking" bundle:nil];
     self.window.rootViewController = self.viewController;
     [self.window makeKeyAndVisible];
+    
+    self.audioController = [[AEAudioController alloc] initWithAudioDescription:[AEAudioController nonInterleaved16BitStereoAudioDescription] inputEnabled:YES];
+    _audioController.preferredBufferDuration = 0.005;
+    _audioController.useMeasurementMode = YES;
+    [_audioController start:NULL];
+    
     return YES;
 }
 

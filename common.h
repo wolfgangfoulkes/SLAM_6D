@@ -56,5 +56,7 @@ metaio::Vector3d calcCOSTOffset(metaio::Vector3d t_, metaio::Vector3d t_last_, m
 metaio::Rotation calcCOSROffset(metaio::Rotation r_, metaio::Rotation r_last_);
 void calcCOSOffset(metaio::Vector3d t_, metaio::Rotation r_, metaio::Vector3d t_last_, metaio::Rotation r_last_, metaio::Vector3d& _t, metaio::Rotation& _r);
 
+void calcPanPosition(metaio::Vector3d t_, metaio::Rotation r_, double& _azimuth, double& _elevation, double& _distance);
+
 
 #endif /* defined(__Demo__common__) */

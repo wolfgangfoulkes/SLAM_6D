@@ -11,6 +11,8 @@
 #import "DebugHandler.h"
 #import "CompSixAxis.h"
 
+@class AEAudioController;
+
 @interface InstantTrackingViewController : MetaioSDKViewController <UIWebViewDelegate>
 {
     DebugHandler debugHandler;
@@ -43,6 +45,7 @@
 @property (nonatomic, retain) IBOutlet UIButton *debugViewToggle;
 @property (nonatomic, retain) IBOutlet UIButton *debugPrintButton;
 
+- (void)initAudio;
 
 - (IBAction)onDebugDown:(id)sender;
 

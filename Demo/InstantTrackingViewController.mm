@@ -8,13 +8,16 @@
 #import <opencv2/core.hpp>
 #import <opencv2/calib3d.hpp>
 #import <QuartzCore/QuartzCore.h>
+
 #import <AudioToolbox/AudioToolbox.h>
+
 #import <WebKit/WebKit.h>
 #import <JavaScriptCore/JavaScriptCore.h>
 #import <CoreMotion/CoreMotion.h>
-
+#import <TheAmazingAudioEngine.h>
 #import "InstantTrackingViewController.h"
 #import "EAGLView.h"
+
 
 #import "common.h"
 #import "Pose.h"
@@ -34,6 +37,13 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 @interface InstantTrackingViewController ()
 {
 }
+
+@property (nonatomic, strong) AEAudioController *audioController;
+@property (nonatomic, strong) AEAudioFilePlayer *loop1;
+@property (nonatomic, strong) AEAudioUnitFilter *au_filter;
+@property (nonatomic, strong) AEAudioUnitFilter *au_3DMixer;
+
+
 @end
 
 
@@ -44,6 +54,118 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 
 /*****UNUSED*****/
 @synthesize debugPrintButton;
+
+- (void) initAudio
+{
+    NSLog(@"-----Audio---!");
+    
+    //create audio controller
+    self.audioController = [[AEAudioController alloc]
+                           initWithAudioDescription:[AEAudioController nonInterleaved16BitStereoAudioDescription]
+                               inputEnabled:NO];
+    //setup file player
+    NSURL* sound_url = [[NSBundle mainBundle] URLForResource:@"Assets/sound/pain" withExtension:@"mp3"];
+    if (!sound_url)
+    {
+        NSLog(@"error bad path");
+    }
+    self.loop1 = [AEAudioFilePlayer
+        audioFilePlayerWithURL:sound_url
+        audioController:_audioController
+        error:NULL];
+    if (!self.loop1)
+    {
+        NSLog(@"error creating loop");
+    }
+    _loop1.volume = 0.5;
+    _loop1.channelIsMuted = NO;
+    _loop1.loop = YES;
+
+    
+    //add player to controller
+    [_audioController addChannels:@[_loop1]];
+    
+    //create filter
+    AudioComponentDescription filter = AEAudioComponentDescriptionMake(kAudioUnitManufacturer_Apple,
+                                     kAudioUnitType_Effect,
+                                     kAudioUnitSubType_Reverb2);
+    NSError *error = NULL;
+    self.au_filter = [[AEAudioUnitFilter alloc]
+                      initWithComponentDescription:filter
+                                   audioController:_audioController
+                                             error:&error];
+    if ( ! _au_filter ) {
+        NSLog(@"failed to create filter");
+    }
+
+    
+    //add filter to controller's master output
+    //[self.audioController addFilter:_au_filter];
+    
+    //create mixer https://developer.apple.com/library/mac/technotes/tn2112/_index.html
+    error = NULL;
+    AudioComponentDescription mixerCD;
+
+    mixerCD.componentFlags = 0; 
+    mixerCD.componentFlagsMask = 0; 
+    mixerCD.componentType = kAudioUnitType_Mixer; 
+    mixerCD.componentSubType = kAudioUnitSubType_AU3DMixerEmbedded;
+    mixerCD.componentManufacturer = kAudioUnitManufacturer_Apple;
+    
+    self.au_3DMixer = [[AEAudioUnitFilter alloc]
+                        initWithComponentDescription:mixerCD
+                        audioController:_audioController
+                        useDefaultInputFormat: YES
+                        error:&error];
+    
+    if ( ! _au_3DMixer ) {
+        NSLog(@"failed to create mixer");
+    }
+    
+    //add mixer to controller's master output
+    [self.audioController addFilter:_au_3DMixer];
+    
+    //initialize mixer params (THIS IS NECESSARY)
+    /*  (
+        AudioUnit inUnit,
+        AudioUnitParameterID inID, 
+        AudioUnitScope inScope, 
+        AudioUnitElement inElement, 
+        AudioUnitParameterValue inValue, 
+        UInt32 inBufferOffsetInFrames 
+        );
+    */
+    AudioUnitSetParameter(  _au_3DMixer.audioUnit,
+                    k3DMixerParam_Distance,
+                    kAudioUnitScope_Input,
+                    0,
+                    1.0f,
+                    0);
+    AudioUnitSetParameter(  _au_3DMixer.audioUnit,
+                    k3DMixerParam_Elevation,
+                    kAudioUnitScope_Input,
+                    0,
+                    0.0f,
+                    0);
+    AudioUnitSetParameter(  _au_3DMixer.audioUnit,
+                    k3DMixerParam_Azimuth,
+                    kAudioUnitScope_Input,
+                    0,
+                    0.0f,
+                    0);
+
+    
+    
+    //start controller
+    error = NULL;
+    BOOL result = [_audioController start:&error];
+    if ( !result ) {
+        NSLog(@"error starting audio");
+    }
+    
+    NSLog(@"-----");
+}
+
 
 # pragma mark - LOOP
 
@@ -59,6 +181,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         return;
     }
     
+
     [self updateTrackingState];
     if (updateMetaio && activeCOS)
     {
@@ -87,47 +210,35 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         metaio::Vector3d eu;
         metaio::Rotation r;
         
-        
-//        //object 1
-//        m_obj->setScale(m_scale);
-//
-//        m_obj_t.x = (debugHandler.t_touch.x * 1000);
-//        m_obj_t.z = (debugHandler.t_touch.y * 1000);
-//        
-//        t.x = cam.t_last.x + m_obj_t.x;
-//        t.y = cam.t_last.y + m_obj_t.y;
-//        t.z = cam.t_last.z + m_obj_t.z;
-//        m_obj->setTranslation(t);
-//        
-//        //eu.y = debugHandler.r_touch.getEulerAngleDegrees().y; //removed rotation control for debug
-//        //m_obj_r.setFromEulerAngleDegrees(eu);
-//        r = cam.r_last * m_obj_r;
-//        m_obj->setRotation(r); //I don't know what order this should be in, but this looked better
-//        
-//        
-//        debugHandler.o_t = t;
-//        debugHandler.o_r = r;
-//        
-//        eu.setZero();
-//        t.setZero();
-//        r.setNoRotation();
-//        
-//        //object 2
-//        m_obj1->setScale(m_scale1);
-//        
-//        t.x = cam.t_last.x + m_obj1_t.x;
-//        t.y = cam.t_last.y + m_obj1_t.y;
-//        t.z = cam.t_last.z + m_obj1_t.z;
-//        m_obj1->setTranslation(t);
-//        
-//        r = cam.r_last * m_obj1_r;
-//        m_obj1->setRotation(r);
-//        
-        
         if (!hasTracking)
         {
             hasTracking = true;
         }
+        
+        double azimuth = 0;
+        double elevation = 0;
+        double distance = 0;
+        
+        calcPanPosition(cam.t_last, cam.r_last, azimuth, elevation, distance);
+        
+        AudioUnitSetParameter(  _au_3DMixer.audioUnit,
+                        k3DMixerParam_Azimuth,
+                        kAudioUnitScope_Input, //kAudioUnitScope_Input
+                        0,
+                        azimuth,
+                        0);
+        AudioUnitSetParameter(  _au_3DMixer.audioUnit,
+                        k3DMixerParam_Elevation,
+                        kAudioUnitScope_Input, //kAudioUnitScope_Input
+                        0,
+                        elevation,
+                        0);
+        AudioUnitSetParameter(  _au_3DMixer.audioUnit,
+                        k3DMixerParam_Distance,
+                        kAudioUnitScope_Input, //kAudioUnitScope_Input
+                        0,
+                        distance * 0.01,
+                        0);
     }
     debugHandler.update();
 }
@@ -168,6 +279,8 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     debugHandler.COS = activeCOS;
     debugHandler.tracking_state = state;
 }
+
+
 
 - (void) offsetTrackingValues: (metaio::TrackingValues&)tv_
 {
@@ -239,6 +352,8 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     
     //init time
     elapsed = [[NSDate alloc] init];
+    
+    [self initAudio];
 }
 
 -(void)viewDidAppear:(BOOL)animated
