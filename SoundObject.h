@@ -26,7 +26,7 @@ class SoundObject : public Thing
     SoundObject(std::string name);
     void init(); //should get rid of specialized "init" and instead have init check for correct vars set?
     void init(std::string name_);
-    void init(std::string name_, NSString * path_, AEAudioController * ac_);
+    void init(std::string name_, NSString * path_, AEAudioController * ac_/*, int channelIndex*/);
     void load();
     void update();
     void render();

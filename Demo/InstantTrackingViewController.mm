@@ -97,7 +97,8 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         }
         
         self->audio_handler.setPan(cam.t_last, cam.r_last);
-        self->debugHandler.o_t = self->audio_handler.so.t;
+//        self->debugHandler.o_t = self->audio_handler.so.t;
+        self->debugHandler.o_t = metaio::Vector3d(-300, 0, -500);
     }
     debugHandler.update();
 }

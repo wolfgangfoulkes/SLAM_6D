@@ -15,9 +15,8 @@ class AudioHandler
 {
     public:
     AEAudioController *audio_controller;
-    AEAudioFilePlayer *loop1;
-    AEAudioUnitFilter *au_3DMixer;
     SoundObject so;
+    SoundObject so1;
     bool is_init;
     
     AudioHandler();
