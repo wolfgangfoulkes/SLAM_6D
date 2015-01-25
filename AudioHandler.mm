@@ -28,6 +28,9 @@ void AudioHandler::init(AEAudioController* ac_)
         return;
     }
     
+    NSString * path = [[NSBundle mainBundle] pathForResource:@"Assets/sound/pain" ofType:@"mp3"];
+    so.init("dave", path, this->audio_controller);
+    
     this->loop1 = [AEAudioFilePlayer
         audioFilePlayerWithURL:url
         audioController:this->audio_controller
@@ -38,7 +41,7 @@ void AudioHandler::init(AEAudioController* ac_)
         NSLog(@"error creating loop");
         return;
     }
-    this->loop1.volume = 0.5;
+    this->loop1.volume = 0.0;
     this->loop1.channelIsMuted = NO;
     this->loop1.loop = YES;
     
@@ -97,6 +100,7 @@ void AudioHandler::init(AEAudioController* ac_)
                     0,
                     0.0f,
                     0);
+    this->so.t = metaio::Vector3d(500, 0, 250);
     
     is_init = true;
 }
@@ -141,4 +145,6 @@ void AudioHandler::setPan(metaio::Vector3d t_, metaio::Rotation r_)
                         0,
                         distance * 0.01,
                         0);
+    
+        so.setPan(t_, r_);
 }

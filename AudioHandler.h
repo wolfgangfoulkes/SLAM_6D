@@ -9,7 +9,7 @@
 #import <AudioToolbox/AudioToolbox.h>
 #import <TheAmazingAudioEngine.h>
 #import "common.h"
-
+#import "SoundObject.h"
 
 class AudioHandler
 {
@@ -17,6 +17,7 @@ class AudioHandler
     AEAudioController *audio_controller;
     AEAudioFilePlayer *loop1;
     AEAudioUnitFilter *au_3DMixer;
+    SoundObject so;
     bool is_init;
     
     AudioHandler();

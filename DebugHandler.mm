@@ -60,17 +60,20 @@ void DebugHandler::update()
     this->getJS();
     
     metaio::Vector3d SCALE(X_COEFF, Y_COEFF, Z_COEFF);
+    
     metaio::Vector3d _offs = metaio::Vector3d(this->pose->t_offs); _offs = round(_offs, SIG_FIGS);  _offs = scale(_offs, SCALE);
     metaio::Vector3d _cam = metaio::Vector3d(this->pose->t_p);      _cam = round(_cam, SIG_FIGS);    _cam = scale(_cam, SCALE);
     metaio::Vector3d _obj = metaio::Vector3d(this->pose->t_last);   _obj = round(_obj, SIG_FIGS);    _obj = scale(_obj, SCALE);
-    metaio::Vector3d _obj1 = metaio::Vector3d(this->o_t);          _obj1 = round(_obj1, SIG_FIGS);  _obj1 = scale(_obj1, SCALE);
+    //metaio::Vector3d _obj1 = metaio::Vector3d(this->o_t);          _obj1 = round(_obj1, SIG_FIGS);  _obj1 = scale(_obj1, SCALE);
+    metaio::Vector3d _obj1 = this->pose->r_last.rotatePoint(this->o_t) + this->pose->t_last;
+    _obj1 = round(_obj1, SIG_FIGS);  _obj1 = scale(_obj1, SCALE);
     
     metaio::Vector3d _cf_acc = metaio::Vector3d(this->cf_acc);   _cf_acc = round(_cf_acc, SIG_FIGS);
     
     updatePose(@"init", _offs, this->pose->r_offs);
     updatePose(@"c", _cam , this->pose->r_p);
     updatePose(@"o", _obj , this->pose->r_last);
-    updatePose(@"o1", _obj1 , this->o_r);
+    updatePose(@"o1", _obj1 , this->pose->r_last);
     updatePose(@"sensors", this->acc, this->gyr);
     updatePose(@"filter", this->cf_acc, this->cf_gyr);
     
@@ -250,7 +253,7 @@ void DebugHandler::setOBJVisibility(NSString * name_, bool visibility_)
     Object3D * obj = this->getOBJ(name_);
     if (!obj) { return; }
     
-    obj->is_visible = visibility_;
+    obj->is_render = visibility_;
     JSValue * model = ctx[@"display"][@"models"][name_][@"model"];
     model[@"visible"] = @(visibility_);
 //    if ([model[@"visible"] toBool])

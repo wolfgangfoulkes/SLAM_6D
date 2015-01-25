@@ -13,7 +13,7 @@ Object3D::Object3D() : Thing() //this happens by default anyway, just ta let ya 
     this->type = "Object3D";
     this->path = "undefined";
     this->scale = 1.0;
-    this->is_visible = true; //false l8er
+    this->is_render = true; //false l8er, should set in init
 }
 
 Object3D::Object3D(std::string name_) : Object3D()

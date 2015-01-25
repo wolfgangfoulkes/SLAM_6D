@@ -16,7 +16,6 @@ class Thing
     public:
     std::string name;
     std::string type;
-    Pose pose;
     //int COS;
     metaio::Vector3d t;
     metaio::Rotation r;

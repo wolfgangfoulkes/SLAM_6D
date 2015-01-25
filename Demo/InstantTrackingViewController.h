@@ -9,13 +9,14 @@
 #import "MetaioSDKViewController.h"
 
 #import "DebugHandler.h"
-#import "CompSixAxis.h"
+#import "AudioHandler.h"
 
 @class AEAudioController;
 
 @interface InstantTrackingViewController : MetaioSDKViewController <UIWebViewDelegate>
 {
     DebugHandler debugHandler;
+    AudioHandler audio_handler;
     
     NSMutableArray * ma_log;
     JSContext * ctx;

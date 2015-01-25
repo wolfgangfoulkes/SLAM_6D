@@ -21,7 +21,6 @@
 
 #import "common.h"
 #import "Pose.h"
-#import "AudioHandler.h"
 
 int printf(const char * __restrict format, ...) //printf don't print to console
 //from http://stackoverflow.com/questions/8924831/iphone-debugging-real-device
@@ -37,12 +36,9 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 
 @interface InstantTrackingViewController ()
 {
-    AudioHandler audio_handler;
 }
 
 @property (nonatomic, strong) AEAudioController *audioController;
-//@property (nonatomic, strong) AEAudioFilePlayer *loop1;
-//@property (nonatomic, strong) AEAudioUnitFilter *au_3DMixer;
 
 
 @end
@@ -55,15 +51,6 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 
 /*****UNUSED*****/
 @synthesize debugPrintButton;
-
-- (void) initAudio
-{
-    //create audio controller
-    self.audioController = [[AEAudioController alloc]
-                           initWithAudioDescription:[AEAudioController nonInterleaved16BitStereoAudioDescription]
-                               inputEnabled:NO];
-    self->audio_handler.init(self.audioController);
-}
 
 
 # pragma mark - LOOP
@@ -104,18 +91,13 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         
         cam.updateP(tv);
         
-        //position objects
-        metaio::Vector3d t;
-        metaio::Vector3d eu;
-        metaio::Rotation r;
-        
         if (!hasTracking)
         {
             hasTracking = true;
         }
         
         self->audio_handler.setPan(cam.t_last, cam.r_last);
-        
+        self->debugHandler.o_t = self->audio_handler.so.t;
     }
     debugHandler.update();
 }
@@ -173,6 +155,15 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     offs_r.setFromEulerAngleDegrees(offs_eu);
     tv_.translation = tv_.translation + offs_t;
     tv_.rotation = tv_.rotation * offs_r;
+}
+
+- (void) initAudio
+{
+    //create audio controller
+    self.audioController = [[AEAudioController alloc]
+                           initWithAudioDescription:[AEAudioController nonInterleaved16BitStereoAudioDescription]
+                               inputEnabled:NO];
+    self->audio_handler.init(self.audioController);
 }
 
 #pragma mark - UIView(s)Controller lifecycle
@@ -238,7 +229,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     [self setTrackingConfiguration];
     if (self->audio_handler.is_init)
     {
-        self->audio_handler.start();
+        self->audio_handler.start(); //should be internal so it happens at the end of "init". do that l8er
     }
     else
     {

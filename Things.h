@@ -15,7 +15,7 @@ class Object3D : public Thing
     public:
     std::string path;
     float scale;
-    bool is_visible;
+    bool is_render;
     
     Object3D();
     Object3D(std::string name_); //probably ought remove this.

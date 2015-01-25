@@ -13,6 +13,8 @@
 		7CCB429D19582BAE007355FA /* InstantTrackingViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7CCB429B19582BAE007355FA /* InstantTrackingViewController.mm */; };
 		9839FB0F1A1C12660076D4A8 /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9839FB0E1A1C12660076D4A8 /* opencv2.framework */; };
 		9844D1331A74D2CA00272500 /* libTheAmazingAudioEngine.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9844D1301A74D2AC00272500 /* libTheAmazingAudioEngine.a */; };
+		9844D1571A753A4E00272500 /* SoundObject.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9844D1551A753A4E00272500 /* SoundObject.mm */; };
+		9844D15A1A753A9E00272500 /* AudioChannel.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9844D1581A753A9E00272500 /* AudioChannel.mm */; };
 		984660A41A48D36E002818C5 /* DebugHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = 984660A21A48D36E002818C5 /* DebugHandler.mm */; };
 		9860DC251A1A7236005626C0 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9860DC241A1A7236005626C0 /* Accelerate.framework */; };
 		9860DC271A1A7271005626C0 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9860DC261A1A7271005626C0 /* GLKit.framework */; };
@@ -98,6 +100,10 @@
 		9839FB0E1A1C12660076D4A8 /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = opencv2.framework; sourceTree = "<group>"; };
 		9844D12B1A74D2AC00272500 /* TheAmazingAudioEngine.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = TheAmazingAudioEngine.xcodeproj; path = TheAmazingAudioEngine/TheAmazingAudioEngine.xcodeproj; sourceTree = "<group>"; };
 		9844D1531A74FAA700272500 /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = System/Library/Frameworks/AudioUnit.framework; sourceTree = SDKROOT; };
+		9844D1551A753A4E00272500 /* SoundObject.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SoundObject.mm; sourceTree = "<group>"; };
+		9844D1561A753A4E00272500 /* SoundObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoundObject.h; sourceTree = "<group>"; };
+		9844D1581A753A9E00272500 /* AudioChannel.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AudioChannel.mm; sourceTree = "<group>"; };
+		9844D1591A753A9E00272500 /* AudioChannel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioChannel.h; sourceTree = "<group>"; };
 		984660A21A48D36E002818C5 /* DebugHandler.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = DebugHandler.mm; sourceTree = "<group>"; };
 		984660A31A48D36E002818C5 /* DebugHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugHandler.h; sourceTree = "<group>"; };
 		9860DC241A1A7236005626C0 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
@@ -226,6 +232,10 @@
 				9844D12B1A74D2AC00272500 /* TheAmazingAudioEngine.xcodeproj */,
 				989513EA1A73860D0006F969 /* AudioHandler.mm */,
 				989513EB1A73860D0006F969 /* AudioHandler.h */,
+				9844D1551A753A4E00272500 /* SoundObject.mm */,
+				9844D1561A753A4E00272500 /* SoundObject.h */,
+				9844D1581A753A9E00272500 /* AudioChannel.mm */,
+				9844D1591A753A9E00272500 /* AudioChannel.h */,
 				98E56D411A51EC6500E46F50 /* Things.mm */,
 				98E56D421A51EC6500E46F50 /* Things.h */,
 				98E56D3E1A51E7B300E46F50 /* Thing.mm */,
@@ -455,10 +465,12 @@
 				989977A61A1DFB31000AB036 /* common.mm in Sources */,
 				9899779D1A1D9B11000AB036 /* Pose.mm in Sources */,
 				989977A81A1DFE26000AB036 /* main.mm in Sources */,
+				9844D1571A753A4E00272500 /* SoundObject.mm in Sources */,
 				986B18791A30FE2900CD7C5A /* Kalman.mm in Sources */,
 				986B18761A2BEF8700CD7C5A /* js.mm in Sources */,
 				989513EC1A73860D0006F969 /* AudioHandler.mm in Sources */,
 				98DCAC381A4FEA7D00915477 /* CompSixAxis.mm in Sources */,
+				9844D15A1A753A9E00272500 /* AudioChannel.mm in Sources */,
 				B9BC116015D8FA7C00713ED3 /* AppDelegate.mm in Sources */,
 				B9BC118B15D900D900713ED3 /* EAGLView.mm in Sources */,
 				B9BC118C15D900D900713ED3 /* MetaioSDKViewController.mm in Sources */,
