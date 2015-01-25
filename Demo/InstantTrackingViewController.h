@@ -21,16 +21,6 @@
     int                 m_frames;
     NSDate              *elapsed;
     
-//    
-//    metaio::IGeometry*  m_obj;            // pointer to the model
-//    metaio::IGeometry*  m_obj1;           // pointer to the model
-//    metaio::Vector3d    m_obj_t;
-//    metaio::Vector3d    m_obj1_t;
-//    metaio::Rotation    m_obj_r;
-//    metaio::Rotation    m_obj1_r;
-//    NSInteger           m_scale;
-//    NSInteger           m_scale1;
-    
     Pose cam;
     
     metaio::TrackingValues COS_offs; //can replace with pose
