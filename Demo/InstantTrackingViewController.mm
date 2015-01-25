@@ -10,17 +10,18 @@
 #import <QuartzCore/QuartzCore.h>
 
 #import <AudioToolbox/AudioToolbox.h>
+#import <TheAmazingAudioEngine.h>
 
 #import <WebKit/WebKit.h>
 #import <JavaScriptCore/JavaScriptCore.h>
 #import <CoreMotion/CoreMotion.h>
-#import <TheAmazingAudioEngine.h>
 #import "InstantTrackingViewController.h"
 #import "EAGLView.h"
 
 
 #import "common.h"
 #import "Pose.h"
+#import "AudioHandler.h"
 
 int printf(const char * __restrict format, ...) //printf don't print to console
 //from http://stackoverflow.com/questions/8924831/iphone-debugging-real-device
@@ -36,12 +37,12 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 
 @interface InstantTrackingViewController ()
 {
+    AudioHandler audio_handler;
 }
 
 @property (nonatomic, strong) AEAudioController *audioController;
-@property (nonatomic, strong) AEAudioFilePlayer *loop1;
-@property (nonatomic, strong) AEAudioUnitFilter *au_filter;
-@property (nonatomic, strong) AEAudioUnitFilter *au_3DMixer;
+//@property (nonatomic, strong) AEAudioFilePlayer *loop1;
+//@property (nonatomic, strong) AEAudioUnitFilter *au_3DMixer;
 
 
 @end
@@ -57,113 +58,11 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 
 - (void) initAudio
 {
-    NSLog(@"-----Audio---!");
-    
     //create audio controller
     self.audioController = [[AEAudioController alloc]
                            initWithAudioDescription:[AEAudioController nonInterleaved16BitStereoAudioDescription]
                                inputEnabled:NO];
-    //setup file player
-    NSURL* sound_url = [[NSBundle mainBundle] URLForResource:@"Assets/sound/pain" withExtension:@"mp3"];
-    if (!sound_url)
-    {
-        NSLog(@"error bad path");
-    }
-    self.loop1 = [AEAudioFilePlayer
-        audioFilePlayerWithURL:sound_url
-        audioController:_audioController
-        error:NULL];
-    if (!self.loop1)
-    {
-        NSLog(@"error creating loop");
-    }
-    _loop1.volume = 0.5;
-    _loop1.channelIsMuted = NO;
-    _loop1.loop = YES;
-
-    
-    //add player to controller
-    [_audioController addChannels:@[_loop1]];
-    
-    //create filter
-    AudioComponentDescription filter = AEAudioComponentDescriptionMake(kAudioUnitManufacturer_Apple,
-                                     kAudioUnitType_Effect,
-                                     kAudioUnitSubType_Reverb2);
-    NSError *error = NULL;
-    self.au_filter = [[AEAudioUnitFilter alloc]
-                      initWithComponentDescription:filter
-                                   audioController:_audioController
-                                             error:&error];
-    if ( ! _au_filter ) {
-        NSLog(@"failed to create filter");
-    }
-
-    
-    //add filter to controller's master output
-    //[self.audioController addFilter:_au_filter];
-    
-    //create mixer https://developer.apple.com/library/mac/technotes/tn2112/_index.html
-    error = NULL;
-    AudioComponentDescription mixerCD;
-
-    mixerCD.componentFlags = 0; 
-    mixerCD.componentFlagsMask = 0; 
-    mixerCD.componentType = kAudioUnitType_Mixer; 
-    mixerCD.componentSubType = kAudioUnitSubType_AU3DMixerEmbedded;
-    mixerCD.componentManufacturer = kAudioUnitManufacturer_Apple;
-    
-    self.au_3DMixer = [[AEAudioUnitFilter alloc]
-                        initWithComponentDescription:mixerCD
-                        audioController:_audioController
-                        useDefaultInputFormat: YES
-                        error:&error];
-    
-    if ( ! _au_3DMixer ) {
-        NSLog(@"failed to create mixer");
-    }
-    
-    //add mixer to controller's master output
-    [self.audioController addFilter:_au_3DMixer];
-    
-    //initialize mixer params (THIS IS NECESSARY)
-    /*  (
-        AudioUnit inUnit,
-        AudioUnitParameterID inID, 
-        AudioUnitScope inScope, 
-        AudioUnitElement inElement, 
-        AudioUnitParameterValue inValue, 
-        UInt32 inBufferOffsetInFrames 
-        );
-    */
-    AudioUnitSetParameter(  _au_3DMixer.audioUnit,
-                    k3DMixerParam_Distance,
-                    kAudioUnitScope_Input,
-                    0,
-                    1.0f,
-                    0);
-    AudioUnitSetParameter(  _au_3DMixer.audioUnit,
-                    k3DMixerParam_Elevation,
-                    kAudioUnitScope_Input,
-                    0,
-                    0.0f,
-                    0);
-    AudioUnitSetParameter(  _au_3DMixer.audioUnit,
-                    k3DMixerParam_Azimuth,
-                    kAudioUnitScope_Input,
-                    0,
-                    0.0f,
-                    0);
-
-    
-    
-    //start controller
-    error = NULL;
-    BOOL result = [_audioController start:&error];
-    if ( !result ) {
-        NSLog(@"error starting audio");
-    }
-    
-    NSLog(@"-----");
+    self->audio_handler.init(self.audioController);
 }
 
 
@@ -215,30 +114,8 @@ int printf(const char * __restrict format, ...) //printf don't print to console
             hasTracking = true;
         }
         
-        double azimuth = 0;
-        double elevation = 0;
-        double distance = 0;
+        self->audio_handler.setPan(cam.t_last, cam.r_last);
         
-        calcPanPosition(cam.t_last, cam.r_last, azimuth, elevation, distance);
-        
-        AudioUnitSetParameter(  _au_3DMixer.audioUnit,
-                        k3DMixerParam_Azimuth,
-                        kAudioUnitScope_Input, //kAudioUnitScope_Input
-                        0,
-                        azimuth,
-                        0);
-        AudioUnitSetParameter(  _au_3DMixer.audioUnit,
-                        k3DMixerParam_Elevation,
-                        kAudioUnitScope_Input, //kAudioUnitScope_Input
-                        0,
-                        elevation,
-                        0);
-        AudioUnitSetParameter(  _au_3DMixer.audioUnit,
-                        k3DMixerParam_Distance,
-                        kAudioUnitScope_Input, //kAudioUnitScope_Input
-                        0,
-                        distance * 0.01,
-                        0);
     }
     debugHandler.update();
 }
@@ -359,6 +236,14 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 -(void)viewDidAppear:(BOOL)animated
 {
     [self setTrackingConfiguration];
+    if (self->audio_handler.is_init)
+    {
+        self->audio_handler.start();
+    }
+    else
+    {
+        NSLog(@"audio handler failed to initialize");
+    }
 }
 
 
