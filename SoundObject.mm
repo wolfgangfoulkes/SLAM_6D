@@ -129,6 +129,19 @@ void SoundObject::init(std::string name_, NSString * path_, AEAudioController * 
                     0.0f,
                     0);
     
+    printProperty();
+    
+    UInt32 algorithm = kSpatializationAlgorithm_SphericalHead;
+    UInt32 size = sizeof(algorithm);
+    AudioUnitSetProperty(this->au_3DMixer.audioUnit,
+        kAudioUnitProperty_SpatializationAlgorithm,
+        kAudioUnitScope_Input,
+        0,
+        &algorithm,
+        size);
+    
+    printProperty();
+    
     this->is_init = true;
 }
 
@@ -178,4 +191,89 @@ void SoundObject::setPan(metaio::Vector3d t_, metaio::Rotation r_)
                     0,
                     distance * 0.01,
                     0);
+}
+
+void SoundObject::printProperty()
+{
+    UInt32 property_size[1];
+    property_size[0] = 11111111;
+    AudioUnitGetPropertyInfo( this->au_3DMixer.audioUnit,
+    kAudioUnitProperty_SpatializationAlgorithm,
+    kAudioUnitScope_Input,
+    0,
+    &property_size[0],
+    NULL);
+    NSLog(@"property size? %zu", property_size[0]);
+    
+    
+    UInt32 algorithm[1];
+    algorithm[0] = 11111111;
+    UInt32 size = sizeof(algorithm);
+    AudioUnitGetProperty( this->au_3DMixer.audioUnit,
+    kAudioUnitProperty_SpatializationAlgorithm,
+    kAudioUnitScope_Input,
+    0,
+    &algorithm[0],
+    &size);
+    switch(algorithm[0])
+    {
+        case 0:
+            NSLog(@"EqualPowerPanning");
+            break;
+        case 1:
+            NSLog(@"SphericalHead");
+            break;
+        case 2:
+            NSLog(@"HRTF");
+            break;
+        case 3:
+            NSLog(@"SoundField");
+            break;
+        case 4:
+            NSLog(@"VectorBasedPanning");
+            break;
+        case 5:
+            NSLog(@"StereoPassThrough");
+            break;
+        default:
+            NSLog(@"unknown algorithm");
+            break;
+    }
+}
+
+void SoundObject::printProperties()
+{
+    //  Get number of parameters in this unit (size in bytes really):
+    UInt32 parameterListSize = 0;
+    AudioUnitGetPropertyInfo(this->au_3DMixer.audioUnit,
+        kAudioUnitProperty_ParameterList,
+        kAudioUnitScope_Input,
+        0,
+        &parameterListSize,
+        NULL);
+
+    //  Get ids for the parameters:
+    AudioUnitParameterID parameterIDs[parameterListSize];
+    AudioUnitGetProperty(this->au_3DMixer.audioUnit,
+        kAudioUnitProperty_ParameterList,
+        kAudioUnitScope_Input,
+        0,
+        &parameterIDs[0],
+        &parameterListSize);
+
+    AudioUnitParameterInfo parameterInfo_t;
+    UInt32 parameterInfoSize = sizeof(AudioUnitParameterInfo);
+    UInt32 parametersCount = parameterListSize / sizeof(AudioUnitParameterID);
+    NSLog(@"# of parameters: %zu", parametersCount);
+    
+    for(UInt32 pIndex = 0; pIndex < parametersCount; pIndex++)
+    {
+        AudioUnitGetProperty(this->au_3DMixer.audioUnit,
+            kAudioUnitProperty_ParameterInfo,
+            kAudioUnitScope_Input,
+            parameterIDs[pIndex],
+            &parameterInfo_t,
+            &parameterInfoSize);
+            NSLog(@"param %s: min value = %f, max value = %f", parameterInfo_t.name, parameterInfo_t.minValue, parameterInfo_t.maxValue);
+    }
 }

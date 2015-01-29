@@ -127,9 +127,9 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     
     if (activeCOS_ != activeCOS)
     {
-        NSString * _fmt = @"changing COS: %d=>%d";
-        NSString * _s = [NSString stringWithFormat:_fmt, activeCOS, activeCOS_];
-        logMA(_s, ma_log);
+        //NSString * _fmt = @"changing COS: %d=>%d";
+        //NSString * _s = [NSString stringWithFormat:_fmt, activeCOS, activeCOS_];
+        //logMA(_s, ma_log);
     }
     
     lastCOS = activeCOS;

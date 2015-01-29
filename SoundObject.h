@@ -32,6 +32,9 @@ class SoundObject : public Thing
     void render();
     
     void setPan(metaio::Vector3d t_, metaio::Rotation r_);
+    
+    void printProperty();
+    void printProperties();
 };
 
 #endif /* defined(__Demo__SoundObject__) */
