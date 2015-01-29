@@ -24,4 +24,6 @@ class AudioHandler
     void start();
     void update();
     void setPan(metaio::Vector3d t_, metaio::Rotation r_);
+    
+    void printInfo(AEChannelGroupRef group_);
 };

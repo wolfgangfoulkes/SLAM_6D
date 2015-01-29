@@ -15,10 +15,9 @@
 SoundObject::SoundObject() : Thing()
 {
     this->type = "SoundObject";
-    this->name = "undefined";
 }
 
-SoundObject::SoundObject(std::string name_)
+SoundObject::SoundObject(std::string name_) : SoundObject()
 {
     this->name = name_;
 }
@@ -34,6 +33,8 @@ void SoundObject::init(std::string name_)
 
 void SoundObject::init(std::string name_, NSString * path_, AEAudioController * ac_)
 {
+    this->volume = 0.5;
+    
     this->name = name_;
     this->path = [NSString stringWithString: path_];
     NSURL * url = [NSURL fileURLWithPath:this->path];
@@ -88,16 +89,6 @@ void SoundObject::init(std::string name_, NSString * path_, AEAudioController * 
     }
     
     [ac_ addFilter:this->au_3DMixer toChannelGroup:this->channel_group];
-//    NSArray * channels = [ac_ channels];
-//    NSArray * channel_groups = [ac_ topLevelChannelGroups];
-//    NSArray * filters = [ac_ filters];
-//    NSArray * filters_for_group = [ac_ filtersForChannelGroup: this->channel_group];
-//    NSString * channels_s = [channels componentsJoinedByString:@", "];
-//    NSString * groups_s = [channel_groups componentsJoinedByString:@", "];
-//    NSString * filters_s = [filters componentsJoinedByString:@", "];
-//    NSString * filters_for_group_s = [filters_for_group componentsJoinedByString:@", "];
-//    NSLog([NSString stringWithFormat:@"channels: %@, groups: %@, filters: %@, filters_for_group: %@", channels_s, groups_s, filters_s, filters_for_group_s]);
-    
     
     //initialize mixer params (THIS IS NECESSARY)
     /*****
@@ -129,7 +120,8 @@ void SoundObject::init(std::string name_, NSString * path_, AEAudioController * 
                     0.0f,
                     0);
     
-    printProperty();
+    //NSLog(@"%s -----", this->name.c_str());
+    //printProperty();
     
     UInt32 algorithm = kSpatializationAlgorithm_SphericalHead;
     UInt32 size = sizeof(algorithm);
@@ -140,7 +132,8 @@ void SoundObject::init(std::string name_, NSString * path_, AEAudioController * 
         &algorithm,
         size);
     
-    printProperty();
+    //printProperty();
+    //NSLog(@"----------");
     
     this->is_init = true;
 }

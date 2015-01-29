@@ -52,3 +52,16 @@ void AudioHandler::setPan(metaio::Vector3d t_, metaio::Rotation r_)
         so1.setPan(t_, r_);
 
 }
+
+void AudioHandler::printInfo(AEChannelGroupRef group_)
+{
+    NSArray * channels = [this->audio_controller channels];
+    NSArray * channel_groups = [this->audio_controller topLevelChannelGroups];
+    NSArray * filters = [this->audio_controller filters];
+    NSArray * filters_for_group = [this->audio_controller filtersForChannelGroup: group_];
+    NSString * channels_s = [channels componentsJoinedByString:@", "];
+    NSString * groups_s = [channel_groups componentsJoinedByString:@", "];
+    NSString * filters_s = [filters componentsJoinedByString:@", "];
+    NSString * filters_for_group_s = [filters_for_group componentsJoinedByString:@", "];
+    NSLog([NSString stringWithFormat:@"channels: %@, groups: %@, filters: %@, filters_for_group: %@", channels_s, groups_s, filters_s, filters_for_group_s]);
+}

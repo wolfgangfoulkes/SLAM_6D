@@ -19,6 +19,7 @@ class SoundObject : public Thing
     NSString * path;
     AEChannelGroupRef channel_group;
     AEAudioUnitFilter *au_3DMixer;
+    double volume;
     
     AEAudioFilePlayer *loop; //temporary
     
