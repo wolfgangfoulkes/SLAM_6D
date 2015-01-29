@@ -343,6 +343,6 @@ void cartesianToSpherical(metaio::Vector3d t_, metaio::Rotation r_, double& _azi
 {
     _distance = distance(t_);
     _azimuth = rToD( atan2(t_.x, t_.z) ); //atan2(a, b) = atan( a/b ) with the correct quadrant
-    _elevation = 90.0 - rToD(acos( t_.y / _distance )); //elevation is expressed -90 -> 0 -> 90
+    _elevation = 90.0 - rToD( acos( t_.y / _distance ) ); //elevation is expressed -90 -> 0 -> 90
 }
 
