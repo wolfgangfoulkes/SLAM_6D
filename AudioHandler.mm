@@ -50,4 +50,5 @@ void AudioHandler::setPan(metaio::Vector3d t_, metaio::Rotation r_)
 {
         so.setPan(t_, r_);
         so1.setPan(t_, r_);
+
 }

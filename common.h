@@ -13,6 +13,11 @@
 #import <opencv2/opencv.hpp>
 #import <metaioSDK/IMetaioSDKIOS.h>
 
+/** Degrees to Radian **/
+#define dToR( degrees ) ( ( degrees ) / 180.0 * M_PI )
+
+/** Radians to Degrees **/
+#define rToD( radians ) ( ( radians ) * ( 180.0 / M_PI ) )
 
 /*untested unless mentioned*/
 void matToArray(cv::Mat m_, float * _m);
@@ -56,7 +61,8 @@ metaio::Vector3d calcCOSTOffset(metaio::Vector3d t_, metaio::Vector3d t_last_, m
 metaio::Rotation calcCOSROffset(metaio::Rotation r_, metaio::Rotation r_last_);
 void calcCOSOffset(metaio::Vector3d t_, metaio::Rotation r_, metaio::Vector3d t_last_, metaio::Rotation r_last_, metaio::Vector3d& _t, metaio::Rotation& _r);
 
-void calcPanPosition(metaio::Vector3d t_, metaio::Rotation r_, double& _azimuth, double& _elevation, double& _distance);
+void cartesianToSpherical(metaio::Vector3d t_, metaio::Rotation r_, double& _azimuth, double& _elevation, double& _distance);
+//void sphericalToCartesian(double azimuth_, double elevation_, double distance_, metaio::Vector3d& _t, metaio::Rotation& _r);
 
 
 #endif /* defined(__Demo__common__) */

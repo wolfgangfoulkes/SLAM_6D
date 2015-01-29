@@ -64,9 +64,17 @@ void DebugHandler::update()
     metaio::Vector3d _offs = metaio::Vector3d(this->pose->t_offs); _offs = round(_offs, SIG_FIGS);  _offs = scale(_offs, SCALE);
     metaio::Vector3d _cam = metaio::Vector3d(this->pose->t_p);      _cam = round(_cam, SIG_FIGS);    _cam = scale(_cam, SCALE);
     metaio::Vector3d _obj = metaio::Vector3d(this->pose->t_last);   _obj = round(_obj, SIG_FIGS);    _obj = scale(_obj, SCALE);
-    //metaio::Vector3d _obj1 = metaio::Vector3d(this->o_t);          _obj1 = round(_obj1, SIG_FIGS);  _obj1 = scale(_obj1, SCALE);
-    metaio::Vector3d _obj1 = this->pose->r_last.rotatePoint(this->o_t) + this->pose->t_last;
+//    metaio::Vector3d _obj1 = this->pose->r_last.rotatePoint(this->o_t) + this->pose->t_last;
+    //_obj1 = round(_obj1, SIG_FIGS);  _obj1 = scale(_obj1, SCALE);
+    
+    metaio::Vector3d _obj1_t = this->pose->r_last.rotatePoint(this->o_t) + this->pose->t_last;
+    double a = 0;
+    double e = 0;
+    double d = 0;
+    cartesianToSpherical(_obj1_t, this->pose->r_last, a, e, d);
+    metaio::Vector3d _obj1 = metaio::Rotation(0, dToR(a), 0).rotatePoint(metaio::Vector3d(0, 0, d));
     _obj1 = round(_obj1, SIG_FIGS);  _obj1 = scale(_obj1, SCALE);
+    //logMA([NSString stringWithFormat:@"%f, %f, %f", a, e, d], this->log);
     
     metaio::Vector3d _cf_acc = metaio::Vector3d(this->cf_acc);   _cf_acc = round(_cf_acc, SIG_FIGS);
     
@@ -128,26 +136,30 @@ void DebugHandler::getJS()
     
     printLog = [ctx[@"printLog"] toBool];
     
-    metaio::Vector3d _t(0, 0, 0);
-    metaio::Rotation _r; _r.setNoRotation();
+    if (TOUCH)
+    {
+    
+        metaio::Vector3d _t(0, 0, 0);
+        metaio::Rotation _r; _r.setNoRotation();
 
-    double t_x = [ctx[@"db"][@"t"][@"x"] toDouble];
-    double t_y = [ctx[@"db"][@"t"][@"y"] toDouble];
-    double r_y = [ctx[@"db"][@"r"][@"y"] toDouble];
-    
-    t_touch.x = t_x;
-    t_touch.y = t_y;
-    
-    _t.x = t_x * TOUCH_X_COEFF;
-    _t.y = t_y * TOUCH_Y_COEFF;
-    
-    _r = metaio::Rotation(dToR(0), dToR(r_y), dToR(0));
-    
-    r_touch = _r;
+        double t_x = [ctx[@"db"][@"t"][@"x"] toDouble];
+        double t_y = [ctx[@"db"][@"t"][@"y"] toDouble];
+        double r_y = [ctx[@"db"][@"r"][@"y"] toDouble];
+        
+        t_touch.x = t_x;
+        t_touch.y = t_y;
+        
+        _t.x = t_x * TOUCH_X_COEFF;
+        _t.y = t_y * TOUCH_Y_COEFF;
+        
+        _r = metaio::Rotation(dToR(0), dToR(r_y), dToR(0));
+        
+        r_touch = _r;
 
-    updatePose(@"touch", _t, _r);
-    
-    SCALE_COEFF = [ctx[@"SCALE_COEFF"] toDouble];
+        updatePose(@"touch", _t, _r);
+        
+        SCALE_COEFF = [ctx[@"SCALE_COEFF"] toDouble];
+    }
 }
 
 void DebugHandler::updatePose(NSString * pose_, metaio::Vector3d t_, metaio::Rotation r_)

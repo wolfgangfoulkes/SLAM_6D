@@ -17,6 +17,7 @@
 class DebugHandler {
 public:
     int called;
+    const bool TOUCH = false;
     const double SIG_FIGS = 100;
 
     const double TOUCH_X_COEFF = 100;
@@ -25,6 +26,7 @@ public:
     const double X_COEFF = 0.05; //to scale output, and put into the right COS.
     const double Y_COEFF = 0.05;
     const double Z_COEFF = 0.05;
+    
     
     //to scale coordinates for display
     //eventually, we'll need to scale Z more or less, bc Z is the hardest for the camera to figure

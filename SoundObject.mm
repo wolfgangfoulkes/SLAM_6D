@@ -88,27 +88,28 @@ void SoundObject::init(std::string name_, NSString * path_, AEAudioController * 
     }
     
     [ac_ addFilter:this->au_3DMixer toChannelGroup:this->channel_group];
-    NSArray * channels = [ac_ channels];
-    NSArray * channel_groups = [ac_ topLevelChannelGroups];
-    NSArray * filters = [ac_ filters];
-    NSArray * filters_for_group = [ac_ filtersForChannelGroup: this->channel_group];
-    NSString * channels_s = [channels componentsJoinedByString:@", "];
-    NSString * groups_s = [channel_groups componentsJoinedByString:@", "];
-    NSString * filters_s = [filters componentsJoinedByString:@", "];
-    NSString * filters_for_group_s = [filters_for_group componentsJoinedByString:@", "];
-    NSLog([NSString stringWithFormat:@"channels: %@, groups: %@, filters: %@, filters_for_group: %@", channels_s, groups_s, filters_s, filters_for_group_s]);
+//    NSArray * channels = [ac_ channels];
+//    NSArray * channel_groups = [ac_ topLevelChannelGroups];
+//    NSArray * filters = [ac_ filters];
+//    NSArray * filters_for_group = [ac_ filtersForChannelGroup: this->channel_group];
+//    NSString * channels_s = [channels componentsJoinedByString:@", "];
+//    NSString * groups_s = [channel_groups componentsJoinedByString:@", "];
+//    NSString * filters_s = [filters componentsJoinedByString:@", "];
+//    NSString * filters_for_group_s = [filters_for_group componentsJoinedByString:@", "];
+//    NSLog([NSString stringWithFormat:@"channels: %@, groups: %@, filters: %@, filters_for_group: %@", channels_s, groups_s, filters_s, filters_for_group_s]);
     
     
     //initialize mixer params (THIS IS NECESSARY)
-    /*  (
-        AudioUnit inUnit,
-        AudioUnitParameterID inID, 
-        AudioUnitScope inScope,
-        AudioUnitElement inElement,
-        AudioUnitParameterValue inValue, 
-        UInt32 inBufferOffsetInFrames 
-        );
-    */
+    /*****
+    (
+    AudioUnit inUnit,
+    AudioUnitParameterID inID, 
+    AudioUnitScope inScope,
+    AudioUnitElement inElement,
+    AudioUnitParameterValue inValue, 
+    UInt32 inBufferOffsetInFrames 
+    );
+    *****/
     AudioUnitSetParameter(  this->au_3DMixer.audioUnit,
                     k3DMixerParam_Distance,
                     kAudioUnitScope_Input,
@@ -150,17 +151,14 @@ bool operator== (const SoundObject& left_, const SoundObject& right_)
 
 void SoundObject::setPan(metaio::Vector3d t_, metaio::Rotation r_)
 {
-    //metaio::Vector3d t_adj = r_.rotatePoint(this->t) + t_; //this or r.inverse, dunno which
+    metaio::Vector3d t_adj = r_.rotatePoint(this->t) + t_; //this or r.inverse, dunno which
     //rotation is correct, translation seems mostly correct, but maybe buggy
-    
-    metaio::Vector3d t_init = r_.inverse().rotatePoint(t_) + this->t;
-    metaio::Vector3d t_adj = r_.rotatePoint(t_init);
     
     double azimuth = 0;
     double elevation = 0;
     double distance = 0;
     
-    calcPanPosition(t_adj, r_, azimuth, elevation, distance);
+    cartesianToSpherical(t_adj, r_, azimuth, elevation, distance);
     
     AudioUnitSetParameter(  this->au_3DMixer.audioUnit,
                     k3DMixerParam_Azimuth,

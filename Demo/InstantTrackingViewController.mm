@@ -66,7 +66,6 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     {
         return;
     }
-    
 
     [self updateTrackingState];
     if (updateMetaio && activeCOS)
@@ -223,6 +222,46 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     elapsed = [[NSDate alloc] init];
     
     [self initAudio];
+    
+//    double a = 0;
+//    double e = 0;
+//    double d = 0;
+//    
+//    cartesianToSpherical(metaio::Vector3d(100, 0, 100), metaio::Rotation(0, 0, 0), a, e, d);
+//    
+//    NSLog(@"a = 45? %f, %f, %f", a, e, d);
+//    
+//    cartesianToSpherical(metaio::Vector3d(100, 0, 0), metaio::Rotation(0, 0, 0), a, e, d);
+//    
+//    NSLog(@"a = 90? %f, %f, %f", a, e, d);
+//    
+//    cartesianToSpherical(metaio::Vector3d(0, 0, 100), metaio::Rotation(0, 0, 0), a, e, d);
+//    
+//    NSLog(@"a = 0? %f, %f, %f", a, e, d);
+//    
+//    cartesianToSpherical(metaio::Vector3d(100, 0, 100), metaio::Rotation(0, 0, 0), a, e, d);
+//    
+//    NSLog(@"a = 45? %f, %f, %f", a, e, d);
+//    
+//    cartesianToSpherical(metaio::Vector3d(-100, 0, 100), metaio::Rotation(0, 0, 0), a, e, d);
+//    
+//    NSLog(@"a = -45? %f, %f, %f", a, e, d);
+//    
+//    cartesianToSpherical(metaio::Vector3d(100, 0, -100), metaio::Rotation(0, 0, 0), a, e, d);
+//    
+//    NSLog(@"a = 135? %f, %f, %f", a, e, d);
+//    
+//    cartesianToSpherical(metaio::Vector3d(-100, 0, -100), metaio::Rotation(0, 0, 0), a, e, d);
+//    
+//    NSLog(@"a = -135? %f, %f, %f", a, e, d);
+//    
+//    cartesianToSpherical(metaio::Vector3d(100, 100, 0), metaio::Rotation(0, 0, 0), a, e, d);
+//    
+//    NSLog(@"e = 45? %f, %f, %f", a, e, d);
+//    
+//    cartesianToSpherical(metaio::Vector3d(0, -100, 100), metaio::Rotation(0, 0, 0), a, e, d);
+//    
+//    NSLog(@"e = -45? %f, %f, %f", a, e, d);
 }
 
 -(void)viewDidAppear:(BOOL)animated

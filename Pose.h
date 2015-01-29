@@ -38,12 +38,6 @@ add only what you need
 using namespace std;
 using namespace cv;
 
-/** Degrees to Radian **/
-#define dToR( degrees ) ( ( degrees ) / 180.0 * M_PI )
-
-/** Radians to Degrees **/
-#define rToD( radians ) ( ( radians ) * ( 180.0 / M_PI ) )
-
 class Pose
 {
     public:

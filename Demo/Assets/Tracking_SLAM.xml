@@ -11,7 +11,7 @@
                 <SensorCosID>map1</SensorCosID>
                 <Parameters>
                     <Initialization Type="map">
-                        <Map>mlab/mlab_front_left.slam</Map>
+                        <Map>b305/modular_left.slam</Map>
                     </Initialization>
                     <Learning Enabled="true"> 
                         <MinNumberOfObservations>4</MinNumberOfObservations>
@@ -26,7 +26,7 @@
                 <SensorCosID>map2</SensorCosID>
                 <Parameters>
                     <Initialization Type="map">
-                        <Map>mlab/mlab_front_right.slam</Map>
+                        <Map>b305/modular_right.slam</Map>
                     </Initialization>
                     <Learning Enabled="true">
                         <MinNumberOfObservations>4</MinNumberOfObservations>
