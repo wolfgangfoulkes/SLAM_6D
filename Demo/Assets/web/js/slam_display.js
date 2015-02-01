@@ -16,15 +16,51 @@ Model = function(){
     this.model = 0;
 };
 
+function buildAxes( length ) {
+    var axes = new THREE.Object3D();
+
+    axes.add( buildAxis( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( length, 0, 0 ), 0xFF0000, false ) ); // +X, red, solid
+    axes.add( buildAxis( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( -length, 0, 0 ), 0xFF0000, true) ); // -X, red, dashed
+    axes.add( buildAxis( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, length, 0 ), 0x00FF00, false ) ); // +Y, green, solid
+    axes.add( buildAxis( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, -length, 0 ), 0x00FF00, true ) ); // -Y, green, dashed
+    axes.add( buildAxis( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, length ), 0x0000FF, false ) ); // +Z, blue, solid
+    axes.add( buildAxis( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, -length ), 0x0000FF, true ) ); // -Z, blue, dashed
+
+    return axes;
+
+}
+
+function buildAxis( src, dst, colorHex, dashed ) {
+    var geom = new THREE.Geometry(),
+        mat; 
+
+    if(dashed) {
+        mat = new THREE.LineDashedMaterial({ linewidth: 3, color: colorHex, dashSize: 3, gapSize: 3 });
+    } else {
+        mat = new THREE.LineBasicMaterial({ linewidth: 3, color: colorHex });
+    }
+
+    geom.vertices.push( src.clone() );
+    geom.vertices.push( dst.clone() );
+    geom.computeLineDistances(); // This one is SUPER important, otherwise dashed lines will appear as simple plain lines
+
+    var axis = new THREE.Line( geom, mat, THREE.LinePieces );
+
+    return axis;
+
+}
+
 display = new function()
 {
     
-    this.animate = false;
     this.models = {}; //replace with object, so you can access by name
     this.cam = new Pose();
     this.scene = null;
     this.camera = null;
     this.renderer = null;
+    this.axes = null;
+    this.animate = false;
+    this.draw_axes = false;
     
     this.init = function()
     {
@@ -41,6 +77,11 @@ display = new function()
         
         $container.append( display.renderer.domElement );
         setInterval(display.update, 1000/30);
+        
+        // Add axes
+        display.axes = buildAxes( 1000 );
+        display.axes.visible = false;
+        display.scene.add( display.axes );
     };
     
     this.update = function()
@@ -53,13 +94,15 @@ display = new function()
         display.camera.quaternion.y = display.cam.r.y;
         display.camera.quaternion.z = display.cam.r.z;
         display.camera.quaternion.w = display.cam.r.w;
+        
+        display.axes.visible = display.draw_axes;
+        
         display.renderer.render(display.scene, display.camera);
     };
     
     
     this.addOBJ = function(name, obj_path_, x_, y_, z_, rx_, ry_, rz_, rw_, scale_)
     {
-        console.log("addOBJ");
         x_ = defaultOr(x_, 0);
         y_ = defaultOr(y_, 0);
         z_ = defaultOr(z_, 0);
@@ -68,6 +111,8 @@ display = new function()
         rz_ = defaultOr(rz_, 0);
         rw_ = defaultOr(rw_, 0);
         scale_ = defaultOr(scale_, 1.0);
+        
+        //console.log("addOBJ:" + x_.toString() + ", " + y_.toString() + ", " + z_.toString());
 
         var pose_ = new Pose();
         pose_.t.x = x_;
@@ -107,6 +152,7 @@ display = new function()
         	object.position.x = x_;
             object.position.y = y_;
             object.position.z = z_;
+            //console.log("object position:" + object.position.x.toString() + ", " + object.position.y.toString() + ", " + object.position.z.toString());
             //object.position.set(x_, y_, z_);
 
             object.useQuaternion = true;
@@ -115,11 +161,13 @@ display = new function()
             object.quaternion.y = ry_;
             object.quaternion.z = rz_;
             object.quaternion.w = rw_;
+            //console.log("object quaternion:" + object.quaternion.x.toString() + ", " + object.quaternion.y.toString() + ", " + object.quaternion.z.toString() + object.quaternion.w.toString());
             //object.quaternion.set(rx_, ry_, rz_, rw_);
             
            object.scale.x = scale_;
            object.scale.y = scale_;
            object.scale.z = scale_;
+           //console.log("object scale:" + object.scale.x.toString() + ", " + object.scale.y.toString() + ", " + object.scale.z.toString());
            //object.scale.set(scale_, scale_, scale_);
 
            object.traverse(function (child) {
@@ -142,7 +190,7 @@ display = new function()
     //can replace this with 2 functions, one that takes an object, and traverses and maps tex to obj
     this.addTexturedOBJ = function(name, obj_path_, image_path_, x_, y_, z_, rx_, ry_, rz_, rw_, scale_)
     {
-        console.log("addOBJ");
+        
         x_ = defaultOr(x_, 0);
         y_ = defaultOr(y_, 0);
         z_ = defaultOr(z_, 0);
@@ -151,6 +199,8 @@ display = new function()
         rz_ = defaultOr(rz_, 0);
         rw_ = defaultOr(rw_, 0);
         scale_ = defaultOr(scale_, 1.0);
+        
+        //console.log("addTexturedOBJ:" + x_.toString() + ", " + y_.toString() + ", " + z_.toString());
 
         var pose_ = new Pose();
         pose_.t.x = x_;
@@ -194,6 +244,8 @@ display = new function()
             object.position.y = y_;
             object.position.z = z_;
             //object.position.set(x_, y_, z_);
+            
+            //console.log("textured object position:" + object.position.x.toString() + ", " + object.position.y.toString() + ", " + object.position.z.toString());
 
             object.useQuaternion = true;
             
@@ -201,11 +253,13 @@ display = new function()
             object.quaternion.y = ry_;
             object.quaternion.z = rz_;
             object.quaternion.w = rw_;
+            //console.log("textured object quaternion:" + object.quaternion.x.toString() + ", " + object.quaternion.y.toString() + ", " + object.quaternion.z.toString() + object.quaternion.w.toString());
             //object.quaternion.set(rx_, ry_, rz_, rw_);
             
            object.scale.x = scale_;
            object.scale.y = scale_;
            object.scale.z = scale_;
+           //console.log("textured object scale:" + object.scale.x.toString() + ", " + object.scale.y.toString() + ", " + object.scale.z.toString());
            //object.scale.set(scale_, scale_, scale_);
 
            object.traverse(function (child) {

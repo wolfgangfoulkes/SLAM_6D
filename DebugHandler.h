@@ -18,6 +18,7 @@ class DebugHandler {
 public:
     int called;
     const bool TOUCH = false;
+    const bool DRAW_AXES = true;
     const double SIG_FIGS = 100;
 
     const double TOUCH_X_COEFF = 100;

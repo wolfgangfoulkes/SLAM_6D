@@ -117,15 +117,17 @@ void DebugHandler::initGL()
     this->addOBJ(
         @"head2",
         @"../../Assets/obj/head.obj",
-        metaio::Vector3d(-100 * SCALE_COEFF, 0, -50 * SCALE_COEFF),
+        metaio::Vector3d(-400 * SCALE_COEFF, 25 * SCALE_COEFF, 200 * SCALE_COEFF),
         metaio::Rotation(0, 0, 0),
-        2.0);
+        3.0);
     this->addOBJ(
         @"head3",
         @"../../Assets/obj/head.obj",
-        metaio::Vector3d(-200 * SCALE_COEFF, -80 * SCALE_COEFF, 0),
+        metaio::Vector3d(300 * SCALE_COEFF, 25 * SCALE_COEFF, 200 * SCALE_COEFF),
         metaio::Rotation(0, 0, 0),
-        1.0);
+        3.0);
+    
+    ctx[@"display"][@"draw_axes"] = @(DRAW_AXES);
 }
 
 void DebugHandler::updateGL()

@@ -182,15 +182,15 @@ NSMutableDictionary * toDict(metaio::Vector3d t_, metaio::Vector4d qu_, metaio::
         return _dict;
 }
 
-NSMutableDictionary * toDict(metaio::Vector3d t_, metaio::Vector3d eu_, metaio::Vector3d scale_)
-{
-    NSMutableDictionary * _dict = [[NSMutableDictionary alloc] initWithDictionary:
-                @{  @"t" : @{           @"x" : @(t_.x),     @"y" : @(t_.y),     @"z" : @(t_.z)                          },
-                    @"r" : @{           @"x" : @(eu_.x),    @"y" : @(eu_.y),    @"z" : @(eu_.z),    @"w" : @(0)         },
-                    @"scale" : @{       @"x" : @(scale_.x), @"y" : @(scale_.y), @"z" : @(scale_.z)                      }   }
-        ];
-        return _dict;
-}
+//NSMutableDictionary * toDict(metaio::Vector3d t_, metaio::Vector3d eu_, metaio::Vector3d scale_)
+//{
+//    NSMutableDictionary * _dict = [[NSMutableDictionary alloc] initWithDictionary:
+//                @{  @"t" : @{           @"x" : @(t_.x),     @"y" : @(t_.y),     @"z" : @(t_.z)                          },
+//                    @"r" : @{           @"x" : @(eu_.x),    @"y" : @(eu_.y),    @"z" : @(eu_.z),    @"w" : @(0)         },
+//                    @"scale" : @{       @"x" : @(scale_.x), @"y" : @(scale_.y), @"z" : @(scale_.z)                      }   }
+//        ];
+//        return _dict;
+//}
 
 /********/
 

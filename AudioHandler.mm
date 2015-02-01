@@ -22,11 +22,11 @@ void AudioHandler::init(AEAudioController* ac_)
     this->audio_controller = ac_;
     
     NSString * path = [[NSBundle mainBundle] pathForResource:@"Assets/sound/pain" ofType:@"mp3"];
-    this->so.t = metaio::Vector3d(-800, 0, 0);
+    this->so.t = metaio::Vector3d(-200, 0, 200);
     so.init("one", path, this->audio_controller);
     
     NSString * path1 = [[NSBundle mainBundle] pathForResource:@"Assets/sound/success" ofType:@"mp3"];
-    this->so1.t = metaio::Vector3d(800, 0, 0);
+    this->so1.t = metaio::Vector3d(300, 0, 200);
     so1.init("two", path1, this->audio_controller);
     
     is_init = true;
@@ -50,7 +50,6 @@ void AudioHandler::setPan(metaio::Vector3d t_, metaio::Rotation r_)
 {
         so.setPan(t_, r_);
         so1.setPan(t_, r_);
-
 }
 
 void AudioHandler::printInfo(AEChannelGroupRef group_)
