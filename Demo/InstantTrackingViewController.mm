@@ -201,7 +201,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     debugViewIsInit = false; //initialized when web view loads
     
     showDebugView = true; //debug view shows on launch
-    debugHandler.print = showDebugView;
+    debugHandler.show = showDebugView;
     
     //should the loop update metaio?
     updateMetaio = true;
@@ -446,9 +446,9 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 #pragma mark - Button handlers
 
 - (IBAction)onDebugDown:(id)sender {
-    [self.webView setHidden:![self.webView isHidden] ];
+    //[self.webView setHidden:![self.webView isHidden] ];
     showDebugView = !showDebugView;
-    debugHandler.print = showDebugView;
+    debugHandler.show = showDebugView;
 }
 
 - (IBAction)onPrintDown:(id)sender {

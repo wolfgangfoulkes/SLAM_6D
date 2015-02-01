@@ -7,7 +7,7 @@ DebugHandler::DebugHandler()
 {
     jsIsInit = false;
     jsIsReady = false;
-    print = false;
+    this->show = false;
     printLog = false;
     
     pose = nil;
@@ -50,15 +50,29 @@ void DebugHandler::update()
         return;
     }
     
-    if (!pose || !this->print)
+    if (!this->pose)
     {
         return;
     }
     
-    ctx[@"printToScreen"] = @(this->print);
-    
     this->getJS();
     
+    ctx[@"printToScreen"] = @(this->show);
+    if (this->show)
+    {
+        this->updateReadout();
+    }
+    
+    this->updateGL();
+    
+    if (printLog)
+    {
+        ctx[@"log"] = this->log;
+    }
+}
+
+void DebugHandler::updateReadout()
+{
     metaio::Vector3d SCALE(X_COEFF, Y_COEFF, Z_COEFF);
     
     metaio::Vector3d _offs = metaio::Vector3d(this->pose->t_offs); _offs = round(_offs, SIG_FIGS);  _offs = scale(_offs, SCALE);
@@ -87,13 +101,6 @@ void DebugHandler::update()
     
     ctx[@"COS"][@"idx"] = @(COS); //@(this->pose->COS);
     ctx[@"COS"][@"state"] = [NSString stringWithFormat:@"%s", tracking_state.c_str()];
-    
-    this->updateGL();
-    
-    if (printLog)
-    {
-        ctx[@"log"] = this->log;
-    }
 }
 
 void DebugHandler::initGL()

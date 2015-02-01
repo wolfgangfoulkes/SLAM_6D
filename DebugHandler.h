@@ -54,7 +54,7 @@ public:
     
     bool jsIsInit;
     bool jsIsReady;
-    bool print;
+    bool show;
     bool printLog;
     
     DebugHandler();
@@ -63,6 +63,7 @@ public:
     void initJS(JSContext * ctx);
     void getJS();
     void updatePose(NSString * pose_, metaio::Vector3d t_, metaio::Rotation r_);
+    void updateReadout();
     
     void setPose();
     

@@ -42,6 +42,8 @@ scale_xy = 1.0;
 
 update = function()
 {
+    $(".debug").toggleClass("hidden", !printToScreen);
+    if (!printToScreen) {return;}
     setXY();
     setReadout();
 }
@@ -76,7 +78,6 @@ setXYItem = function(name, x_, y_, angle_)
 
 setReadout = function()
 {
-    if (!printToScreen) {return;}
     printPose(".cam", c);
     printPose(".obj", o);
     printPose(".init", init)
