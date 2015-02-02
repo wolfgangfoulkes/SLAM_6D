@@ -158,6 +158,12 @@ void matToP(cv::Mat mat_, metaio::Vector3d& _p)
     _p.y = mat_.at<float>(1, 0);
     _p.z = mat_.at<float>(2, 0);
 }
+/***** metaio *****/
+
+bool operator== (const metaio::Rotation& left_, const metaio::Rotation& right_)
+{
+    return (left_.getAngleToRotation(right_) == 0.0);
+}
 
 /***** C++ -> JS *****/
 

@@ -16,6 +16,7 @@
 		9844D1571A753A4E00272500 /* SoundObject.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9844D1551A753A4E00272500 /* SoundObject.mm */; };
 		9844D15A1A753A9E00272500 /* AudioChannel.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9844D1581A753A9E00272500 /* AudioChannel.mm */; };
 		984660A41A48D36E002818C5 /* DebugHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = 984660A21A48D36E002818C5 /* DebugHandler.mm */; };
+		9854D3831A7F4A8600E22EBA /* Position.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9854D3811A7F4A8600E22EBA /* Position.mm */; };
 		9860DC251A1A7236005626C0 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9860DC241A1A7236005626C0 /* Accelerate.framework */; };
 		9860DC271A1A7271005626C0 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9860DC261A1A7271005626C0 /* GLKit.framework */; };
 		9860DC281A1A72E5005626C0 /* metaioSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 986917CE1A08C72F00508D34 /* metaioSDK.framework */; };
@@ -106,6 +107,8 @@
 		9844D1591A753A9E00272500 /* AudioChannel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioChannel.h; sourceTree = "<group>"; };
 		984660A21A48D36E002818C5 /* DebugHandler.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = DebugHandler.mm; sourceTree = "<group>"; };
 		984660A31A48D36E002818C5 /* DebugHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugHandler.h; sourceTree = "<group>"; };
+		9854D3811A7F4A8600E22EBA /* Position.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Position.mm; sourceTree = "<group>"; };
+		9854D3821A7F4A8600E22EBA /* Position.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Position.h; sourceTree = "<group>"; };
 		9860DC241A1A7236005626C0 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		9860DC261A1A7271005626C0 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		9860DC291A1A865C005626C0 /* EventKitUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKitUI.framework; path = System/Library/Frameworks/EventKitUI.framework; sourceTree = SDKROOT; };
@@ -232,6 +235,8 @@
 				9844D12B1A74D2AC00272500 /* TheAmazingAudioEngine.xcodeproj */,
 				989513EA1A73860D0006F969 /* AudioHandler.mm */,
 				989513EB1A73860D0006F969 /* AudioHandler.h */,
+				9854D3811A7F4A8600E22EBA /* Position.mm */,
+				9854D3821A7F4A8600E22EBA /* Position.h */,
 				9844D1551A753A4E00272500 /* SoundObject.mm */,
 				9844D1561A753A4E00272500 /* SoundObject.h */,
 				9844D1581A753A9E00272500 /* AudioChannel.mm */,
@@ -463,6 +468,7 @@
 				984660A41A48D36E002818C5 /* DebugHandler.mm in Sources */,
 				7CCB429D19582BAE007355FA /* InstantTrackingViewController.mm in Sources */,
 				989977A61A1DFB31000AB036 /* common.mm in Sources */,
+				9854D3831A7F4A8600E22EBA /* Position.mm in Sources */,
 				9899779D1A1D9B11000AB036 /* Pose.mm in Sources */,
 				989977A81A1DFE26000AB036 /* main.mm in Sources */,
 				9844D1571A753A4E00272500 /* SoundObject.mm in Sources */,

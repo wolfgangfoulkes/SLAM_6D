@@ -106,26 +106,8 @@ void DebugHandler::updateReadout()
 void DebugHandler::initGL()
 {
     JSValue * display_init = ctx[@"display"][@"init"];
+    
     [display_init callWithArguments:@[]];
-    this->addOBJ(
-        @"head1",
-        @"../../Assets/obj/head.obj",
-        @"../../Assets/images/head.png",
-        metaio::Vector3d(0, 0, 0),
-        metaio::Rotation(0, 0, 0),
-        3.0);
-    this->addOBJ(
-        @"head2",
-        @"../../Assets/obj/head.obj",
-        metaio::Vector3d(-400 * SCALE_COEFF, 25 * SCALE_COEFF, 200 * SCALE_COEFF),
-        metaio::Rotation(0, 0, 0),
-        3.0);
-    this->addOBJ(
-        @"head3",
-        @"../../Assets/obj/head.obj",
-        metaio::Vector3d(300 * SCALE_COEFF, 25 * SCALE_COEFF, 200 * SCALE_COEFF),
-        metaio::Rotation(0, 0, 0),
-        3.0);
     
     ctx[@"display"][@"draw_axes"] = @(DRAW_AXES);
 }
@@ -206,6 +188,9 @@ void DebugHandler::setPose()
 void DebugHandler::addOBJ(NSString * name_, NSString * obj_path_, metaio::Vector3d t_, metaio::Rotation r_, float scale_)
 {
     Object3D * obj = new Object3D();
+    t_.x *= SCALE_COEFF;
+    t_.y *= SCALE_COEFF;
+    t_.z *= SCALE_COEFF;
     obj->init(name_.UTF8String, obj_path_.UTF8String, t_, r_, scale_);
     this->things.push_back(obj);
     

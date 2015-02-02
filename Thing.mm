@@ -14,6 +14,7 @@ Thing::Thing()
     this->name = "undefined";
     this->is_loaded = false;
     this->is_init = false;
+    this->scale = 1.0;
 }
 
 void Thing::init()

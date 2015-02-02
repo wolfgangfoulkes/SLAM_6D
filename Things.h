@@ -14,7 +14,6 @@ class Object3D : public Thing
 {
     public:
     std::string path;
-    float scale;
     bool is_render;
     
     Object3D();

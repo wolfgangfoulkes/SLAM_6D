@@ -18,7 +18,7 @@
     DebugHandler debugHandler;
     AudioHandler audio_handler;
     
-    NSMutableArray * ma_log;
+    NSMutableArray * log;
     JSContext * ctx;
 
     int                 m_frames;
@@ -34,6 +34,7 @@
     bool hasTracking;
     bool isTracking;
     bool debugViewIsInit;
+    bool displayHasObjects;
     bool showDebugView;
     bool updateMetaio;
     
@@ -47,6 +48,8 @@
 @property (nonatomic, retain) IBOutlet UIButton *debugPrintButton;
 
 - (void)initAudio;
+
+- (void)initDisplay;
 
 - (IBAction)onDebugDown:(id)sender;
 

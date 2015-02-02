@@ -66,6 +66,11 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     {
         return;
     }
+    
+    if (!displayHasObjects)
+    {
+        [self initDisplay];
+    }
 
     [self updateTrackingState];
     if (updateMetaio && activeCOS)
@@ -85,7 +90,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         if (cam.COS && (activeCOS != cam.COS)) //if the pose has tracked a COS, and the COS has changed
         {
             cam.setOffs(tv);
-            logMA([NSString stringWithFormat:@"lastCOS: %d, activeCOS: %d, cam.COS: %d", lastCOS, activeCOS, cam.COS], ma_log);
+            logMA([NSString stringWithFormat:@"lastCOS: %d, activeCOS: %d, cam.COS: %d", lastCOS, activeCOS, cam.COS], log);
         }
         
         cam.updateP(tv);
@@ -95,7 +100,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
             hasTracking = true;
         }
         
-        self->audio_handler.setPan(cam.t_last, cam.r_last);
+        self->audio_handler.setListener(cam.t_last, cam.r_last);
 //        self->debugHandler.o_t = self->audio_handler.so.t;
         self->debugHandler.o_t = metaio::Vector3d(-300, 0, -500);
     }
@@ -115,7 +120,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
         if (cos1.isTrackingState()) {activeCOS_ = 1;}
         else if (cos2.isTrackingState()) {activeCOS_ = 2;}
         else {
-            //logMA(@"unknownCOS", ma_log);
+            //logMA(@"unknownCOS", log);
         }
         metaio::TrackingValues tv = m_metaioSDK->getTrackingValues(activeCOS);
         state = tv.trackingStateToString(tv.state);
@@ -129,7 +134,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     {
         //NSString * _fmt = @"changing COS: %d=>%d";
         //NSString * _s = [NSString stringWithFormat:_fmt, activeCOS, activeCOS_];
-        //logMA(_s, ma_log);
+        //logMA(_s, log);
     }
     
     lastCOS = activeCOS;
@@ -157,6 +162,31 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     tv_.rotation = tv_.rotation * offs_r;
 }
 
+- (void) initDisplay
+{
+    self->debugHandler.addOBJ(
+        @"head1",
+        @"../../Assets/obj/head.obj",
+        @"../../Assets/images/head.png",
+        metaio::Vector3d(0, 0, 0),
+        metaio::Rotation(0, 0, 0),
+        3.0);
+    self->debugHandler.addOBJ(
+        @"head2",
+        @"../../Assets/obj/head.obj",
+        metaio::Vector3d(-200, 25, 200),
+        metaio::Rotation(0, 0, 0),
+        3.0);
+    self->debugHandler.addOBJ(
+        @"head3",
+        @"../../Assets/obj/head.obj",
+        metaio::Vector3d(300, 25, 200),
+        metaio::Rotation(0, 0, 0),
+        3.0);
+    
+    displayHasObjects = true;
+}
+
 - (void) initAudio
 {
     //create audio controller
@@ -164,6 +194,33 @@ int printf(const char * __restrict format, ...) //printf don't print to console
                            initWithAudioDescription:[AEAudioController nonInterleaved16BitStereoAudioDescription]
                                inputEnabled:NO];
     self->audio_handler.init(self.audioController);
+    if (!self->audio_handler.is_init)
+    {
+        NSLog(@"---RUN--error: audio handler failed to initialize!");
+    }
+    self->audio_handler.log = log;
+    
+    bool added = false;
+    NSString * path1 = [[NSBundle mainBundle] pathForResource:@"Assets/sound/pain" ofType:@"mp3"];
+    NSString * path2 = [[NSBundle mainBundle] pathForResource:@"Assets/sound/success" ofType:@"mp3"];
+    added = audio_handler.add("head2", path1, metaio::Vector3d(-200, 0, 200));
+    //NSLog((added) ? @"first: success!" : @"error: adding first");
+    added = audio_handler.add("head3", path2, metaio::Vector3d(300, 0, 200));
+    //NSLog((added) ? @"second: success!" : @"error: adding second");
+    
+//    added = audio_handler.has("head2");
+//    if (added)
+//    {
+//        SoundObject& so = audio_handler.get("head2");
+//        NSLog(@"added %s to audio: (%f, %f, %f)", so.name.c_str(), so.t.x, so.t.y, so.t.z);
+//    }
+//    added = audio_handler.has("head3");
+//    if (added)
+//    {
+//        SoundObject& so = audio_handler.get("head3");
+//        
+//        NSLog(@"added %s to audio: (%f, %f, %f)", so.name.c_str(), so.t.x, so.t.y, so.t.z);
+//    }
 }
 
 #pragma mark - UIView(s)Controller lifecycle
@@ -194,11 +251,12 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     isTracking = hasTracking = false;
     
     //shared debug log
-    ma_log = [[NSMutableArray alloc] init];
-    cam.ma_log = ma_log; //be careful, you gotta initialize this with every instance!
-    debugHandler.log = ma_log;
+    log = [[NSMutableArray alloc] init];
+    cam.ma_log = log; //be careful, you gotta initialize this with every instance!
+    debugHandler.log = log;
     debugHandler.pose = &cam;
     debugViewIsInit = false; //initialized when web view loads
+    displayHasObjects = false;
     
     showDebugView = true; //debug view shows on launch
     debugHandler.show = showDebugView;
@@ -309,12 +367,12 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 {
     if (poses.empty())
     {
-        logMA(@"poses is empty", ma_log);
+        logMA(@"poses is empty", log);
 		return;
     }
     
     string _state = poses[0].trackingStateToString(poses[0].state);
-    logMA([NSString stringWithFormat:@"tracking event: %s", _state.c_str()], ma_log);
+    logMA([NSString stringWithFormat:@"tracking event: %s", _state.c_str()], log);
     [self updateTrackingState];
     
     if (poses[0].state == metaio::ETS_LOST)
@@ -338,7 +396,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 	{
 		NSLog(@"SLAM has timed out!");
 	}
-    logMA(@"\ninstant tracking!1!?\n", ma_log);
+    logMA(@"\ninstant tracking!1!?\n", log);
 	
 }
 
@@ -376,7 +434,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
 //        metaio::TrackingValues offs;
 //        metaio::Vector3d offs_euler(90.0, 0.0, 0.0);
 //        offs.rotation.setFromEulerAngleDegrees(offs_euler);
-//        logMA([NSString stringWithFormat:@"defined: %d", COSs], ma_log);
+//        logMA([NSString stringWithFormat:@"defined: %d", COSs], log);
 //        for (int i = 0; i < COSs; i++)
 //        {
 //            m_metaioSDK->setCosOffset(i+1, offs);
@@ -385,7 +443,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     else
     {
         NSLog(@"No success loading the tracking configuration");
-        logMA(@"No success loading the tracking configuration", ma_log);
+        logMA(@"No success loading the tracking configuration", log);
     }
     
 }
@@ -457,7 +515,7 @@ int printf(const char * __restrict format, ...) //printf don't print to console
     tRToS(cam.t_last, cam.r_last).c_str(),
     tRToS(cam.t_p, cam.r_p).c_str(),
     tRToS(cam.t_offs, cam.r_offs).c_str()],
-    ma_log);
+    log);
 }
 
 # pragma mark - JS Debug

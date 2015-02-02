@@ -11,11 +11,14 @@
 
 #import <AudioToolbox/AudioToolbox.h>
 #import "TheAmazingAudioEngine.h"
+#import "Position.h"
 #import "Thing.h"
 
 class SoundObject : public Thing
 {
     public:
+    NSMutableArray * log; //be careful, you gotta initialize this with every instance!
+    
     NSString * path;
     AEChannelGroupRef channel_group;
     AEAudioUnitFilter *au_3DMixer;
@@ -32,7 +35,8 @@ class SoundObject : public Thing
     void update();
     void render();
     
-    void setPan(metaio::Vector3d t_, metaio::Rotation r_);
+    void setListener(metaio::Vector3d t_, metaio::Rotation r_);
+    void setListener(Position p_);
     
     void printProperty();
     void printProperties();

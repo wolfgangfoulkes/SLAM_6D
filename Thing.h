@@ -9,7 +9,7 @@
 #ifndef __Demo__Thing__
 #define __Demo__Thing__
 
-#import "Pose.h"
+#import "common.h"
 
 class Thing
 {
@@ -19,6 +19,7 @@ class Thing
     //int COS;
     metaio::Vector3d t;
     metaio::Rotation r;
+    float scale;
     bool is_loaded;
     bool is_init;
     

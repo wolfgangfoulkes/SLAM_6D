@@ -37,6 +37,8 @@ void matToP(cv::Mat mat_, cv::Vec4f& _p);
 void matToP(cv::Mat mat_, metaio::Vector4d& _p);
 void matToP(cv::Mat mat_, metaio::Vector3d& _p);
 
+bool operator== (const metaio::Rotation& left_, const metaio::Rotation& right_);
+
 NSMutableDictionary * toDict(metaio::Vector3d t_ = metaio::Vector3d(0, 0, 0), metaio::Rotation r_ = metaio::Rotation(0, 0, 0), metaio::Vector3d scale_ = metaio::Vector3d(0, 0, 0));
 NSMutableDictionary * toDict(metaio::Vector3d t_ = metaio::Vector3d(0, 0, 0), metaio::Vector4d qu_ = metaio::Vector4d(0, 0, 0, 0), metaio::Vector3d scale_ = metaio::Vector3d(0, 0, 0));
 //NSMutableDictionary * toDict(metaio::Vector3d t_ = metaio::Vector3d(0, 0, 0), metaio::Vector3d eu_ = metaio::Vector3d(0, 0, 0), metaio::Vector3d scale_ = metaio::Vector3d(0, 0, 0));

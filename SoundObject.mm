@@ -150,12 +150,12 @@ void SoundObject::render()
 {
 }
 
-bool operator== (const SoundObject& left_, const SoundObject& right_)
-{
-    return ((left_.type == right_.type) && (left_.name == right_.name));
-}
+//bool operator== (const SoundObject& left_, const SoundObject& right_)
+//{
+//    return ((left_.type == right_.type) && (left_.name == right_.name));
+//}
 
-void SoundObject::setPan(metaio::Vector3d t_, metaio::Rotation r_)
+void SoundObject::setListener(metaio::Vector3d t_, metaio::Rotation r_)
 {
     metaio::Vector3d t_adj = r_.rotatePoint(this->t) + t_; //this or r.inverse, dunno which
     //rotation is correct, translation seems mostly correct, but maybe buggy
@@ -182,7 +182,38 @@ void SoundObject::setPan(metaio::Vector3d t_, metaio::Rotation r_)
                     k3DMixerParam_Distance,
                     kAudioUnitScope_Input, //kAudioUnitScope_Input
                     0,
-                    distance * 0.01,
+                    distance * this->scale,
+                    0);
+}
+
+void SoundObject::setListener(Position p_)
+{
+    metaio::Vector3d t_adj = p_.r.rotatePoint(this->t) + p_.t; //this or r.inverse, dunno which
+    //rotation is correct, translation seems mostly correct, but maybe buggy
+    
+    double azimuth = 0;
+    double elevation = 0;
+    double distance = 0;
+    
+    cartesianToSpherical(t_adj, p_.r, azimuth, elevation, distance);
+    
+    AudioUnitSetParameter(  this->au_3DMixer.audioUnit,
+                    k3DMixerParam_Azimuth,
+                    kAudioUnitScope_Input, //kAudioUnitScope_Input
+                    0,
+                    azimuth,
+                    0);
+    AudioUnitSetParameter(  this->au_3DMixer.audioUnit,
+                    k3DMixerParam_Elevation,
+                    kAudioUnitScope_Input, //kAudioUnitScope_Input
+                    0,
+                    elevation,
+                    0);
+    AudioUnitSetParameter(  this->au_3DMixer.audioUnit,
+                    k3DMixerParam_Distance,
+                    kAudioUnitScope_Input, //kAudioUnitScope_Input
+                    0,
+                    distance * this->scale,
                     0);
 }
 
