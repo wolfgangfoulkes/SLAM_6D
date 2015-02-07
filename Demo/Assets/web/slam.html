@@ -5,23 +5,29 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
         
         <link rel="stylesheet" href="js/libs/jquery-ui.min.css">
+        <link rel="stylesheet" type="text/css" href="slam.css">
+        
         <script src="js/libs/jquery-1.11.1.min.js" type="text/javascript"></script>
         <script src="js/libs/jquery-ui.min.js" type="text/javascript"></script>
         <script src="js/libs/jquery.mobile-1.4.5.min.js" type="text/javascript"></script>
-        
-		<link rel="stylesheet" type="text/css" href="slam.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/threejs/r69/three.min.js" type="text/javascript"></script>
+        <script src="js/libs/three/OBJLoader.js" type="text/javascript"></script>
+
+
 
 	</head>
 	<body>
+        <div class="display">
+        </div>
         
-        <div class="readout">
+        <div class="readout debug">
             <div class="controls">
                 <div class="button panel">panel</div>
                 <div class="button printLog">print log</div>
                 <div class="button setP">set</div>
                 <div class="button setPInit">init</div>
-                <div class="button rLeft">r--</div>
-                <div class="button rRight">r++</div>
+                <div class="button rLeft">--</div>
+                <div class="button rRight">++</div>
             </div>
             <div class="pose cam">
                 camera:
@@ -154,10 +160,14 @@
                 <div class="idx">0</div>
                 <div class="state">0</div>
             </div>
+            <div class="scale"> scale: (coordinates, objects)
+                <div class="coordinates">0</div>
+                <div class="objects">0</div>
+            </div>
             <div class="log hidden"></div>
         </div>
 
-        <div id="xy-outer">
+        <div id="xy-outer" class="debug">
             <div id="xy-inner">
                 <div class="axes"> </div>
                 <div class="axes init"> </div>
@@ -172,5 +182,6 @@
     
     <footer>
         <script type="text/javascript" src="js/slam_debug.js"></script>
+        <script type="text/javascript" src="js/slam_display.js"></script>
     </footer>
 </html>

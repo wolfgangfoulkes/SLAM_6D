@@ -9,28 +9,20 @@
 #import "MetaioSDKViewController.h"
 
 #import "DebugHandler.h"
-#import "CompSixAxis.h"
+#import "AudioHandler.h"
+
+@class AEAudioController;
 
 @interface InstantTrackingViewController : MetaioSDKViewController <UIWebViewDelegate>
 {
     DebugHandler debugHandler;
+    AudioHandler audio_handler;
     
-    NSMutableArray * ma_log;
+    NSMutableArray * log;
     JSContext * ctx;
 
     int                 m_frames;
     NSDate              *elapsed;
-    
-    CompSixAxis comp_filter;
-    
-    metaio::IGeometry*  m_obj;            // pointer to the model
-    metaio::IGeometry*  m_obj1;           // pointer to the model
-    metaio::Vector3d    m_obj_t;
-    metaio::Vector3d    m_obj1_t;
-    metaio::Rotation    m_obj_r;
-    metaio::Rotation    m_obj1_r;
-    NSInteger           m_scale;
-    NSInteger           m_scale1;
     
     Pose cam;
     
@@ -42,6 +34,7 @@
     bool hasTracking;
     bool isTracking;
     bool debugViewIsInit;
+    bool displayHasObjects;
     bool showDebugView;
     bool updateMetaio;
     
@@ -54,6 +47,9 @@
 @property (nonatomic, retain) IBOutlet UIButton *debugViewToggle;
 @property (nonatomic, retain) IBOutlet UIButton *debugPrintButton;
 
+- (void)initAudio;
+
+- (void)initDisplay;
 
 - (IBAction)onDebugDown:(id)sender;
 
@@ -70,9 +66,6 @@
 
 - (void) loadDebugView;
 - (void) initDebugView;
-
-- (metaio::Vector3d) compFilterAcc: (metaio::Vector3d)acc_ andRVel: (metaio::Vector3d)r_vel_;
-
 
 //- (void)addPose: (int)name ToDebugContextT: (metaio::Vector4d)obj_t andR:(metaio::Rotation)obj_r;
 

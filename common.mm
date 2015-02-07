@@ -21,6 +21,8 @@ using namespace std;
 #define HALF_PI                         1.5707963f
 #define TWO_PI                          6.2831853f
 
+/***** OPENCV *****/
+
 void matToArray(cv::Mat m_, float * _m) //works with vectors too, if you pass in &vec[0]
 {
     cv::Mat m(m_.rows, m_.cols, CV_32F, _m);
@@ -156,6 +158,47 @@ void matToP(cv::Mat mat_, metaio::Vector3d& _p)
     _p.y = mat_.at<float>(1, 0);
     _p.z = mat_.at<float>(2, 0);
 }
+/***** metaio *****/
+
+bool operator== (const metaio::Rotation& left_, const metaio::Rotation& right_)
+{
+    return (left_.getAngleToRotation(right_) == 0.0);
+}
+
+/***** C++ -> JS *****/
+
+NSMutableDictionary * toDict(metaio::Vector3d t_, metaio::Rotation r_, metaio::Vector3d scale_)
+{
+    metaio::Vector4d qu_ = r_.getQuaternion();
+    NSMutableDictionary * _dict = [[NSMutableDictionary alloc] initWithDictionary:
+                @{  @"t" : @{           @"x" : @(t_.x),     @"y" : @(t_.y),     @"z" : @(t_.z)                          },
+                    @"r" : @{           @"x" : @(qu_.x),    @"y" : @(qu_.y),    @"z" : @(qu_.z),    @"w" : @(qu_.w)     },
+                    @"scale" : @{       @"x" : @(scale_.x), @"y" : @(scale_.y), @"z" : @(scale_.z)                      }   }
+        ];
+        return _dict;
+}
+
+NSMutableDictionary * toDict(metaio::Vector3d t_, metaio::Vector4d qu_, metaio::Vector3d scale_)
+{
+    NSMutableDictionary * _dict = [[NSMutableDictionary alloc] initWithDictionary:
+                @{  @"t" : @{           @"x" : @(t_.x),     @"y" : @(t_.y),     @"z" : @(t_.z)                          },
+                    @"r" : @{           @"x" : @(qu_.x),    @"y" : @(qu_.y),    @"z" : @(qu_.z),    @"w" : @(qu_.w)     },
+                    @"scale" : @{       @"x" : @(scale_.x), @"y" : @(scale_.y), @"z" : @(scale_.z)                      }   }
+        ];
+        return _dict;
+}
+
+//NSMutableDictionary * toDict(metaio::Vector3d t_, metaio::Vector3d eu_, metaio::Vector3d scale_)
+//{
+//    NSMutableDictionary * _dict = [[NSMutableDictionary alloc] initWithDictionary:
+//                @{  @"t" : @{           @"x" : @(t_.x),     @"y" : @(t_.y),     @"z" : @(t_.z)                          },
+//                    @"r" : @{           @"x" : @(eu_.x),    @"y" : @(eu_.y),    @"z" : @(eu_.z),    @"w" : @(0)         },
+//                    @"scale" : @{       @"x" : @(scale_.x), @"y" : @(scale_.y), @"z" : @(scale_.z)                      }   }
+//        ];
+//        return _dict;
+//}
+
+/********/
 
 metaio::TrackingValues toTrackingValues(metaio::Rotation r_, metaio::Vector3d t_)
 {
@@ -174,6 +217,8 @@ metaio::TrackingValues toTrackingValues(cv::Mat r_, cv::Mat t_)
     metaio::TrackingValues _tv = metaio::TrackingValues(toTrackingValues(r, t));
     return _tv;
 }
+
+/***** MATH ******/
 
 metaio::Vector3d mult(metaio::Vector3d v_, float f_)
 {
@@ -215,15 +260,24 @@ metaio::Rotation calcCOSROffset(metaio::Rotation r_, metaio::Rotation r_last_)
     return _r;
 }
 
+float distance(metaio::Vector3d v_)
+{
+    return sqrt(v_.x * v_.x +
+                v_.y * v_.y +
+                v_.z * v_.z);
+}
+
 void calcCOSOffset(metaio::Vector3d t_, metaio::Rotation r_, metaio::Vector3d t_last_, metaio::Rotation r_last_, metaio::Vector3d& _t, metaio::Rotation& _r)
 {
     _t = calcCOSTOffset(t_, t_last_, r_);
     _r = calcCOSROffset(r_, r_last_);
 }
 
+/***** DEBUG *****/
+
 void logMA(NSString * s_, NSMutableArray * ma_)
 {
-    if (ma_.count >= 200)
+    if (ma_.count >= 50)
     {
         [ma_ removeObjectAtIndex:0];
         //[ma_ removeObjectsInRange:{0, 10}]; //put this in debugHandler
@@ -233,7 +287,7 @@ void logMA(NSString * s_, NSMutableArray * ma_)
 
 void logMA(std::string s_, NSMutableArray * ma_)
 {
-    if (ma_.count >= 200)
+    if (ma_.count >= 50)
     {
         [ma_ removeObjectAtIndex:0];
         //[ma_ removeObjectsInRange:{0, 10}]; //put this in debugHandler
@@ -259,6 +313,8 @@ void logTR(metaio::Rotation r_, metaio::Vector3d t_)
 {
     NSLog([NSString stringWithUTF8String:tRToS(t_, r_).c_str()]);
 }
+
+/***** MISC *****/
 
 metaio::Vector3d loPassXYZ(metaio::Vector3d v0_, metaio::Vector3d v1_)
 {
@@ -289,4 +345,10 @@ std::string tRToS(metaio::Vector3d t_, metaio::Rotation r_)
     return _ss.str();
 }
 
+void cartesianToSpherical(metaio::Vector3d t_, metaio::Rotation r_, double& _azimuth, double& _elevation, double& _distance)
+{
+    _distance = distance(t_);
+    _azimuth = rToD( atan2(t_.x, t_.z) ); //atan2(a, b) = atan( a/b ) with the correct quadrant
+    _elevation = 90.0 - rToD( acos( t_.y / _distance ) ); //elevation is expressed -90 -> 0 -> 90
+}
 

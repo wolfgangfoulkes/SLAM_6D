@@ -9,23 +9,28 @@
 #ifndef __Demo__Thing__
 #define __Demo__Thing__
 
-#import "Pose.h"
+#import "common.h"
 
 class Thing
 {
     public:
-    Pose pose;
+    std::string name;
+    std::string type;
     //int COS;
     metaio::Vector3d t;
     metaio::Rotation r;
+    float scale;
+    bool is_loaded;
     bool is_init;
     
     Thing();
-    Thing(metaio::Vector3d t_, metaio::Rotation r_);
     
+    virtual void load();
     virtual void init(); //load content
     virtual void update();
     virtual void render();
+    
+    friend bool operator== (const Thing& left_, const Thing& right_);
 };
 
 #endif /* defined(__Demo__Thing__) */

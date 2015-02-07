@@ -41,6 +41,22 @@ body.phone .button {
     height: 10vh:
 }
 
+.display {
+    z-index: 0;
+}
+
+.readout {
+    z-index: 1;
+}
+
+.display {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
 .readout {
     position: absolute;
     bottom: 0;
@@ -48,6 +64,7 @@ body.phone .button {
     top: 0;
     width: 50vw;
     visibility: transparent;
+    background: none;
 }
 
 .log {

@@ -13,6 +13,11 @@
 #import <opencv2/opencv.hpp>
 #import <metaioSDK/IMetaioSDKIOS.h>
 
+/** Degrees to Radian **/
+#define dToR( degrees ) ( ( degrees ) / 180.0 * M_PI )
+
+/** Radians to Degrees **/
+#define rToD( radians ) ( ( radians ) * ( 180.0 / M_PI ) )
 
 /*untested unless mentioned*/
 void matToArray(cv::Mat m_, float * _m);
@@ -32,6 +37,12 @@ void matToP(cv::Mat mat_, cv::Vec4f& _p);
 void matToP(cv::Mat mat_, metaio::Vector4d& _p);
 void matToP(cv::Mat mat_, metaio::Vector3d& _p);
 
+bool operator== (const metaio::Rotation& left_, const metaio::Rotation& right_);
+
+NSMutableDictionary * toDict(metaio::Vector3d t_ = metaio::Vector3d(0, 0, 0), metaio::Rotation r_ = metaio::Rotation(0, 0, 0), metaio::Vector3d scale_ = metaio::Vector3d(0, 0, 0));
+NSMutableDictionary * toDict(metaio::Vector3d t_ = metaio::Vector3d(0, 0, 0), metaio::Vector4d qu_ = metaio::Vector4d(0, 0, 0, 0), metaio::Vector3d scale_ = metaio::Vector3d(0, 0, 0));
+//NSMutableDictionary * toDict(metaio::Vector3d t_ = metaio::Vector3d(0, 0, 0), metaio::Vector3d eu_ = metaio::Vector3d(0, 0, 0), metaio::Vector3d scale_ = metaio::Vector3d(0, 0, 0));
+
 metaio::TrackingValues toTrackingValues(metaio::Rotation r_, metaio::Vector3d t_);
 metaio::TrackingValues toTrackingValues(cv::Mat r_, cv::Mat t_);
 
@@ -46,10 +57,14 @@ void logTR(metaio::Rotation r_ = metaio::Rotation(0, 0, 0), metaio::Vector3d t_ 
 metaio::Vector3d mult(metaio::Vector3d v_, float f_);
 metaio::Vector3d round(metaio::Vector3d v_, float f_);
 metaio::Vector3d scale(metaio::Vector3d v_, metaio::Vector3d scale_);
+float distance(metaio::Vector3d v_);
 
 metaio::Vector3d calcCOSTOffset(metaio::Vector3d t_, metaio::Vector3d t_last_, metaio::Rotation r_);
 metaio::Rotation calcCOSROffset(metaio::Rotation r_, metaio::Rotation r_last_);
 void calcCOSOffset(metaio::Vector3d t_, metaio::Rotation r_, metaio::Vector3d t_last_, metaio::Rotation r_last_, metaio::Vector3d& _t, metaio::Rotation& _r);
+
+void cartesianToSpherical(metaio::Vector3d t_, metaio::Rotation r_, double& _azimuth, double& _elevation, double& _distance);
+//void sphericalToCartesian(double azimuth_, double elevation_, double distance_, metaio::Vector3d& _t, metaio::Rotation& _r);
 
 
 #endif /* defined(__Demo__common__) */

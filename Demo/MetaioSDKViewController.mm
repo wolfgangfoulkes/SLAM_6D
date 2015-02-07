@@ -124,11 +124,13 @@
     metaio::Vector2d screenSize;
     screenSize.x = self.glView.bounds.size.width * scaleFactor;
     screenSize.y = self.glView.bounds.size.height * scaleFactor;
+    
+//     m_metaioSDK->initializeRenderer(screenSize.x, screenSize.y, metaio::getScreenRotationForInterfaceOrientation(self.interfaceOrientation), metaio::ERENDER_SYSTEM_NULL, context);
 
-    m_metaioSDK->initializeRenderer(screenSize.x, screenSize.y, metaio::getScreenRotationForInterfaceOrientation(self.interfaceOrientation), metaio::ERENDER_SYSTEM_OPENGL_ES_2_0, context);
+      m_metaioSDK->initializeRenderer(screenSize.x, screenSize.y, metaio::getScreenRotationForInterfaceOrientation(self.interfaceOrientation), metaio::ERENDER_SYSTEM_OPENGL_ES_2_0, context);
     
     // necessary for requesting screenshots. //metaio 6.0 has changed params on this one
-    //m_metaioSDK->setRendererFrameBuffers([glView getDefaultFrameBuffer], [glView getColorRenderBuffer]);
+    //  m_metaioSDK->setRendererFrameBuffers([glView getDefaultFrameBuffer], [glView getColorRenderBuffer]);
     
     
     // register our callback method for animations

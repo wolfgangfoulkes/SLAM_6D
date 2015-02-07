@@ -123,3 +123,9 @@ xcuserdata
 # UNKNOWN: recommended by others, but I can't discover what these files are
 #
 # ...none. Everything is now explained.:
+
+metaioSDK.framework
+metaioSDK.framework/*
+
+opencv2.framework
+opencv2.framework/*

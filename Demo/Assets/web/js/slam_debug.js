@@ -10,6 +10,8 @@ Pose = function()
 db = new Pose();
 db.t = {x: 0.5, y: 0.5, z: 0.5};
 
+SCALE_COEFF = 0.0;
+
 //set externally
 c = new Pose();
 o = new Pose();
@@ -40,6 +42,8 @@ scale_xy = 1.0;
 
 update = function()
 {
+    $(".debug").toggleClass("hidden", !printToScreen);
+    if (!printToScreen) {return;}
     setXY();
     setReadout();
 }
@@ -74,7 +78,6 @@ setXYItem = function(name, x_, y_, angle_)
 
 setReadout = function()
 {
-    if (!printToScreen) {return;}
     printPose(".cam", c);
     printPose(".obj", o);
     printPose(".init", init)
@@ -86,6 +89,8 @@ setReadout = function()
     var $cos_state = $(".cos .state");
     $cos_idx.text(COS.idx);
     $cos_state.text(COS.state);
+    
+    $(".scale .coordinates").text(SCALE_COEFF.toPrecision(5));
     
     if (print_log)
     {
@@ -197,7 +202,7 @@ jQuery(document).ready(function(){
     {
         if (setP || setPInit)
         {
-            db.r.y = db.r.y - 10;
+            SCALE_COEFF = SCALE_COEFF * (1/1.1);
         }
     });
     
@@ -205,7 +210,7 @@ jQuery(document).ready(function(){
     {
         if (setP || setPInit)
         {
-            db.r.y = db.r.y + 10;
+            SCALE_COEFF = SCALE_COEFF * 1.1;
         }
     });
 
