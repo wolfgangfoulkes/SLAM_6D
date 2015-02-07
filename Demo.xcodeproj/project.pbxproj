@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		013917791A8606420026FE4E /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98BD77281A1139B400CC9EAD /* WebKit.framework */; };
+		0139177A1A8606510026FE4E /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98BD772A1A113A3600CC9EAD /* JavaScriptCore.framework */; };
 		6325D4471638445100BBCF85 /* cancel.png in Resources */ = {isa = PBXBuildFile; fileRef = 6325D4391638445100BBCF85 /* cancel.png */; };
 		6325D44B1638445100BBCF85 /* junaio.png in Resources */ = {isa = PBXBuildFile; fileRef = 6325D43D1638445100BBCF85 /* junaio.png */; };
 		7CCB429C19582BAE007355FA /* InstantTracking.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7CCB429919582BAE007355FA /* InstantTracking.xib */; };
@@ -34,8 +36,6 @@
 		98A012411A1450BC005993B4 /* js in Resources */ = {isa = PBXBuildFile; fileRef = 98A012401A1450BC005993B4 /* js */; };
 		98BD77211A112B6C00CC9EAD /* slam.html in Resources */ = {isa = PBXBuildFile; fileRef = 98BD77201A112B6C00CC9EAD /* slam.html */; };
 		98BD77251A112C2F00CC9EAD /* slam.css in Resources */ = {isa = PBXBuildFile; fileRef = 98BD77241A112C2F00CC9EAD /* slam.css */; };
-		98BD77291A1139B400CC9EAD /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98BD77281A1139B400CC9EAD /* WebKit.framework */; };
-		98BD772B1A113A3600CC9EAD /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98BD772A1A113A3600CC9EAD /* JavaScriptCore.framework */; };
 		98D533D51A07B3CA00E7089D /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = B9BC117115D8FD9B00713ED3 /* libxml2.dylib */; };
 		98DCAC381A4FEA7D00915477 /* CompSixAxis.mm in Sources */ = {isa = PBXBuildFile; fileRef = 98DCAC361A4FEA7D00915477 /* CompSixAxis.mm */; };
 		98E56D401A51E7B300E46F50 /* Thing.mm in Sources */ = {isa = PBXBuildFile; fileRef = 98E56D3E1A51E7B300E46F50 /* Thing.mm */; };
@@ -198,7 +198,7 @@
 				B9BC115215D8FA7B00713ED3 /* Foundation.framework in Frameworks */,
 				9860DC271A1A7271005626C0 /* GLKit.framework in Frameworks */,
 				989977A41A1DFAB8000AB036 /* ImageIO.framework in Frameworks */,
-				98BD772B1A113A3600CC9EAD /* JavaScriptCore.framework in Frameworks */,
+				0139177A1A8606510026FE4E /* JavaScriptCore.framework in Frameworks */,
 				989977AA1A1E0325000AB036 /* libSystem.B.dylib in Frameworks */,
 				9844D1331A74D2CA00272500 /* libTheAmazingAudioEngine.a in Frameworks */,
 				98D533D51A07B3CA00E7089D /* libxml2.dylib in Frameworks */,
@@ -211,7 +211,7 @@
 				B9BC117A15D8FDC900713ED3 /* QuartzCore.framework in Frameworks */,
 				9E62CF7F1732B30300E238F5 /* Security.framework in Frameworks */,
 				B9BC115015D8FA7B00713ED3 /* UIKit.framework in Frameworks */,
-				98BD77291A1139B400CC9EAD /* WebKit.framework in Frameworks */,
+				013917791A8606420026FE4E /* WebKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
